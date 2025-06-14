@@ -5,7 +5,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "master" ]
 
 jobs:
   setup:
