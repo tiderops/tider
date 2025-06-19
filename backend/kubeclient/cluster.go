@@ -3,10 +3,14 @@ package kubeclient
 import (
 	"Kubexplorer/backend/model"
 	"context"
+	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
 )
 
 type cluster struct {
@@ -17,26 +21,100 @@ func NewCluster() ClusterClient {
 	return &cluster{}
 }
 
-func (c *cluster) ListAvailableClusters(profile model.ClusterProfile) ([]model.ClusterInfo, error) {
-	config, err := clientcmd.LoadFromFile(profile.KubeConfigPath)
+func listKubeConfigFiles() ([]string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	kubeDir := filepath.Join(home, ".kube")
+
+	files, err := os.ReadDir(kubeDir)
+	if err != nil {
+		return nil, err
+	}
+
+	var configs []string
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		name := file.Name()
+		if strings.HasSuffix(name, ".yaml") || strings.HasSuffix(name, ".yml") || name == "config" {
+			configs = append(configs, filepath.Join(kubeDir, name))
+		}
+	}
+
+	return configs, nil
+}
+
+func (c *cluster) ListAvailableClusters() ([]model.ClusterInfo, error) {
+	files, err := listKubeConfigFiles()
 	if err != nil {
 		return nil, err
 	}
 
 	var clusters []model.ClusterInfo
 
-	for name, context := range config.Contexts {
-		ci := model.ClusterInfo{
-			Name:      name,
-			Server:    context.Cluster,
-			Current:   false,
-			User:      context.AuthInfo,
-			Namespace: context.Namespace,
+	for _, file := range files {
+		config, err := clientcmd.LoadFromFile(file)
+		if err != nil {
+			fmt.Printf("Skipping file %s: %v", file, err)
 		}
-		clusters = append(clusters, ci)
+
+		for name, ctx := range config.Contexts {
+			clt := config.Clusters[ctx.Cluster]
+			if clt == nil {
+				continue
+			}
+
+			status := checkClusterStatus(file, name)
+			ci := model.ClusterInfo{
+				Name:      name,
+				Cluster:   ctx.Cluster,
+				Server:    clt.Server,
+				User:      ctx.AuthInfo,
+				Namespace: ctx.Namespace,
+				Status:    status,
+				Source:    file,
+			}
+			clusters = append(clusters, ci)
+		}
 	}
 
 	return clusters, nil
+}
+
+func checkClusterStatus(kubeConfigPath string, contextName string) bool {
+	configOverrides := &clientcmd.ConfigOverrides{CurrentContext: contextName}
+	configLoadingRules := &clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeConfigPath}
+	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(configLoadingRules, configOverrides)
+
+	restConfig, err := clientConfig.ClientConfig()
+	if err != nil {
+		return false
+	}
+
+	clientset, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return false
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	done := make(chan bool, 1)
+	go func() {
+		_, err = clientset.Discovery().ServerVersion()
+		done <- err == nil
+	}()
+
+	select {
+	case ok := <-done:
+		return ok
+	case <-ctx.Done():
+		return false
+	}
 }
 
 func (c *cluster) GetCurrentCluster() (model.EnvironmentDto, error) {
@@ -50,53 +128,8 @@ func (c *cluster) GetCurrentCluster() (model.EnvironmentDto, error) {
 	return dto, nil
 }
 
-func (c *cluster) GetClusters() ([]model.EnvironmentDto, error) {
-	return []model.EnvironmentDto{
-		{
-			Name:        "minikube",
-			Description: "minikube description",
-			Env:         "Dev",
-			Status:      true,
-		},
-		{
-			Name:        "minikube-2",
-			Description: "minikube description",
-			Env:         "UAT",
-			Status:      true,
-		},
-		{
-			Name:        "minikube-3",
-			Description: "minikube description",
-			Env:         "PRD",
-			Status:      false,
-		},
-		{
-			Name:        "minikube-4",
-			Description: "minikube description",
-			Env:         "PRD-2",
-			Status:      true,
-		},
-		{
-			Name:        "minikube-5",
-			Description: "minikube description",
-			Env:         "Sandbox",
-			Status:      false,
-		},
-	}, nil
-}
-
 func (c *cluster) GetNode(name string) (model.NodeDtoV2, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	node, err := clientset.CoreV1().Nodes().Get(context.TODO(), name, metav1.GetOptions{})
+	node, err := c.client.CoreV1().Nodes().Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -114,35 +147,29 @@ func (c *cluster) GetNode(name string) (model.NodeDtoV2, error) {
 	}, nil
 }
 
-func (c *cluster) GetNodes() ([]model.NodeDto, error) {
-	return []model.NodeDto{
-		{
-			Name: "node-1",
+func (c *cluster) GetNodes() ([]model.NodeDtoV2, error) {
+	nodes, err := c.client.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var result []model.NodeDtoV2
+
+	for _, node := range nodes.Items {
+		dto := model.NodeDtoV2{
+			Name:      node.Name,
+			Namespace: node.Namespace,
 			Resource: model.Resource{
-				Cpu:    "6Gi",
-				Memory: "20Gi",
+				Cpu:    node.Status.Capacity.Cpu().String(),
+				Memory: node.Status.Capacity.Memory().String(),
 			},
-			Roles: []string{
-				"ADMIN",
-				"GENERAL",
-			},
-			Version: "1.24.0",
-			Age:     "20 day",
-			Status:  true,
-		},
-		{
-			Name: "node-2",
-			Resource: model.Resource{
-				Cpu:    "6Gi",
-				Memory: "20Gi",
-			},
-			Roles: []string{
-				"ADMIN",
-				"GENERAL",
-			},
-			Version: "1.28.0",
-			Age:     "100 day",
-			Status:  true,
-		},
-	}, nil
+			Version:           node.ResourceVersion,
+			CreationTimestamp: node.CreationTimestamp.String(),
+			Labels:            node.Labels,
+		}
+
+		result = append(result, dto)
+	}
+
+	return result, nil
 }

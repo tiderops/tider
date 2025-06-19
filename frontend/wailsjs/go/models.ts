@@ -95,10 +95,12 @@ export namespace model {
 	
 	export class ClusterInfo {
 	    Name: string;
+	    Cluster: string;
 	    Server: string;
-	    Current: boolean;
 	    User: string;
 	    Namespace: string;
+	    Status: boolean;
+	    Source: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ClusterInfo(source);
@@ -107,10 +109,12 @@ export namespace model {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
+	        this.Cluster = source["Cluster"];
 	        this.Server = source["Server"];
-	        this.Current = source["Current"];
 	        this.User = source["User"];
 	        this.Namespace = source["Namespace"];
+	        this.Status = source["Status"];
+	        this.Source = source["Source"];
 	    }
 	}
 	export class ConfigMap {
@@ -426,46 +430,6 @@ export namespace model {
 	        this.Name = source["Name"];
 	        this.PodNames = source["PodNames"];
 	    }
-	}
-	export class NodeDto {
-	    Name: string;
-	    Resource: Resource;
-	    Roles: string[];
-	    Version: string;
-	    Age: string;
-	    Status: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new NodeDto(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Name = source["Name"];
-	        this.Resource = this.convertValues(source["Resource"], Resource);
-	        this.Roles = source["Roles"];
-	        this.Version = source["Version"];
-	        this.Age = source["Age"];
-	        this.Status = source["Status"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
 	}
 	export class NodeDtoV2 {
 	    Name: string;

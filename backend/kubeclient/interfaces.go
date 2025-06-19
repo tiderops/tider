@@ -6,11 +6,10 @@ import (
 )
 
 type ClusterClient interface {
-	ListAvailableClusters(profile model.ClusterProfile) ([]model.ClusterInfo, error)
+	ListAvailableClusters() ([]model.ClusterInfo, error)
 	GetCurrentCluster() (model.EnvironmentDto, error)
-	GetClusters() ([]model.EnvironmentDto, error)
 	GetNode(name string) (model.NodeDtoV2, error)
-	GetNodes() ([]model.NodeDto, error)
+	GetNodes() ([]model.NodeDtoV2, error)
 }
 
 type MetricClient interface {

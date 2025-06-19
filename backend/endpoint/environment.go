@@ -3,7 +3,6 @@ package endpoint
 import (
 	"Kubexplorer/backend/model"
 	"Kubexplorer/backend/usecase"
-	"fmt"
 )
 
 type EnvironmentEndpoint struct {
@@ -14,14 +13,12 @@ func NewEnvironmentEndpoint(useCase usecase.EnvironmentUseCase) *EnvironmentEndp
 	return &EnvironmentEndpoint{useCase: useCase}
 }
 
-func (ee *EnvironmentEndpoint) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
-	return ee.useCase.GetCurrentEnvironment(env, name)
+func (ee *EnvironmentEndpoint) GetClusters() ([]model.ClusterInfo, error) {
+	return ee.useCase.ListAvailableClusters()
 }
 
-func (ee *EnvironmentEndpoint) GetAllEnvironment() ([]model.EnvironmentDto, error) {
-	x, _ := ee.useCase.GetAllEnvironment()
-	fmt.Print("ENV NAME: ", x[2].Name)
-	return ee.useCase.GetAllEnvironment()
+func (ee *EnvironmentEndpoint) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
+	return ee.useCase.GetCurrentEnvironment(env, name)
 }
 
 func (ee *EnvironmentEndpoint) GetObjectsView() (model.ObjectMapDto, error) {

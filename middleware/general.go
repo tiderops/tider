@@ -16,7 +16,7 @@ func NewGeneralMiddleware(endpoint *endpoint.GeneralEndpoint) *GeneralMiddleware
 	return &GeneralMiddleware{endpoint: *endpoint}
 }
 
-func (g *GeneralMiddleware) GetNodes() ([]model.NodeDto, error) {
+func (g *GeneralMiddleware) GetNodes() ([]model.NodeDtoV2, error) {
 	return g.endpoint.GetNodes()
 }
 

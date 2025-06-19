@@ -16,12 +16,12 @@ func NewEnvironmentMiddleware(endpoint *endpoint.EnvironmentEndpoint) *Environme
 	return &EnvironmentMiddleware{endpoint: *endpoint}
 }
 
-func (e *EnvironmentMiddleware) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
-	return e.endpoint.GetCurrentEnvironment(env, name)
+func (e *EnvironmentMiddleware) GetClusters() ([]model.ClusterInfo, error) {
+	return e.endpoint.GetClusters()
 }
 
-func (e *EnvironmentMiddleware) GetAllEnvironment() ([]model.EnvironmentDto, error) {
-	return e.endpoint.GetAllEnvironment()
+func (e *EnvironmentMiddleware) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
+	return e.endpoint.GetCurrentEnvironment(env, name)
 }
 
 func (e *EnvironmentMiddleware) GetObjectsView() (model.ObjectMapDto, error) {

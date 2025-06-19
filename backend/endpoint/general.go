@@ -17,7 +17,7 @@ func NewGeneralEndpoint(nodeUseCase usecase.NodeUseCase, namespaceUseCase usecas
 	}
 }
 
-func (ge *GeneralEndpoint) GetNodes() ([]model.NodeDto, error) {
+func (ge *GeneralEndpoint) GetNodes() ([]model.NodeDtoV2, error) {
 	return ge.nodeUseCase.GetNodes()
 }
 

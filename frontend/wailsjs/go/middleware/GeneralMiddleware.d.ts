@@ -12,6 +12,6 @@ export function GetNamespaces():Promise<Array<model.NamespaceDto>>;
 
 export function GetNode(arg1:string):Promise<model.NodeDtoV2>;
 
-export function GetNodes():Promise<Array<model.NodeDto>>;
+export function GetNodes():Promise<Array<model.NodeDtoV2>>;
 
 export function UpdateNamespace(arg1:string,arg2:model.NamespaceDto):Promise<void>;

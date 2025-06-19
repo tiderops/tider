@@ -8,9 +8,9 @@ import (
 )
 
 type EnvironmentUseCase interface {
-	GetAllEnvironment() ([]model.EnvironmentDto, error)
 	GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error)
 	GetObjectsView() (model.ObjectMapDto, error)
+	ListAvailableClusters() ([]model.ClusterInfo, error)
 }
 
 type environmentUseCase struct {
@@ -22,12 +22,12 @@ func NewEnvironmentUseCase(client kubeclient.ClusterClient) EnvironmentUseCase {
 	return &environmentUseCase{client: client}
 }
 
-func (e *environmentUseCase) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
-	return e.client.GetCurrentCluster()
+func (e *environmentUseCase) ListAvailableClusters() ([]model.ClusterInfo, error) {
+	return e.client.ListAvailableClusters()
 }
 
-func (e *environmentUseCase) GetAllEnvironment() ([]model.EnvironmentDto, error) {
-	return e.client.GetClusters()
+func (e *environmentUseCase) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
+	return e.client.GetCurrentCluster()
 }
 
 func (e *environmentUseCase) GetObjectsView() (model.ObjectMapDto, error) {
