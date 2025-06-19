@@ -5,3 +5,5 @@ import {model} from '../models';
 export function GetAllEnvironment():Promise<Array<model.EnvironmentDto>>;
 
 export function GetCurrentEnvironment(arg1:string,arg2:string):Promise<model.EnvironmentDto>;
+
+export function GetObjectsView():Promise<model.ObjectMapDto>;

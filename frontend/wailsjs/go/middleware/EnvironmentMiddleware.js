@@ -9,3 +9,7 @@ export function GetAllEnvironment() {
 export function GetCurrentEnvironment(arg1, arg2) {
   return window['go']['middleware']['EnvironmentMiddleware']['GetCurrentEnvironment'](arg1, arg2);
 }
+
+export function GetObjectsView() {
+  return window['go']['middleware']['EnvironmentMiddleware']['GetObjectsView']();
+}

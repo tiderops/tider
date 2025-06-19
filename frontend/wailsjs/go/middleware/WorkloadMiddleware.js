@@ -22,6 +22,10 @@ export function GetPods() {
   return window['go']['middleware']['WorkloadMiddleware']['GetPods']();
 }
 
+export function ResourceTuning(arg1) {
+  return window['go']['middleware']['WorkloadMiddleware']['ResourceTuning'](arg1);
+}
+
 export function RestartPod(arg1, arg2) {
   return window['go']['middleware']['WorkloadMiddleware']['RestartPod'](arg1, arg2);
 }

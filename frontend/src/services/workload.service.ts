@@ -3,8 +3,8 @@ import {
   GetDeployment,
   GetDeployments,
   GetPod,
-  GetPods,
-  RestartPod,
+  GetPods, ResourceTuning,
+  RestartPod, TroubleshootDeployment, TroubleshootPod,
   UpdateDeployment,
   UpdatePod,
 } from '../../wailsjs/go/middleware/WorkloadMiddleware'
@@ -23,3 +23,7 @@ export const fetchUpdateDeployment = async (name: string, namespace: string, dto
   UpdateDeployment(name, namespace, dto)
 export const fetchDeleteDeployment = async (name: string, namespace: string) =>
   DeleteDeployment(name, namespace)
+
+export const fetchResourceTuning = async (namespace: string) => ResourceTuning(namespace)
+export const fetchTroubleshootPod = async (name: string, namespace: string) => TroubleshootPod(name, namespace)
+export const fetchTroubleshootDeployment = async (name: string, namespace: string) => TroubleshootDeployment(name, namespace)

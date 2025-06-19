@@ -17,15 +17,15 @@ func (se *StorageEndpoint) GetPersistentVolumes() ([]model.PersistentVolumeDto, 
 	return se.useCase.GetPersistentVolumes()
 }
 
-func (se *StorageEndpoint) GetPersistentVolumeByName(name string) (model.PersistentVolumeDto, error) {
+func (se *StorageEndpoint) GetPersistentVolume(name string) (model.PersistentVolumeDto, error) {
 	return se.useCase.GetPersistentVolume(name)
 }
 
-func (se *StorageEndpoint) UpdatePersistentVolumeByName(name string, dto model.PersistentVolumeDto) error {
+func (se *StorageEndpoint) UpdatePersistentVolume(name string, dto model.PersistentVolumeDto) error {
 	return se.useCase.UpdatePersistentVolume(name, dto)
 }
 
-func (se *StorageEndpoint) DeletePersistentVolumeByName(name string) error {
+func (se *StorageEndpoint) DeletePersistentVolume(name string) error {
 	return se.useCase.DeletePersistentVolume(name)
 }
 

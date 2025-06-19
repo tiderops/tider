@@ -20,32 +20,32 @@ func (n *NetworkMiddleware) GetServices(namespace string) ([]model.ServiceDto, e
 	return n.endpoint.GetServices(namespace)
 }
 
-func (n *NetworkMiddleware) GetServiceByName(name string, namespace string) (model.ServiceDto, error) {
-	return n.endpoint.GetServiceByName(name, namespace)
+func (n *NetworkMiddleware) GetService(name string, namespace string) (model.ServiceDto, error) {
+	return n.endpoint.GetService(name, namespace)
 }
 
-func (n *NetworkMiddleware) UpdateServiceByName(name string, namespace string, dto model.ServiceDto) error {
-	return n.endpoint.UpdateServiceByName(name, namespace, dto)
+func (n *NetworkMiddleware) UpdateService(name string, namespace string, dto model.ServiceDto) error {
+	return n.endpoint.UpdateService(name, namespace, dto)
 }
 
-func (n *NetworkMiddleware) DeleteServiceByName(name string, namespace string) error {
-	return n.endpoint.DeleteServiceByName(name, namespace)
+func (n *NetworkMiddleware) DeleteService(name string, namespace string) error {
+	return n.endpoint.DeleteService(name, namespace)
 }
 
 func (n *NetworkMiddleware) GetIngresses(namespace string) ([]model.IngressDto, error) {
 	return n.endpoint.GetIngresses(namespace)
 }
 
-func (n *NetworkMiddleware) GetIngressByName(name string, namespace string) (model.IngressDto, error) {
-	return n.endpoint.GetIngressByName(name, namespace)
+func (n *NetworkMiddleware) GetIngress(name string, namespace string) (model.IngressDto, error) {
+	return n.endpoint.GetIngress(name, namespace)
 }
 
-func (n *NetworkMiddleware) UpdateIngressByName(name string, namespace string, dto model.IngressDto) error {
-	return n.endpoint.UpdateIngressByName(name, namespace, dto)
+func (n *NetworkMiddleware) UpdateIngress(name string, namespace string, dto model.IngressDto) error {
+	return n.endpoint.UpdateIngress(name, namespace, dto)
 }
 
-func (n *NetworkMiddleware) DeleteIngressByName(name string, namespace string) error {
-	return n.endpoint.DeleteIngressByName(name, namespace)
+func (n *NetworkMiddleware) DeleteIngress(name string, namespace string) error {
+	return n.endpoint.DeleteIngress(name, namespace)
 }
 
 func BuildNetwork(client kubernetes.Interface) *NetworkMiddleware {

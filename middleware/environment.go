@@ -24,6 +24,10 @@ func (e *EnvironmentMiddleware) GetAllEnvironment() ([]model.EnvironmentDto, err
 	return e.endpoint.GetAllEnvironment()
 }
 
+func (e *EnvironmentMiddleware) GetObjectsView() (model.ObjectMapDto, error) {
+	return e.endpoint.GetObjectsView()
+}
+
 func BuildEnvironment(client kubernetes.Interface) *EnvironmentMiddleware {
 	clusterClient := kubeclient.NewCluster()
 
