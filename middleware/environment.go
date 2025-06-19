@@ -16,12 +16,16 @@ func NewEnvironmentMiddleware(endpoint *endpoint.EnvironmentEndpoint) *Environme
 	return &EnvironmentMiddleware{endpoint: *endpoint}
 }
 
+func (e *EnvironmentMiddleware) GetClusters() ([]model.ClusterInfo, error) {
+	return e.endpoint.GetClusters()
+}
+
 func (e *EnvironmentMiddleware) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
 	return e.endpoint.GetCurrentEnvironment(env, name)
 }
 
-func (e *EnvironmentMiddleware) GetAllEnvironment() ([]model.EnvironmentDto, error) {
-	return e.endpoint.GetAllEnvironment()
+func (e *EnvironmentMiddleware) GetObjectsView() (model.ObjectMapDto, error) {
+	return e.endpoint.GetObjectsView()
 }
 
 func BuildEnvironment(client kubernetes.Interface) *EnvironmentMiddleware {

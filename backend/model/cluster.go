@@ -2,10 +2,12 @@ package model
 
 type ClusterInfo struct {
 	Name      string
+	Cluster   string
 	Server    string
-	Current   bool
 	User      string
 	Namespace string
+	Status    bool
+	Source    string
 }
 
 type ClusterProfile struct {

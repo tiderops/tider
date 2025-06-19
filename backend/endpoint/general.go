@@ -17,27 +17,27 @@ func NewGeneralEndpoint(nodeUseCase usecase.NodeUseCase, namespaceUseCase usecas
 	}
 }
 
-func (ge *GeneralEndpoint) GetNodes() ([]model.NodeDto, error) {
+func (ge *GeneralEndpoint) GetNodes() ([]model.NodeDtoV2, error) {
 	return ge.nodeUseCase.GetNodes()
 }
 
-func (ge *GeneralEndpoint) GetNodeByName(name string) (model.NodeDtoV2, error) {
+func (ge *GeneralEndpoint) GetNode(name string) (model.NodeDtoV2, error) {
 	return ge.nodeUseCase.GetNode(name)
 }
 
-func (ge *GeneralEndpoint) GetNamespace() ([]model.NamespaceDto, error) {
+func (ge *GeneralEndpoint) GetNamespaces() ([]model.NamespaceDto, error) {
 	return ge.namespaceUseCase.GetNamespaces()
 }
 
-func (ge *GeneralEndpoint) GetNamespaceByName(name string) (model.NamespaceDto, error) {
+func (ge *GeneralEndpoint) GetNamespace(name string) (model.NamespaceDto, error) {
 	return ge.namespaceUseCase.GetNamespace(name)
 }
 
-func (ge *GeneralEndpoint) UpdateNamespaceByName(name string, dto model.NamespaceDto) error {
+func (ge *GeneralEndpoint) UpdateNamespace(name string, dto model.NamespaceDto) error {
 	return ge.namespaceUseCase.UpdateNamespace(name, dto)
 }
 
-func (ge *GeneralEndpoint) DeleteNamespaceByName(name string) error {
+func (ge *GeneralEndpoint) DeleteNamespace(name string) error {
 	return ge.namespaceUseCase.DeleteNamespace(name)
 }
 

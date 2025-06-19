@@ -16,28 +16,32 @@ func NewGeneralMiddleware(endpoint *endpoint.GeneralEndpoint) *GeneralMiddleware
 	return &GeneralMiddleware{endpoint: *endpoint}
 }
 
-func (g *GeneralMiddleware) GetNodes() ([]model.NodeDto, error) {
+func (g *GeneralMiddleware) GetNodes() ([]model.NodeDtoV2, error) {
 	return g.endpoint.GetNodes()
 }
 
-func (g *GeneralMiddleware) GetNodeByName(name string) (model.NodeDtoV2, error) {
-	return g.endpoint.GetNodeByName(name)
+func (g *GeneralMiddleware) GetNode(name string) (model.NodeDtoV2, error) {
+	return g.endpoint.GetNode(name)
 }
 
-func (g *GeneralMiddleware) GetNamespace() ([]model.NamespaceDto, error) {
-	return g.endpoint.GetNamespace()
+func (g *GeneralMiddleware) GetNamespaces() ([]model.NamespaceDto, error) {
+	return g.endpoint.GetNamespaces()
 }
 
-func (g *GeneralMiddleware) GetNamespaceByName(name string) (model.NamespaceDto, error) {
-	return g.endpoint.GetNamespaceByName(name)
+func (g *GeneralMiddleware) GetNamespace(name string) (model.NamespaceDto, error) {
+	return g.endpoint.GetNamespace(name)
 }
 
-func (g *GeneralMiddleware) UpdateNamespaceByName(name string, dto model.NamespaceDto) error {
-	return g.endpoint.UpdateNamespaceByName(name, dto)
+func (g *GeneralMiddleware) UpdateNamespace(name string, dto model.NamespaceDto) error {
+	return g.endpoint.UpdateNamespace(name, dto)
 }
 
-func (g *GeneralMiddleware) DeleteNamespaceByName(name string) error {
-	return g.endpoint.DeleteNamespaceByName(name)
+func (g *GeneralMiddleware) DeleteNamespace(name string) error {
+	return g.endpoint.DeleteNamespace(name)
+}
+
+func (g *GeneralMiddleware) ExportNamespaceObjects(namespace string, directory string) error {
+	return g.endpoint.ExportNamespaceObjects(namespace, directory)
 }
 
 func BuildGeneral(client kubernetes.Interface) *GeneralMiddleware {

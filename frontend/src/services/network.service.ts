@@ -1,26 +1,26 @@
 import {
-  DeleteIngressByName,
-  DeleteServiceByName,
-  GetIngressByName,
+  DeleteIngress,
+  DeleteService,
+  GetIngress,
   GetIngresses,
-  GetServiceByName,
+  GetService,
   GetServices,
-  UpdateIngressByName,
-  UpdateServiceByName,
+  UpdateIngress,
+  UpdateService,
 } from '../../wailsjs/go/middleware/NetworkMiddleware'
 
 export const fetchGetServices = async (namespace: string) => GetServices(namespace)
-export const fetchGetServiceByName = async (name: string, namespace: string) =>
-  GetServiceByName(name, namespace)
-export const fetchUpdateServiceByName = async (name: string, namespace: string, dto: any) =>
-  UpdateServiceByName(name, namespace, dto)
-export const fetchDeleteServiceByName = async (name: string, namespace: string) =>
-  DeleteServiceByName(name, namespace)
+export const fetchGetService = async (name: string, namespace: string) =>
+  GetService(name, namespace)
+export const fetchUpdateService = async (name: string, namespace: string, dto: any) =>
+  UpdateService(name, namespace, dto)
+export const fetchDeleteService = async (name: string, namespace: string) =>
+  DeleteService(name, namespace)
 
 export const fetchGetIngresses = async (namespace: string) => GetIngresses(namespace)
-export const fetchGetIngressByName = async (name: string, namespace: string) =>
-  GetIngressByName(name, namespace)
-export const fetchUpdateIngressByName = async (name: string, namespace: string, dto: any) =>
-  UpdateIngressByName(name, namespace, dto)
-export const fetchDeleteIngressByName = async (name: string, namespace: string) =>
-  DeleteIngressByName(name, namespace)
+export const fetchGetIngress = async (name: string, namespace: string) =>
+  GetIngress(name, namespace)
+export const fetchUpdateIngress = async (name: string, namespace: string, dto: any) =>
+  UpdateIngress(name, namespace, dto)
+export const fetchDeleteIngress = async (name: string, namespace: string) =>
+  DeleteIngress(name, namespace)

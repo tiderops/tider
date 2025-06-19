@@ -6,7 +6,7 @@ import (
 )
 
 type NodeUseCase interface {
-	GetNodes() ([]model.NodeDto, error)
+	GetNodes() ([]model.NodeDtoV2, error)
 	GetNode(name string) (model.NodeDtoV2, error)
 }
 
@@ -18,7 +18,7 @@ func NewNodeUseCase(client kubeclient.ClusterClient) NodeUseCase {
 	return &nodeUseCase{client: client}
 }
 
-func (n *nodeUseCase) GetNodes() ([]model.NodeDto, error) {
+func (n *nodeUseCase) GetNodes() ([]model.NodeDtoV2, error) {
 	return n.client.GetNodes()
 }
 

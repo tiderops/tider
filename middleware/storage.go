@@ -20,16 +20,16 @@ func (s *StorageMiddleware) GetPersistentVolumes() ([]model.PersistentVolumeDto,
 	return s.endpoint.GetPersistentVolumes()
 }
 
-func (s *StorageMiddleware) GetPersistentVolumeByName(name string) (model.PersistentVolumeDto, error) {
-	return s.endpoint.GetPersistentVolumeByName(name)
+func (s *StorageMiddleware) GetPersistentVolume(name string) (model.PersistentVolumeDto, error) {
+	return s.endpoint.GetPersistentVolume(name)
 }
 
-func (s *StorageMiddleware) UpdatePersistentVolumeByName(name string, dto model.PersistentVolumeDto) error {
-	return s.endpoint.UpdatePersistentVolumeByName(name, dto)
+func (s *StorageMiddleware) UpdatePersistentVolume(name string, dto model.PersistentVolumeDto) error {
+	return s.endpoint.UpdatePersistentVolume(name, dto)
 }
 
-func (s *StorageMiddleware) DeletePersistentVolumeByName(name string) error {
-	return s.endpoint.DeletePersistentVolumeByName(name)
+func (s *StorageMiddleware) DeletePersistentVolume(name string) error {
+	return s.endpoint.DeletePersistentVolume(name)
 }
 
 func (s *StorageMiddleware) GetPersistentVolumesClaim(namespace string) ([]model.PersistentVolumeClaimDto, error) {

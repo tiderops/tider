@@ -1,19 +1,21 @@
 import {
-  DeleteNamespaceByName,
+  DeleteNamespace, ExportNamespaceObjects,
+  GetNamespaces,
   GetNamespace,
-  GetNamespaceByName,
-  GetNodeByName,
+  GetNode,
   GetNodes,
-  UpdateNamespaceByName,
+  UpdateNamespace,
 } from '../../wailsjs/go/middleware/GeneralMiddleware'
 import { model } from '../../wailsjs/go/models'
 import NamespaceDto = model.NamespaceDto
 
 export const fetchGetNodes = async () => GetNodes()
-export const fetchGetNodeByName = async (name: string) => GetNodeByName(name)
+export const fetchGetNode = async (name: string) => GetNode(name)
 
-export const fetchGetNamespace = async (): Promise<NamespaceDto[]> => GetNamespace()
-export const fetchGetNamespaceByName = async (name: string) => GetNamespaceByName(name)
-export const fetchUpdateNamespaceByName = async (name: string, dto: any) =>
-  UpdateNamespaceByName(name, dto)
-export const fetchDeleteNamespaceByName = async (name: string) => DeleteNamespaceByName(name)
+export const fetchGetNamespaces = async (): Promise<NamespaceDto[]> => GetNamespaces()
+export const fetchGetNamespace = async (name: string) => GetNamespace(name)
+export const fetchUpdateNamespace = async (name: string, dto: any) =>
+  UpdateNamespace(name, dto)
+export const fetchDeleteNamespace = async (name: string) => DeleteNamespace(name)
+
+export const fetchExportNamespaceObject = async (name: string, directory: string) => ExportNamespaceObjects(name, directory)

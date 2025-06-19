@@ -93,6 +93,46 @@ export namespace database {
 
 export namespace model {
 	
+	export class ClusterInfo {
+	    Name: string;
+	    Cluster: string;
+	    Server: string;
+	    User: string;
+	    Namespace: string;
+	    Status: boolean;
+	    Source: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ClusterInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Cluster = source["Cluster"];
+	        this.Server = source["Server"];
+	        this.User = source["User"];
+	        this.Namespace = source["Namespace"];
+	        this.Status = source["Status"];
+	        this.Source = source["Source"];
+	    }
+	}
+	export class ConfigMap {
+	    Name: string;
+	    Namespace: string;
+	    UsedByPods: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ConfigMap(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.UsedByPods = source["UsedByPods"];
+	    }
+	}
 	export class Resource {
 	    Cpu: string;
 	    Memory: string;
@@ -143,6 +183,38 @@ export namespace model {
 		    return a;
 		}
 	}
+	export class CronJob {
+	    Name: string;
+	    Namespace: string;
+	    JobNames: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new CronJob(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.JobNames = source["JobNames"];
+	    }
+	}
+	export class Deployment {
+	    Name: string;
+	    Namespace: string;
+	    PodNames: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Deployment(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.PodNames = source["PodNames"];
+	    }
+	}
 	export class DeploymentDto {
 	    Name: string;
 	    Namespace: string;
@@ -191,6 +263,22 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Path = source["Path"];
 	        this.Type = source["Type"];
+	    }
+	}
+	export class Ingress {
+	    Name: string;
+	    Namespace: string;
+	    ServiceRefs: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Ingress(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.ServiceRefs = source["ServiceRefs"];
 	    }
 	}
 	export class RuleDto {
@@ -245,6 +333,26 @@ export namespace model {
 		    return a;
 		}
 	}
+	export class Job {
+	    Name: string;
+	    Namespace: string;
+	    PodNames: string[];
+	    OwnerKind: string;
+	    OwnerName: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Job(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.PodNames = source["PodNames"];
+	        this.OwnerKind = source["OwnerKind"];
+	        this.OwnerName = source["OwnerName"];
+	    }
+	}
 	export class Local {
 	    Path: string;
 	    FSType: string;
@@ -273,6 +381,22 @@ export namespace model {
 	        this.Server = source["Server"];
 	    }
 	}
+	export class Namespace {
+	    Name: string;
+	    PodNames: string[];
+	    ServiceNames: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Namespace(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.PodNames = source["PodNames"];
+	        this.ServiceNames = source["ServiceNames"];
+	    }
+	}
 	export class NamespaceDto {
 	    Name: string;
 	    Version: string;
@@ -293,45 +417,19 @@ export namespace model {
 	        this.Status = source["Status"];
 	    }
 	}
-	export class NodeDto {
+	export class Node {
 	    Name: string;
-	    Resource: Resource;
-	    Roles: string[];
-	    Version: string;
-	    Age: string;
-	    Status: boolean;
+	    PodNames: string[];
 	
 	    static createFrom(source: any = {}) {
-	        return new NodeDto(source);
+	        return new Node(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
-	        this.Resource = this.convertValues(source["Resource"], Resource);
-	        this.Roles = source["Roles"];
-	        this.Version = source["Version"];
-	        this.Age = source["Age"];
-	        this.Status = source["Status"];
+	        this.PodNames = source["PodNames"];
 	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
 	}
 	export class NodeDtoV2 {
 	    Name: string;
@@ -373,6 +471,182 @@ export namespace model {
 		    return a;
 		}
 	}
+	export class Secret {
+	    Name: string;
+	    Namespace: string;
+	    UsedByPods: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Secret(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.UsedByPods = source["UsedByPods"];
+	    }
+	}
+	export class PersistentVolume {
+	    Name: string;
+	    ClaimName: string;
+	    Namespace: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PersistentVolume(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.ClaimName = source["ClaimName"];
+	        this.Namespace = source["Namespace"];
+	    }
+	}
+	export class PersistentVolumeClaim {
+	    Name: string;
+	    Namespace: string;
+	    VolumeName: string;
+	    UsedByPods: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new PersistentVolumeClaim(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.VolumeName = source["VolumeName"];
+	        this.UsedByPods = source["UsedByPods"];
+	    }
+	}
+	export class Service {
+	    Name: string;
+	    Namespace: string;
+	    Selector: Record<string, string>;
+	    PodNames: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Service(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.Selector = source["Selector"];
+	        this.PodNames = source["PodNames"];
+	    }
+	}
+	export class ReplicaSet {
+	    Name: string;
+	    Namespace: string;
+	    Deployment: string;
+	    PodNames: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ReplicaSet(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.Deployment = source["Deployment"];
+	        this.PodNames = source["PodNames"];
+	    }
+	}
+	export class Pod {
+	    Name: string;
+	    Namespace: string;
+	    Labels: Record<string, string>;
+	    NodeName: string;
+	    OwnerKind: string;
+	    OwnerName: string;
+	    Deployment: string;
+	    PVCNames: string[];
+	    ConfigMapRefs: string[];
+	    SecretRefs: string[];
+	    ServiceRefs: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Pod(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Namespace = source["Namespace"];
+	        this.Labels = source["Labels"];
+	        this.NodeName = source["NodeName"];
+	        this.OwnerKind = source["OwnerKind"];
+	        this.OwnerName = source["OwnerName"];
+	        this.Deployment = source["Deployment"];
+	        this.PVCNames = source["PVCNames"];
+	        this.ConfigMapRefs = source["ConfigMapRefs"];
+	        this.SecretRefs = source["SecretRefs"];
+	        this.ServiceRefs = source["ServiceRefs"];
+	    }
+	}
+	export class ObjectMapDto {
+	    ClusterInfo: ClusterInfo;
+	    Nodes: Node[];
+	    Namespaces: Namespace[];
+	    Pods: Pod[];
+	    Deployments: Deployment[];
+	    ReplicaSets: ReplicaSet[];
+	    Services: Service[];
+	    Ingresses: Ingress[];
+	    PersistentVolumeClaims: PersistentVolumeClaim[];
+	    PersistentVolumes: PersistentVolume[];
+	    ConfigMaps: ConfigMap[];
+	    Secrets: Secret[];
+	    Jobs: Job[];
+	    CronJobs: CronJob[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ObjectMapDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ClusterInfo = this.convertValues(source["ClusterInfo"], ClusterInfo);
+	        this.Nodes = this.convertValues(source["Nodes"], Node);
+	        this.Namespaces = this.convertValues(source["Namespaces"], Namespace);
+	        this.Pods = this.convertValues(source["Pods"], Pod);
+	        this.Deployments = this.convertValues(source["Deployments"], Deployment);
+	        this.ReplicaSets = this.convertValues(source["ReplicaSets"], ReplicaSet);
+	        this.Services = this.convertValues(source["Services"], Service);
+	        this.Ingresses = this.convertValues(source["Ingresses"], Ingress);
+	        this.PersistentVolumeClaims = this.convertValues(source["PersistentVolumeClaims"], PersistentVolumeClaim);
+	        this.PersistentVolumes = this.convertValues(source["PersistentVolumes"], PersistentVolume);
+	        this.ConfigMaps = this.convertValues(source["ConfigMaps"], ConfigMap);
+	        this.Secrets = this.convertValues(source["Secrets"], Secret);
+	        this.Jobs = this.convertValues(source["Jobs"], Job);
+	        this.CronJobs = this.convertValues(source["CronJobs"], CronJob);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	
 	export class VolumeClaimSpec {
 	    VolumeName: string;
 	    VolumeMode: string;
@@ -541,6 +815,7 @@ export namespace model {
 		    return a;
 		}
 	}
+	
 	export class PodDto {
 	    Name: string;
 	    Namespace: string;
@@ -581,6 +856,9 @@ export namespace model {
 		    return a;
 		}
 	}
+	
+	
+	
 	
 	
 	export class ServiceDto {

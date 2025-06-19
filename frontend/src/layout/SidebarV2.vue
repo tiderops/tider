@@ -32,8 +32,8 @@ export default defineComponent({
       const env: EnvironmentLayout[] = environments.value.map((e) => {
         return {
           name: e.Name,
-          description: e.Description,
-          env: e.Env,
+          description: e.Server,
+          env: e.Cluster,
           status: e.Status,
           options: kubernetesParameters.value.map((k) => {
             return {

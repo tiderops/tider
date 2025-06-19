@@ -7,11 +7,12 @@ import {
 import { database, model } from '../../wailsjs/go/models'
 import EnvironmentDto = model.EnvironmentDto
 import CommonParameterDto = database.CommonParameterDto
+import ClusterInfo = model.ClusterInfo;
 
 export function sidebarComposable() {
   const commonParameters = ref<CommonParameterDto[]>([])
   const kubernetesParameters = ref<CommonParameterDto[]>([])
-  const environments = ref<EnvironmentDto[]>([])
+  const environments = ref<ClusterInfo[]>([])
 
   const fetchData = async () => {
     try {
