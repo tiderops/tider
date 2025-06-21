@@ -66,10 +66,11 @@ func main() {
 	//usecase2 := usecase2.NewDeploymentUseCase(client2)
 	//ep := endpoint.NewWorkloadEndpoint(usecase, usecase2)
 
-	// KubeClient
+	// KubeClient - INSTANCIA DE MANAGER
 	conf := kubeclient.NewClusterManager()
 	client, _ := conf.GetClient("minikube", getPath())
-	//dynamicClient, _ := conf.GetDynamicClient("minikube", getPath())
+	//dynamicClient, _ := conf.GetDynamicClient("minikube", getPath()))
+	//conf.GetValue("minikube")
 
 	// Create an instance of the app structure
 	app := middleware.NewApp()

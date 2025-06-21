@@ -1,17 +1,15 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 import KsNavBar from '../../layout/Navbar.vue'
 
-export default defineComponent({
-  name: 'WorkloadPage',
-  components: { KsNavBar },
-  data() {
-    return {
-      followingPage: 'Workload',
-    }
-  },
-})
+const followingPage = ref<string>('Workload')
+
+const route = useRoute()
+const clusterId = route.params.cluster as string
+console.log("Cluster ID:", clusterId)
 </script>
+
 <template>
   <div>
     <ks-nav-bar :content="followingPage"></ks-nav-bar>

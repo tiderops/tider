@@ -10,16 +10,16 @@ export function GetDeployment(arg1, arg2) {
   return window['go']['middleware']['WorkloadMiddleware']['GetDeployment'](arg1, arg2);
 }
 
-export function GetDeployments() {
-  return window['go']['middleware']['WorkloadMiddleware']['GetDeployments']();
+export function GetDeployments(arg1) {
+  return window['go']['middleware']['WorkloadMiddleware']['GetDeployments'](arg1);
 }
 
 export function GetPod(arg1, arg2) {
   return window['go']['middleware']['WorkloadMiddleware']['GetPod'](arg1, arg2);
 }
 
-export function GetPods() {
-  return window['go']['middleware']['WorkloadMiddleware']['GetPods']();
+export function GetPods(arg1) {
+  return window['go']['middleware']['WorkloadMiddleware']['GetPods'](arg1);
 }
 
 export function ResourceTuning(arg1) {

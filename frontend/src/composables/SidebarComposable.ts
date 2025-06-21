@@ -2,7 +2,7 @@ import { ref, onMounted } from 'vue'
 import {
   fetchCommonParameters,
   fetchKubernetesParameters,
-  fetchAllEnvironments,
+  fetchClusters,
 } from '../services/layout.service'
 import { database, model } from '../../wailsjs/go/models'
 import EnvironmentDto = model.EnvironmentDto
@@ -12,14 +12,14 @@ import ClusterInfo = model.ClusterInfo;
 export function sidebarComposable() {
   const commonParameters = ref<CommonParameterDto[]>([])
   const kubernetesParameters = ref<CommonParameterDto[]>([])
-  const environments = ref<ClusterInfo[]>([])
+  const clusters = ref<ClusterInfo[]>([])
 
   const fetchData = async () => {
     try {
       commonParameters.value = await fetchCommonParameters()
       kubernetesParameters.value = await fetchKubernetesParameters()
-      environments.value = await fetchAllEnvironments()
-      console.log('environments.value: ', environments.value)
+      clusters.value = await fetchClusters()
+      console.log('clusters.value: ', clusters.value)
     } catch (error) {
       console.error('Error fetching environment data:', error)
       throw error
@@ -36,7 +36,7 @@ export function sidebarComposable() {
   return {
     commonParameters,
     kubernetesParameters,
-    environments,
+    clusters,
     fetchData,
   }
 }

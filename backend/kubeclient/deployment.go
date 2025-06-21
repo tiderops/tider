@@ -19,8 +19,13 @@ func NewDeployment(client kubernetes.Interface) DeploymentClient {
 	return &deploymentClient{client: client}
 }
 
-func (d deploymentClient) GetDeployments() ([]model.DeploymentDto, error) {
-	deployments, err := d.client.AppsV1().Deployments("").List(context.TODO(), metav1.ListOptions{})
+func (d deploymentClient) GetDeployments(clusterCtx string) ([]model.DeploymentDto, error) {
+	client, err := GlobalClusterManager.GetValue(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	deployments, err := client.AppsV1().Deployments("").List(context.TODO(), metav1.ListOptions{})
 
 	if err != nil {
 		panic("Error when get deploys")

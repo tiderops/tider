@@ -49,8 +49,14 @@ func (p *podClient) GetPodsMock() ([]model.PodDto, error) {
 	return pods, errors.New("Not implemented")
 }
 
-func (p *podClient) GetPods() ([]model.PodDto, error) {
-	podsClient := p.client.CoreV1().Pods("")
+func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
+	//podsClient := p.client.CoreV1().Pods("")
+	client, err := GlobalClusterManager.GetValue(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	podsClient := client.CoreV1().Pods("")
 
 	pods, err := podsClient.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -59,6 +65,12 @@ func (p *podClient) GetPods() ([]model.PodDto, error) {
 	var podArray []model.PodDto
 
 	for _, pod := range pods.Items {
+		age := "0"
+
+		if pod.Status.StartTime != nil {
+			age = pod.Status.StartTime.String()
+		}
+
 		p := model.PodDto{
 			Name:      pod.Name,
 			Namespace: pod.Namespace,
@@ -74,7 +86,7 @@ func (p *podClient) GetPods() ([]model.PodDto, error) {
 				},
 			},
 			Status: string(pod.Status.Phase),
-			Age:    pod.Status.StartTime.String(),
+			Age:    age,
 		}
 
 		podArray = append(podArray, p)
@@ -92,7 +104,9 @@ func (p *podClient) GetPods() ([]model.PodDto, error) {
 		)
 	}
 
-	return podArray, errors.New("Not implemented")
+	fmt.Println("podArray[0].Name", podArray[0].Name)
+
+	return podArray, nil
 }
 
 func (p *podClient) GetPod(name string, namespace string) (model.PodDto, error) {

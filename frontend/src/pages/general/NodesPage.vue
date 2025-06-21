@@ -16,7 +16,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <ks-grid-body :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body>
+    <h2>qweqwe</h2>
+
+<!--  <ks-grid-body :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body>-->
 </template>
 
 <style scoped></style>

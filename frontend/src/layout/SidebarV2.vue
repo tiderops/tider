@@ -1,82 +1,49 @@
-<script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs } from 'vue'
-import { sidebarComposable } from '../composables/SidebarComposable'
-import { EnvironmentLayout } from '../types/layout.type'
+<script setup lang="ts">
+import { onMounted, reactive, ref } from 'vue'
+import { sidebarComposable } from '@/composables/SidebarComposable'
+import { ClusterLayout } from '@/types/layout.type'
 import { database } from '../../wailsjs/go/models'
 import CommonParameterDto = database.CommonParameterDto
 
-interface SidebarState {
-  isCollapsed: boolean
-  menu: EnvironmentLayout[]
-  setting: CommonParameterDto[]
-  openDropdowns: { [key: number]: boolean }
+const { commonParameters, kubernetesParameters, clusters, fetchData } = sidebarComposable()
+
+const isCollapsed = ref(false)
+const menu = ref<ClusterLayout[]>([])
+const setting = ref<CommonParameterDto[]>([])
+const openDropdowns = reactive<{ [key: number]: boolean }>({})
+
+const toggleSidebar = () => {
+    isCollapsed.value = !isCollapsed.value
 }
 
-export default defineComponent({
-  name: 'ks-sidebar-v2',
+const toggleDropdown = (index: number) => {
+    openDropdowns[index] = !openDropdowns[index]
+}
 
-  setup() {
-    const { commonParameters, kubernetesParameters, environments, fetchData } = sidebarComposable()
+const isDropdownOpen = (index: number) => {
+    return !!openDropdowns[index]
+}
 
-    const state = reactive<SidebarState>({
-      isCollapsed: false,
-      menu: [],
-      setting: [],
-      openDropdowns: {},
-    })
+onMounted(async () => {
+    console.log('onMounted triggered sidebar')
+    await fetchData()
 
-    onMounted(async () => {
-      console.log('onMounted triggered sidebar')
-      await fetchData()
+    menu.value = clusters.value.map((e) => ({
+        name: e.Name,
+        cluster: e.Cluster,
+        status: e.Status,
+        options: kubernetesParameters.value.map((k) => ({
+            name: k.Name,
+            link: k.Link,
+            icon: k.Icon,
+        })),
+    }))
 
-      const env: EnvironmentLayout[] = environments.value.map((e) => {
-        return {
-          name: e.Name,
-          description: e.Server,
-          env: e.Cluster,
-          status: e.Status,
-          options: kubernetesParameters.value.map((k) => {
-            return {
-              name: k.Name,
-              link: k.Link,
-              icon: k.Icon,
-            }
-          }),
-        }
-      })
-
-      console.log('commonParameters.value', commonParameters.value)
-      const set: CommonParameterDto[] = commonParameters.value.map((c) => {
-        return {
-          Name: c.Name,
-          Link: c.Link,
-          Icon: c.Icon,
-        }
-      })
-
-      state.menu = env
-      state.setting = set
-    })
-
-    const toggleSidebar = (): void => {
-      state.isCollapsed = !state.isCollapsed
-    }
-
-    const toggleDropdown = (index: number): void => {
-      state.openDropdowns[index] = !state.openDropdowns[index]
-    }
-
-    const isDropdownOpen = (index: number): boolean => {
-      return !!state.openDropdowns[index]
-    }
-
-    return {
-      ...toRefs(state),
-      toggleSidebar,
-      toggleDropdown,
-      isDropdownOpen,
-    }
-  },
+    setting.value = commonParameters.value.map((c) => ({
+        Name: c.Name,
+        Link: c.Link,
+        Icon: c.Icon,
+    }))
 })
 </script>
 
@@ -97,7 +64,7 @@ export default defineComponent({
           <div class="env-info">
             <span class="icon">📊</span>
             <span class="link-text" :class="{ hidden: isCollapsed }">
-              {{ item.name }} - {{ item.env }}
+              {{ item.cluster }}
               <span class="status-indicator" :class="{ 'status-active': item.status }"></span>
             </span>
           </div>
@@ -119,7 +86,7 @@ export default defineComponent({
         >
           <li v-for="(option, index) in item.options" :key="index">
             <router-link
-              :to="{ name: option.link, params: { cluster: item.name } }"
+              :to="{ name: option.link, params: { cluster: item.cluster } }"
               class="nav-link"
             >
               <span class="icon">{{ option.icon }}</span>

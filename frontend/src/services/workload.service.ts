@@ -9,14 +9,14 @@ import {
   UpdatePod,
 } from '../../wailsjs/go/middleware/WorkloadMiddleware'
 
-export const fetchGetPods = async () => GetPods()
+export const fetchGetPods = async (clusterCtx: string) => GetPods(clusterCtx)
 export const fetchGetPod = async (name: string, namespace: string) => GetPod(name, namespace)
 export const fetchUpdatePod = async (name: string, namespace: string, dto: any) =>
   UpdatePod(name, namespace, dto)
 export const fetchRestartPod = async (name: string, namespace: string) =>
   RestartPod(name, namespace)
 
-export const fetchGetDeployments = async () => GetDeployments()
+export const fetchGetDeployments = async (clusterCtx: string) => GetDeployments(clusterCtx)
 export const fetchGetDeployment = async (name: string, namespace: string) =>
   GetDeployment(name, namespace)
 export const fetchUpdateDeployment = async (name: string, namespace: string, dto: any) =>

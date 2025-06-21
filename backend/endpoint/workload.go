@@ -15,8 +15,8 @@ func NewWorkloadEndpoint(podUseCase usecase.PodUseCase, deploymentUseCase usecas
 	return &WorkloadEndpoint{podUseCase: podUseCase, deploymentUseCase: deploymentUseCase}
 }
 
-func (we *WorkloadEndpoint) GetPods() ([]model.PodDto, error) {
-	return we.podUseCase.GetPods()
+func (we *WorkloadEndpoint) GetPods(clusterCtx string) ([]model.PodDto, error) {
+	return we.podUseCase.GetPods(clusterCtx)
 }
 
 func (we *WorkloadEndpoint) GetPod(name string, namespace string) (model.PodDto, error) {
@@ -31,8 +31,8 @@ func (we *WorkloadEndpoint) RestartPod(name string, namespace string) error {
 	return we.podUseCase.RestartPod(name, namespace)
 }
 
-func (we *WorkloadEndpoint) GetDeployments() ([]model.DeploymentDto, error) {
-	return we.deploymentUseCase.GetDeployments()
+func (we *WorkloadEndpoint) GetDeployments(clusterCtx string) ([]model.DeploymentDto, error) {
+	return we.deploymentUseCase.GetDeployments(clusterCtx)
 }
 
 func (we *WorkloadEndpoint) GetDeployment(name string, namespace string) (model.DeploymentDto, error) {

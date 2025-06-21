@@ -6,6 +6,7 @@ import (
 	"Kubexplorer/backend/model"
 	"Kubexplorer/backend/service"
 	"Kubexplorer/backend/usecase"
+	"fmt"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -17,8 +18,8 @@ func NewWorkloadMiddleware(endpoint *endpoint.WorkloadEndpoint) *WorkloadMiddlew
 	return &WorkloadMiddleware{endpoint: *endpoint}
 }
 
-func (w *WorkloadMiddleware) GetPods() []model.PodDto {
-	x, _ := w.endpoint.GetPods()
+func (w *WorkloadMiddleware) GetPods(clusterCtx string) []model.PodDto {
+	x, _ := w.endpoint.GetPods(clusterCtx)
 	return x
 }
 
@@ -34,8 +35,10 @@ func (w *WorkloadMiddleware) RestartPod(name string, namespace string) error {
 	return w.endpoint.RestartPod(name, namespace)
 }
 
-func (w *WorkloadMiddleware) GetDeployments() []model.DeploymentDto {
-	x, _ := w.endpoint.GetDeployments()
+func (w *WorkloadMiddleware) GetDeployments(clusterCtx string) []model.DeploymentDto {
+	fmt.Println("clusterCtx-GETDEP", clusterCtx)
+
+	x, _ := w.endpoint.GetDeployments(clusterCtx)
 	return x
 }
 
