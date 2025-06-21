@@ -60,7 +60,7 @@ func (d deploymentClient) GetDeploymentsMock() ([]model.DeploymentDto, error) {
 		p := model.DeploymentDto{
 			Name:      fmt.Sprintf("Deployment %d", i),
 			Namespace: "TODO",
-			Status:    "Alive",
+			Status:    "Running",
 			Age:       strconv.Itoa(rand.Intn(1000)),
 		}
 

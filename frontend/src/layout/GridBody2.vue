@@ -5,6 +5,10 @@ import KsSidebarDetail from './SidebarDetail.vue'
 import KsGridTable from '../components/GridTableComponent.vue'
 import KsGridHeader from '../components/GridHeaderComponent.vue'
 
+const snackbar = ref(false)
+const text = ref('')
+const timeout = ref(2000)
+
 interface GridItem {
     name: string
     namespace: string
@@ -20,17 +24,16 @@ interface HeadState {
 }
 
 // Props
-defineProps<{
+const props = defineProps<{
     cluster?: string
     k8sObject: string
     namespace: string
 }>()
 
 // Composables & constants
-const props = defineProps()
 const response = gridComposable(props.cluster, props.k8sObject)
 const namespaces = ['ns-local', 'ns-dev']
-const statuses = ['Alive', 'Inactive']
+const statuses = ['Running', 'Succeeded', 'Pending']
 
 // Reactive state
 const items = ref<GridItem[]>([])
@@ -72,6 +75,24 @@ const onRowClick = (cellData: any, item: any) => {
     }
 }
 
+const onEditItem = async (item: any) => {
+    console.log('Parent received edit:', item)
+    text.value = `Resource "${item.name}" was edited.`
+    snackbar.value = true
+
+    await response.fetchData()
+    items.value = response.content?.body.value ?? []
+}
+
+const onDeleteItem = async (item: any) => {
+    console.log('Parent received delete:', item)
+    text.value = `Resource "${item.name}" was deleted.`
+    snackbar.value = true
+
+    await response.fetchData()
+    items.value = response.content?.body.value ?? []
+}
+
 // Fetch data on mount
 onMounted(async () => {
     await response.fetchData()
@@ -96,8 +117,16 @@ onMounted(async () => {
         :search="search"
         :sortBy="sortBy"
         @click:row="onRowClick"
+        @delete="onDeleteItem"
+        @edit="onEditItem"
       />
     </v-card>
+      <v-snackbar v-model="snackbar" :timeout="timeout">
+          {{ text }}
+          <template v-slot:actions>
+              <v-btn color="blue" variant="text" @click="snackbar = false">Close</v-btn>
+          </template>
+      </v-snackbar>
     <v-card>
       <KsSidebarDetail
         :isVisible="isSidebarVisible"

@@ -1,55 +1,45 @@
-<script lang="ts">
-import { defineComponent, onMounted } from 'vue'
-import { gridGeneralComposable } from '../composables/GridTableComposable'
+<script setup lang="ts">
+import { gridGeneralComposable } from '@/composables/GridTableComposable'
 
-interface State {
-  isRestarted?: any
+const props = defineProps<{
+    headers: any[]
+    items: any[]
+    search?: string
+    sortBy?: any[]
+}>()
+
+const emit = defineEmits<{
+    (e: 'rowClick', item: any): void
+    (e: 'edit', item: any): void
+    (e: 'delete', item: any): void
+}>()
+
+const editPod = (item: any) => {
+    console.log('EDIT', item)
+    // const { fetchData } =
+    emit('edit', item)
 }
 
-export default defineComponent({
-  name: 'KsGridTable',
-  props: {
-    headers: Array<any>,
-    items: Array<any>,
-    search: String,
-    sortBy: Array<any>,
-  },
-  emits: ['rowClick', 'edit', 'delete'],
-  setup() {
-    const response = gridGeneralComposable('')
+const deletePod = async (item: any) => {
+    console.log('DELETE', item)
+    console.log('DELETE - NAME', item.name)
+    console.log('DELETE - NS', item.namespace)
 
-    const editPod = (item: any) => {
-      console.log('EDIT', item)
-    }
+    const { fetchData } = gridGeneralComposable(item.name, item.namespace)
 
-    const state: State = {
-      isRestarted: null,
-    }
+    await fetchData()
+    emit('delete', item)
+}
 
-    onMounted(async () => {
-      await response.fetchData()
-      state.isRestarted = response.isRestarted
-    })
-
-    const deletePod = (item: any) => {
-      // console.log("DELETE", item);
-      console.log('RESTARTED', state.isRestarted.value)
-    }
-
-    return {
-      editPod,
-      deletePod,
-    }
-  },
-})
 </script>
+
 
 <template>
   <v-data-table-virtual
-    :headers="headers"
-    :items="items"
-    :search="search"
-    :sort-by="sortBy"
+    :headers="props.headers"
+    :items="props.items"
+    :search="props.search"
+    :sort-by="props.sortBy"
     height="720"
     item-value="name"
     density="compact"
@@ -57,7 +47,7 @@ export default defineComponent({
     hover
   >
     <template v-slot:item.status="{ item }">
-      <v-chip :color="item.status === 'Active' ? 'green' : 'red'" dark>
+      <v-chip :color="item.status === 'Running' ? 'green' : 'red'" dark>
         {{ item.status }}
       </v-chip>
     </template>
@@ -66,6 +56,7 @@ export default defineComponent({
       <v-btn @click.stop="editPod(item)" icon>
         <v-icon icon="mdi-pencil" />
       </v-btn>
+
       <v-btn @click.stop="deletePod(item)" icon>
         <v-icon icon="mdi-delete" />
       </v-btn>

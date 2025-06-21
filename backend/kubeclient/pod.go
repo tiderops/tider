@@ -37,7 +37,7 @@ func (p *podClient) GetPodsMock() ([]model.PodDto, error) {
 					Memory: strconv.Itoa(rand.Intn(1000)),
 				},
 			},
-			Status: "Alive",
+			Status: "Running",
 			Age:    strconv.Itoa(rand.Intn(1000)),
 		}
 
@@ -50,13 +50,13 @@ func (p *podClient) GetPodsMock() ([]model.PodDto, error) {
 }
 
 func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
-	//podsClient := p.client.CoreV1().Pods("")
-	client, err := GlobalClusterManager.GetValue(clusterCtx)
-	if err != nil {
-		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
-	}
+	podsClient := p.client.CoreV1().Pods("")
+	//client, err := GlobalClusterManager.GetValue(clusterCtx)
+	//if err != nil {
+	//	return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	//}
 
-	podsClient := client.CoreV1().Pods("")
+	//podsClient := client.CoreV1().Pods("")
 
 	pods, err := podsClient.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

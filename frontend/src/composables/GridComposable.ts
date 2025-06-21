@@ -1,4 +1,4 @@
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { database, model } from '../../wailsjs/go/models'
 import { fetchGetDeployments, fetchGetPods } from '../services/workload.service'
 import { fetchHeaderParams } from '../services/layout.service'
@@ -111,11 +111,6 @@ export function gridBodyPods(clusterCtx: string, k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    // await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -167,11 +162,6 @@ export function gridBodyDeployments(clusterCtx: string, k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -196,11 +186,6 @@ export function gridBodyServices(k8sObject: string) {
       throw error
     }
   }
-
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
 
   const response: GridResponse = {
     fetchData: fetchData,
@@ -227,11 +212,6 @@ export function gridBodyIngresses(k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -256,11 +236,6 @@ export function gridBodyPersistentVolumes(k8sObject: string) {
       throw error
     }
   }
-
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
 
   const response: GridResponse = {
     fetchData: fetchData,
@@ -312,11 +287,6 @@ export function gridBodyNamespaces(k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    // await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -341,11 +311,6 @@ export function gridBodyNodes(namespace: string) {
       throw error
     }
   }
-
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
 
   const response: GridResponse = {
     fetchData: fetchData,
