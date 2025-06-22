@@ -67,8 +67,8 @@ func main() {
 	//ep := endpoint.NewWorkloadEndpoint(usecase, usecase2)
 
 	// KubeClient - INSTANCIA DE MANAGER
-	conf := kubeclient.NewClusterManager()
-	client, _ := conf.GetClient("minikube", getPath())
+	//conf := kubeclient.NewClusterManager()
+	//client, _ := conf.GetClient("minikube", getPath())
 	//dynamicClient, _ := conf.GetDynamicClient("minikube", getPath()))
 	//conf.GetValue("minikube")
 
@@ -88,6 +88,11 @@ func main() {
 	//storageMiddleware := middleware.NewStorageMiddleware(nil)
 	//metricMiddleware := middleware.NewMetricMiddleware(nil)
 
+	//BuildGeneral := middleware.BuildGeneral()
+	//BuildNetwork := middleware.BuildNetwork()
+	//BuildStorage := middleware.BuildStorage()
+	//BuildWorkload := middleware.BuildWorkload()
+	manager := kubeclient.GlobalClusterManager
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  PROGRAM_NAME,
@@ -101,12 +106,12 @@ func main() {
 		OnShutdown:       app.Shutdown,
 		Bind: []interface{}{
 			app,
-			middleware.BuildEnvironment(client),
-			middleware.BuildGeneral(client),
-			middleware.BuildNetwork(client),
-			middleware.BuildParameters(client),
-			middleware.BuildStorage(client),
-			middleware.BuildWorkload(client),
+			middleware.BuildEnvironment(),
+			middleware.BuildParameters(),
+			middleware.BuildGeneral(),
+			middleware.BuildNetwork(nil),
+			middleware.BuildStorage(nil),
+			middleware.BuildWorkload(manager),
 		},
 	})
 

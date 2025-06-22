@@ -3,20 +3,20 @@ package kubeclient
 import (
 	"Kubexplorer/backend/model"
 	"context"
-	"errors"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"math/rand"
 	"strconv"
 )
 
 type podClient struct {
-	client kubernetes.Interface
+	manager ClusterResolver
 }
 
-func NewPod(client kubernetes.Interface) PodClient {
-	return &podClient{client: client}
+func NewPod(manager ClusterResolver) PodClient {
+	return &podClient{
+		manager: manager,
+	}
 }
 
 func (p *podClient) GetPodsMock() ([]model.PodDto, error) {
@@ -46,17 +46,16 @@ func (p *podClient) GetPodsMock() ([]model.PodDto, error) {
 
 	fmt.Println(pods[0].Name)
 
-	return pods, errors.New("Not implemented")
+	return pods, nil
 }
 
 func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
-	podsClient := p.client.CoreV1().Pods("")
-	//client, err := GlobalClusterManager.GetValue(clusterCtx)
-	//if err != nil {
-	//	return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
-	//}
+	client, err := p.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
 
-	//podsClient := client.CoreV1().Pods("")
+	podsClient := client.CoreV1().Pods("")
 
 	pods, err := podsClient.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -109,8 +108,13 @@ func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
 	return podArray, nil
 }
 
-func (p *podClient) GetPod(name string, namespace string) (model.PodDto, error) {
-	pod, _ := p.client.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error) {
+	client, err := p.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return model.PodDto{}, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	pod, _ := client.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 
 	return model.PodDto{
 		Name:      pod.Name,
@@ -128,12 +132,18 @@ func (p *podClient) GetPod(name string, namespace string) (model.PodDto, error) 
 		},
 		Status: string(pod.Status.Phase),
 		Age:    pod.Status.StartTime.String(),
-	}, errors.New("Error while listing ingresses")
+	}, nil
 }
 
-func (p *podClient) UpdatePod(name string, namespace string, dto model.PodDto) error {
-	client := p.client.CoreV1().Pods(namespace)
-	pod, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+func (p *podClient) UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error {
+	client, err := p.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	c := client.CoreV1().Pods(namespace)
+
+	pod, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error while searching ingress")
@@ -142,36 +152,16 @@ func (p *podClient) UpdatePod(name string, namespace string, dto model.PodDto) e
 	pod.Name = dto.Name
 	pod.Namespace = dto.Namespace
 
-	_, err = client.Update(context.TODO(), pod, metav1.UpdateOptions{})
+	_, err = c.Update(context.TODO(), pod, metav1.UpdateOptions{})
 
 	return err
 }
 
-func (p *podClient) DeletePod(name string, namespace string) error {
-	return p.client.CoreV1().Pods(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+func (p *podClient) DeletePod(name string, namespace string, clusterCtx string) error {
+	client, err := p.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	return client.CoreV1().Pods(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
-
-//func status(namespace string) {
-//	podsClient := client.CoreV1().Pods(namespace)
-//	pods, err := podsClient.List(context.TODO(), metav1.ListOptions{})
-//	if err != nil {
-//		fmt.Println("Error to get pods")
-//	}
-//
-//	for _, pod := range pods.Items {
-//
-//		if pod.Status.ContainerStatuses[0].State.Waiting != nil && pod.Status.ContainerStatuses[0].State.Waiting.Reason == string(knowledge.CRASH_LOOP_BACK_OFF) {
-//			fmt.Printf("Pod %s is in CrashLoopBackOff: %s\n", pod.Name, pod.Status.ContainerStatuses[0].State.Waiting.Reason)
-//		}
-//		fmt.Printf("pod: %s\n", pod.Status.ContainerStatuses[0].State.Waiting)
-//	}
-//
-//	knowledge.ErrorSource(knowledge.PODS, string(knowledge.CRASH_LOOP_BACK_OFF))
-//}
-
-// ExampleMapper
-//func mapPod(n v1.Node) model.PodDto {
-//	return model.PodDto{
-//		Name: n.Name,
-//	}
-//}

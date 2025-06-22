@@ -10,6 +10,10 @@ import (
 	"sync"
 )
 
+type ClusterResolver interface {
+	ResolveClusterContext(name string) (*kubernetes.Clientset, error)
+}
+
 var GlobalClusterManager = NewClusterManager()
 
 type ClusterManager struct {
@@ -25,10 +29,9 @@ func NewClusterManager() *ClusterManager {
 	}
 }
 
-func (cm *ClusterManager) GetValue(name string) (*kubernetes.Clientset, error) {
+func (cm *ClusterManager) ResolveClusterContext(name string) (*kubernetes.Clientset, error) {
 	if cm.clients[name] == nil {
-		fmt.Println("NIL-ClUSTER", name)
-		return nil, errors.New("cluster not exist")
+		return nil, errors.New("cluster is not registered")
 	} else {
 		fmt.Println("GetClusterValue", name)
 		return cm.clients[name], nil

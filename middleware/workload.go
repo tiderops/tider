@@ -7,7 +7,6 @@ import (
 	"Kubexplorer/backend/service"
 	"Kubexplorer/backend/usecase"
 	"fmt"
-	"k8s.io/client-go/kubernetes"
 )
 
 type WorkloadMiddleware struct {
@@ -23,16 +22,16 @@ func (w *WorkloadMiddleware) GetPods(clusterCtx string) []model.PodDto {
 	return x
 }
 
-func (w *WorkloadMiddleware) GetPod(name string, namespace string) (model.PodDto, error) {
-	return w.endpoint.GetPod(name, namespace)
+func (w *WorkloadMiddleware) GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error) {
+	return w.endpoint.GetPod(name, namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) UpdatePod(name string, namespace string, dto model.PodDto) error {
-	return w.endpoint.UpdatePod(name, namespace, dto)
+func (w *WorkloadMiddleware) UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error {
+	return w.endpoint.UpdatePod(name, namespace, dto, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) RestartPod(name string, namespace string) error {
-	return w.endpoint.RestartPod(name, namespace)
+func (w *WorkloadMiddleware) RestartPod(name string, namespace string, clusterCtx string) error {
+	return w.endpoint.RestartPod(name, namespace, clusterCtx)
 }
 
 func (w *WorkloadMiddleware) GetDeployments(clusterCtx string) []model.DeploymentDto {
@@ -42,34 +41,34 @@ func (w *WorkloadMiddleware) GetDeployments(clusterCtx string) []model.Deploymen
 	return x
 }
 
-func (w *WorkloadMiddleware) GetDeployment(name string, namespace string) (model.DeploymentDto, error) {
-	return w.endpoint.GetDeployment(name, namespace)
+func (w *WorkloadMiddleware) GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error) {
+	return w.endpoint.GetDeployment(name, namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) UpdateDeployment(name string, namespace string, dto model.DeploymentDto) error {
-	return w.endpoint.UpdateDeployment(name, namespace, dto)
+func (w *WorkloadMiddleware) UpdateDeployment(name string, namespace string, dto model.DeploymentDto, clusterCtx string) error {
+	return w.endpoint.UpdateDeployment(name, namespace, dto, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) DeleteDeployment(name string, namespace string) error {
-	return w.endpoint.DeleteDeployment(name, namespace)
+func (w *WorkloadMiddleware) DeleteDeployment(name string, namespace string, clusterCtx string) error {
+	return w.endpoint.DeleteDeployment(name, namespace, clusterCtx)
 }
 
 func (w *WorkloadMiddleware) ResourceTuning(namespace string) {
 	w.endpoint.ResourceTuning(namespace)
 }
 
-func (w *WorkloadMiddleware) TroubleshootPod(name string, namespace string) {
-	w.endpoint.TroubleshootPod(name, namespace)
+func (w *WorkloadMiddleware) TroubleshootPod(name string, namespace string, clusterCtx string) {
+	w.endpoint.TroubleshootPod(name, namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) TroubleshootDeployment(name string, namespace string) {
-	w.endpoint.TroubleshootDeployment(name, namespace)
+func (w *WorkloadMiddleware) TroubleshootDeployment(name string, namespace string, clusterCtx string) {
+	w.endpoint.TroubleshootDeployment(name, namespace, clusterCtx)
 }
 
-func BuildWorkload(client kubernetes.Interface) *WorkloadMiddleware {
-	deploymentClient := kubeclient.NewDeployment(client)
-	podClient := kubeclient.NewPod(client)
-	diagnosticService := service.NewDiagnosticService(client)
+func BuildWorkload(manager kubeclient.ClusterResolver) *WorkloadMiddleware {
+	deploymentClient := kubeclient.NewDeployment(manager)
+	podClient := kubeclient.NewPod(manager)
+	diagnosticService := service.NewDiagnosticService(nil)
 
 	deploymentUseCase := usecase.NewDeploymentUseCase(deploymentClient, diagnosticService)
 	podUseCase := usecase.NewPodUseCase(podClient, diagnosticService)

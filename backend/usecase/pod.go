@@ -8,10 +8,10 @@ import (
 
 type PodUseCase interface {
 	GetPods(clusterCtx string) ([]model.PodDto, error)
-	GetPod(name string, namespace string) (model.PodDto, error)
-	UpdatePod(name string, namespace string, dto model.PodDto) error
-	RestartPod(name string, namespace string) error
-	TroubleshootPod(name string, namespace string)
+	GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error)
+	UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error
+	RestartPod(name string, namespace string, clusterCtx string) error
+	TroubleshootPod(name string, namespace string, clusterCtx string)
 }
 
 type podUseCase struct {
@@ -27,18 +27,18 @@ func (p *podUseCase) GetPods(clusterCtx string) ([]model.PodDto, error) {
 	return p.client.GetPods(clusterCtx)
 }
 
-func (p *podUseCase) GetPod(name string, namespace string) (model.PodDto, error) {
-	return p.client.GetPod(name, namespace)
+func (p *podUseCase) GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error) {
+	return p.client.GetPod(name, namespace, clusterCtx)
 }
 
-func (p *podUseCase) UpdatePod(name string, namespace string, dto model.PodDto) error {
-	return p.client.UpdatePod(name, namespace, dto)
+func (p *podUseCase) UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error {
+	return p.client.UpdatePod(name, namespace, dto, clusterCtx)
 }
 
-func (p *podUseCase) RestartPod(name string, namespace string) error {
-	return p.client.DeletePod(name, namespace)
+func (p *podUseCase) RestartPod(name string, namespace string, clusterCtx string) error {
+	return p.client.DeletePod(name, namespace, clusterCtx)
 }
 
-func (p *podUseCase) TroubleshootPod(name string, namespace string) {
+func (p *podUseCase) TroubleshootPod(name string, namespace string, clusterCtx string) {
 	p.service.Analyse(name, namespace, service.Pod)
 }

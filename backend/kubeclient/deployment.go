@@ -6,21 +6,20 @@ import (
 	"errors"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"math/rand"
 	"strconv"
 )
 
 type deploymentClient struct {
-	client kubernetes.Interface
+	manager ClusterResolver
 }
 
-func NewDeployment(client kubernetes.Interface) DeploymentClient {
-	return &deploymentClient{client: client}
+func NewDeployment(manager ClusterResolver) DeploymentClient {
+	return &deploymentClient{manager: manager}
 }
 
 func (d deploymentClient) GetDeployments(clusterCtx string) ([]model.DeploymentDto, error) {
-	client, err := GlobalClusterManager.GetValue(clusterCtx)
+	client, err := d.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
 	}
@@ -70,20 +69,30 @@ func (d deploymentClient) GetDeploymentsMock() ([]model.DeploymentDto, error) {
 	return deployments, errors.New("Deployment Not Found")
 }
 
-func (d deploymentClient) GetDeployment(name string, namespace string) (model.DeploymentDto, error) {
-	deployment, _ := d.client.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+func (d deploymentClient) GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error) {
+	client, err := d.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return model.DeploymentDto{}, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	deployment, _ := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 
 	return model.DeploymentDto{
 		Name:      deployment.Name,
 		Namespace: deployment.Namespace,
 		Status:    string(deployment.Status.Conditions[0].Status),
 		Age:       deployment.CreationTimestamp.String(),
-	}, errors.New("Error while listing ingresses")
+	}, errors.New("Deployment Not Found")
 }
 
-func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentDto) error {
-	client := d.client.AppsV1().Deployments(namespace)
-	deployment, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentDto, clusterCtx string) error {
+	client, err := d.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	c := client.AppsV1().Deployments(namespace)
+	deployment, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error while searching ingress")
@@ -92,11 +101,16 @@ func (d deploymentClient) UpdateDeployment(name string, namespace string, dto mo
 	deployment.Name = dto.Name
 	deployment.Namespace = dto.Namespace
 
-	_, err = client.Update(context.TODO(), deployment, metav1.UpdateOptions{})
+	_, err = c.Update(context.TODO(), deployment, metav1.UpdateOptions{})
 
 	return err
 }
 
-func (d deploymentClient) DeleteDeployment(name string, namespace string) error {
-	return d.client.AppsV1().Deployments(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+func (d deploymentClient) DeleteDeployment(name string, namespace string, clusterCtx string) error {
+	client, err := d.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	return client.AppsV1().Deployments(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }

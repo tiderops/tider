@@ -2,6 +2,7 @@
 import { gridGeneralComposable } from '@/composables/GridTableComposable'
 
 const props = defineProps<{
+    cluster?: string
     headers: any[]
     items: any[]
     search?: string
@@ -16,7 +17,6 @@ const emit = defineEmits<{
 
 const editPod = (item: any) => {
     console.log('EDIT', item)
-    // const { fetchData } =
     emit('edit', item)
 }
 
@@ -24,8 +24,9 @@ const deletePod = async (item: any) => {
     console.log('DELETE', item)
     console.log('DELETE - NAME', item.name)
     console.log('DELETE - NS', item.namespace)
+    console.log('DELETE - CLUSTER ID', props.cluster)
 
-    const { fetchData } = gridGeneralComposable(item.name, item.namespace)
+    const { fetchData } = gridGeneralComposable(item.name, item.namespace, props.cluster)
 
     await fetchData()
     emit('delete', item)

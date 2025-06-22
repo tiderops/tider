@@ -112,6 +112,7 @@ onMounted(async () => {
         :statuses="statuses"
       />
       <KsGridTable
+        :cluster=props.cluster
         :headers="header.header"
         :items="filteredItems"
         :search="search"
