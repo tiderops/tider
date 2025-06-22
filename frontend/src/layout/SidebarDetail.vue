@@ -1,20 +1,28 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { defineProps, defineEmits } from 'vue'
 
-export default defineComponent({
-  name: 'ks-sidebar-detail',
-  props: {
-    isVisible: Boolean,
-    selectedRow: Object,
-  },
-  emits: ['close'],
-})
+const props = defineProps<{
+    isVisible: boolean
+    selectedRow: {
+        name?: string
+        namespace?: string
+        replicas?: number
+        cpu?: string
+        memory?: string
+        age?: string
+        status?: string
+    }
+}>()
+
+const emit = defineEmits<{
+    (e: 'close'): void
+}>()
 </script>
 
 <template>
   <v-layout>
     <v-navigation-drawer
-      v-model="isVisible"
+      v-model="props.isVisible"
       location="right"
       :width="750"
       temporary
@@ -22,18 +30,18 @@ export default defineComponent({
     >
       <v-card flat>
         <template v-slot:prepend>
-          <v-btn icon="mdi-chevron-left" variant="text" @click="$emit('close')"></v-btn>
+          <v-btn icon="mdi-chevron-left" variant="text" @click="emit('close')"></v-btn>
           <v-card-title style="color: black">Object Details</v-card-title>
         </template>
         <v-divider></v-divider>
-        <v-card-text v-if="selectedRow">
-          <p>Name: {{ selectedRow.name }}</p>
-          <p>Namespace: {{ selectedRow.namespace }}</p>
-          <p>Replicas: {{ selectedRow.replicas }}</p>
-          <p>CPU: {{ selectedRow.cpu }}</p>
-          <p>Memory: {{ selectedRow.memory }}</p>
-          <p>Age: {{ selectedRow.age }}</p>
-          <p>Status: {{ selectedRow.status }}</p>
+        <v-card-text v-if="props.selectedRow">
+          <p>Name: {{ props.selectedRow.name }}</p>
+          <p>Namespace: {{ props.selectedRow.namespace }}</p>
+          <p>Replicas: {{ props.selectedRow.replicas }}</p>
+          <p>CPU: {{ props.selectedRow.cpu }}</p>
+          <p>Memory: {{ props.selectedRow.memory }}</p>
+          <p>Age: {{ props.selectedRow.age }}</p>
+          <p>Status: {{ props.selectedRow.status }}</p>
         </v-card-text>
       </v-card>
     </v-navigation-drawer>

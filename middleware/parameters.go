@@ -4,7 +4,6 @@ import (
 	"Kubexplorer/backend/database"
 	"Kubexplorer/backend/endpoint"
 	"Kubexplorer/backend/usecase"
-	"k8s.io/client-go/kubernetes"
 )
 
 type ParameterMiddleware struct {
@@ -31,7 +30,7 @@ func (p *ParameterMiddleware) GetHeaderParams(k8sObject string) []database.HeadP
 	return p.endpoint.GetHeadParams(k8sObject)
 }
 
-func BuildParameters(client kubernetes.Interface) *ParameterMiddleware {
+func BuildParameters() *ParameterMiddleware {
 	paramDatabase := database.NewParameterEntity()
 	parameterUseCase := usecase.NewParameterUseCase(paramDatabase)
 

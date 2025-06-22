@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
-import KsGridBody from '../../layout/GridBody.vue'
 import KsGridBodyV2 from '../../layout/GridBody2.vue'
 import KsNavBar from '../../layout/Navbar.vue'
 
@@ -18,7 +17,6 @@ console.log('PRUEBA CARGA NS')
 </script>
 
 <template>
-  <!--    <ks-grid-body :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body>-->
   <ks-grid-body-v2 :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body-v2>
 </template>
 

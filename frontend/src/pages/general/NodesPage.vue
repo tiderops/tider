@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
-import KsGridBody from '../../layout/GridBody.vue'
 import KsNavBar from '../../layout/Navbar.vue'
 
 export default defineComponent({
@@ -16,7 +15,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ks-grid-body :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body>
+    <h2>qweqwe</h2>
+
 </template>
 
 <style scoped></style>

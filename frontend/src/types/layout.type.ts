@@ -17,10 +17,9 @@ export interface Setting {
   icon: string
 }
 
-export interface EnvironmentLayout {
+export interface ClusterLayout {
   name: string
-  description: string
-  env: string
+  cluster: string
   status: boolean
   options: Menu[]
 }

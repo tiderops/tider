@@ -26,7 +26,7 @@ func (r *resourceService) ResourceTuning(namespace string) []model.PodDto {
 	var result []model.PodDto
 
 	for _, metric := range metrics.Items {
-		pod, err := r.pod.GetPod(metric.Name, metric.Namespace)
+		pod, err := r.pod.GetPod(metric.Name, metric.Namespace, "")
 		if err != nil {
 			fmt.Errorf("Error getting pods: %v", err)
 		}

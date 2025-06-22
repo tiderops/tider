@@ -5,7 +5,6 @@ import (
 	"Kubexplorer/backend/kubeclient"
 	"Kubexplorer/backend/model"
 	"Kubexplorer/backend/usecase"
-	"k8s.io/client-go/kubernetes"
 )
 
 type GeneralMiddleware struct {
@@ -44,9 +43,11 @@ func (g *GeneralMiddleware) ExportNamespaceObjects(namespace string, directory s
 	return g.endpoint.ExportNamespaceObjects(namespace, directory)
 }
 
-func BuildGeneral(client kubernetes.Interface) *GeneralMiddleware {
+func BuildGeneral() *GeneralMiddleware {
+	//x, _ := kubeclient.GlobalClusterManager.GetValue("as")
+
 	nodeClient := kubeclient.NewCluster()
-	namespaceClient := kubeclient.NewNamespaceClient(client)
+	namespaceClient := kubeclient.NewNamespaceClient(nil)
 
 	nodeUseCase := usecase.NewNodeUseCase(nodeClient)
 	namespaceUseCase := usecase.NewNamespaceUseCase(namespaceClient)

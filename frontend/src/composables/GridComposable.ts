@@ -1,4 +1,4 @@
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { database, model } from '../../wailsjs/go/models'
 import { fetchGetDeployments, fetchGetPods } from '../services/workload.service'
 import { fetchHeaderParams } from '../services/layout.service'
@@ -22,7 +22,7 @@ interface GridResponse {
   }
 }
 
-export function gridComposable(k8sObject: string): GridResponse {
+export function gridComposable(clusterCtx: string, k8sObject: string): GridResponse {
   switch (k8sObject) {
     case 'node': {
       console.log('Get Nodes')
@@ -46,11 +46,11 @@ export function gridComposable(k8sObject: string): GridResponse {
     }
     case 'deployment': {
       console.log('Get Deployments')
-      return gridBodyDeployments(k8sObject)
+      return gridBodyDeployments(clusterCtx, k8sObject)
     }
     case 'pod': {
       console.log('Get Pods')
-      return gridBodyPods(k8sObject)
+      return gridBodyPods(clusterCtx, k8sObject)
     }
     default: {
       console.log('K8s object not found')
@@ -65,7 +65,7 @@ export function gridComposable(k8sObject: string): GridResponse {
   }
 }
 
-export function gridBodyPods(k8sObject: string) {
+export function gridBodyPods(clusterCtx: string, k8sObject: string) {
   const head = ref<Array<any>>([])
   const body = ref<
     Array<{
@@ -84,7 +84,7 @@ export function gridBodyPods(k8sObject: string) {
       const pods = ref<PodDto[]>([])
       const header = ref<HeadParamsDto[]>([])
 
-      pods.value = await fetchGetPods()
+      pods.value = await fetchGetPods(clusterCtx)
       header.value = await fetchHeaderParams(k8sObject)
 
       console.log('PODS: ', pods.value)
@@ -111,11 +111,6 @@ export function gridBodyPods(k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    // await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -127,7 +122,7 @@ export function gridBodyPods(k8sObject: string) {
   return response
 }
 
-export function gridBodyDeployments(k8sObject: string) {
+export function gridBodyDeployments(clusterCtx: string, k8sObject: string) {
   const head = ref<Array<any>>([])
   const body = ref<
     Array<{
@@ -143,7 +138,7 @@ export function gridBodyDeployments(k8sObject: string) {
       const deployment = ref<DeploymentDto[]>([])
       const header = ref<HeadParamsDto[]>([])
 
-      deployment.value = await fetchGetDeployments()
+      deployment.value = await fetchGetDeployments(clusterCtx)
       header.value = await fetchHeaderParams(k8sObject)
 
       console.log('DEPLOYMENTS', body.value)
@@ -166,11 +161,6 @@ export function gridBodyDeployments(k8sObject: string) {
       throw error
     }
   }
-
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
 
   const response: GridResponse = {
     fetchData: fetchData,
@@ -197,11 +187,6 @@ export function gridBodyServices(k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -227,11 +212,6 @@ export function gridBodyIngresses(k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -256,11 +236,6 @@ export function gridBodyPersistentVolumes(k8sObject: string) {
       throw error
     }
   }
-
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
 
   const response: GridResponse = {
     fetchData: fetchData,
@@ -312,11 +287,6 @@ export function gridBodyNamespaces(k8sObject: string) {
     }
   }
 
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    // await fetchData()
-  })
-
   const response: GridResponse = {
     fetchData: fetchData,
     content: {
@@ -341,11 +311,6 @@ export function gridBodyNodes(namespace: string) {
       throw error
     }
   }
-
-  onMounted(async () => {
-    console.log('onMounted triggered')
-    await fetchData()
-  })
 
   const response: GridResponse = {
     fetchData: fetchData,

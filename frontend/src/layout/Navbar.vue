@@ -1,65 +1,51 @@
-<script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs } from 'vue'
-import { navbarComposable } from '../composables/NavbarComposable'
-import { K8sObjectDto, NavbarDto } from '../types/navbar.type'
+<script setup lang="ts">
+import { onMounted, reactive } from 'vue'
+import { navbarComposable } from '@/composables/NavbarComposable'
+import { K8sObjectDto, NavbarDto } from '@/types/navbar.type'
 
 interface NavbarState {
   menu: NavbarDto[]
   objects: K8sObjectDto[]
 }
 
-export default defineComponent({
-  name: 'ks-nav-bar',
-  props: {
-    content: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const { objects, fetchData } = navbarComposable()
+const { objects, fetchData } = navbarComposable()
 
-    const state = reactive<NavbarState>({
-      menu: [],
-      objects: [],
-    })
+const props = defineProps<{
+    content: string
+}>()
 
-    onMounted(async () => {
-      await fetchData()
-      console.log('OBJECTS', objects.value)
-
-      const dto: NavbarDto[] = objects.value.map((o) => {
-        return {
-          Name: o.Name,
-          IsVisible: o.IsVisible,
-          IsEditable: o.IsEditable,
-          K8sObject: o.K8sObject.map((k) => {
-            return {
-              Name: k.Name,
-              Link: k.Link,
-              IsEditable: k.IsEditable,
-              IsVisible: k.IsVisible,
-            }
-          }),
-        }
-      })
-
-      const type = dto.find((x) => x.Name == props.content)
-      state.menu = dto
-      state.objects = type!.K8sObject
-    })
-
-    return {
-      ...toRefs(state),
-    }
-  },
+const state = reactive<NavbarState>({
+    menu: [],
+    objects: [],
 })
+
+onMounted(async () => {
+    await fetchData()
+    console.log('OBJECTS', objects.value)
+
+    const dto: NavbarDto[] = objects.value.map((o) => ({
+        Name: o.Name,
+        IsVisible: o.IsVisible,
+        IsEditable: o.IsEditable,
+        K8sObject: o.K8sObject.map((k) => ({
+            Name: k.Name,
+            Link: k.Link,
+            IsEditable: k.IsEditable,
+            IsVisible: k.IsVisible,
+        })),
+    }))
+
+    const type = dto.find((x) => x.Name === props.content)
+    state.menu = dto
+    state.objects = type?.K8sObject ?? []
+})
+
 </script>
 
 <template>
   <nav class="navbar">
     <div class="nav-content">
-      <div class="nav-links" v-for="(item, index) in objects" :key="index">
+      <div class="nav-links" v-for="(item, index) in state.objects" :key="index">
         <router-link :to="{ name: item.Link }" class="nav-link">{{ item.Name }}</router-link>
       </div>
     </div>

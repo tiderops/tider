@@ -1,17 +1,19 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 
-export default defineComponent({
-  name: 'KsGridHeader',
-  props: {
-    search: String,
-    filterNamespace: String,
-    filterStatus: String,
-    namespaces: Array,
-    statuses: Array,
-  },
-  emits: ['update:search', 'update:filterNamespace', 'update:filterStatus'],
-})
+const props = defineProps<{
+    search?: string
+    filterNamespace?: string
+    filterStatus?: string
+    namespaces?: string[]
+    statuses?: string[]
+}>()
+
+const emit = defineEmits<{
+    (e: 'update:search', value: string): void,
+    (e: 'update:filterNamespace', value: string): void,
+    (e: 'update:filterStatus', value: string): void
+}>()
+
 </script>
 
 <template>
@@ -19,27 +21,27 @@ export default defineComponent({
     <v-toolbar-title>Filters</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-text-field
-      :model-value="search"
+      :model-value="props.search"
       label="Search"
       clearable
       class="mx-4"
-      @update:model-value="$emit('update:search', $event)"
+      @update:model-value="emit('update:search', $event)"
     ></v-text-field>
     <v-select
-      :model-value="filterNamespace"
-      :items="namespaces"
+      :model-value="props.filterNamespace"
+      :items="props.namespaces"
       label="Namespace"
       clearable
       class="mx-5"
-      @update:model-value="$emit('update:filterNamespace', $event)"
+      @update:model-value="emit('update:filterNamespace', $event)"
     ></v-select>
     <v-select
-      :model-value="filterStatus"
-      :items="statuses"
+      :model-value="props.filterStatus"
+      :items="props.statuses"
       label="Status"
       clearable
       class="mx-5"
-      @update:model-value="$emit('update:filterStatus', $event)"
+      @update:model-value="emit('update:filterStatus', $event)"
     ></v-select>
   </v-toolbar>
 </template>

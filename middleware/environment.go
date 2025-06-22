@@ -5,7 +5,6 @@ import (
 	"Kubexplorer/backend/kubeclient"
 	"Kubexplorer/backend/model"
 	"Kubexplorer/backend/usecase"
-	"k8s.io/client-go/kubernetes"
 )
 
 type EnvironmentMiddleware struct {
@@ -28,7 +27,7 @@ func (e *EnvironmentMiddleware) GetObjectsView() (model.ObjectMapDto, error) {
 	return e.endpoint.GetObjectsView()
 }
 
-func BuildEnvironment(client kubernetes.Interface) *EnvironmentMiddleware {
+func BuildEnvironment() *EnvironmentMiddleware {
 	clusterClient := kubeclient.NewCluster()
 
 	environmentUseCase := usecase.NewEnvironmentUseCase(clusterClient)

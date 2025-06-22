@@ -1,6 +1,7 @@
 package kubeclient
 
 import (
+	"errors"
 	"fmt"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -8,6 +9,12 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sync"
 )
+
+type ClusterResolver interface {
+	ResolveClusterContext(name string) (*kubernetes.Clientset, error)
+}
+
+var GlobalClusterManager = NewClusterManager()
 
 type ClusterManager struct {
 	mu             sync.RWMutex
@@ -17,7 +24,17 @@ type ClusterManager struct {
 
 func NewClusterManager() *ClusterManager {
 	return &ClusterManager{
-		clients: make(map[string]*kubernetes.Clientset),
+		clients:        make(map[string]*kubernetes.Clientset),
+		dynamicClients: make(map[string]*dynamic.DynamicClient),
+	}
+}
+
+func (cm *ClusterManager) ResolveClusterContext(name string) (*kubernetes.Clientset, error) {
+	if cm.clients[name] == nil {
+		return nil, errors.New("cluster is not registered")
+	} else {
+		fmt.Println("GetClusterValue", name)
+		return cm.clients[name], nil
 	}
 }
 

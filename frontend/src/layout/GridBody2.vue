@@ -1,12 +1,15 @@
-<script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
-import { gridComposable } from '../composables/GridComposable'
+<script setup lang="ts">
+import { computed, onMounted, reactive, ref } from 'vue'
+import { gridComposable } from '@/composables/GridComposable'
 import KsSidebarDetail from './SidebarDetail.vue'
 import KsGridTable from '../components/GridTableComponent.vue'
 import KsGridHeader from '../components/GridHeaderComponent.vue'
 
-interface GridState {
-  items: Array<{
+const snackbar = ref(false)
+const text = ref('')
+const timeout = ref(2000)
+
+interface GridItem {
     name: string
     namespace: string
     replicas: number
@@ -14,89 +17,87 @@ interface GridState {
     memory: string
     age: string
     status: string
-  }>
-  search: string
-  filterNamespace: string
-  filterStatus: string
-  sortBy: any
 }
 
 interface HeadState {
-  header: Array<any>
+    header: Array<any>
 }
 
-export default defineComponent({
-  name: 'KsGridBodyV2',
-  components: { KsGridHeader, KsGridTable, KsSidebarDetail },
-  props: {
-    k8sObject: { type: String, required: true },
-    namespace: { type: String, required: true },
-  },
-  setup(props) {
-    const response = gridComposable(props.k8sObject)
-    const namespaces = ['ns-local', 'ns-dev']
-    const statuses = ['Alive', 'Inactive']
+// Props
+const props = defineProps<{
+    cluster?: string
+    k8sObject: string
+    namespace: string
+}>()
 
-    const state = reactive<GridState>({
-      items: [],
-      search: '',
-      filterNamespace: '',
-      filterStatus: '',
-      sortBy: [{ key: 'name', order: 'asc' }],
-    })
+// Composables & constants
+const response = gridComposable(props.cluster, props.k8sObject)
+const namespaces = ['ns-local', 'ns-dev']
+const statuses = ['Running', 'Succeeded', 'Pending']
 
-    const header = reactive<HeadState>({
-      header: [],
-    })
+// Reactive state
+const items = ref<GridItem[]>([])
+const search = ref('')
+const filterNamespace = ref('')
+const filterStatus = ref('')
+const sortBy = ref([{ key: 'name', order: 'asc' }])
 
-    const filteredItems = computed(() => {
-      return state.items.filter((item) => {
+const header = reactive<HeadState>({
+    header: [],
+})
+
+// Filtering logic
+const filteredItems = computed(() =>
+    items.value.filter((item) => {
         const namespaceMatch =
-          !state.filterNamespace || item.namespace.includes(state.filterNamespace)
-        const statusMatch = !state.filterStatus || item.status.includes(state.filterStatus)
+            !filterNamespace.value || item.namespace.includes(filterNamespace.value)
+        const statusMatch = !filterStatus.value || item.status.includes(filterStatus.value)
         const searchMatch =
-          !state.search || item.name.toLowerCase().includes(state.search.toLowerCase())
+            !search.value || item.name.toLowerCase().includes(search.value.toLowerCase())
         return namespaceMatch && statusMatch && searchMatch
-      })
     })
+)
 
-    const isSidebarVisible = ref(false)
-    const selectedRow = ref<any>(null)
+// Sidebar logic
+const isSidebarVisible = ref(false)
+const selectedRow = ref<any>(null)
 
-    const onRowClick = (cellData: any, item: any) => {
-      selectedRow.value = item.item
-      console.log('selectedRow.value', item.item)
+const onRowClick = (cellData: any, item: any) => {
+    selectedRow.value = item.item
 
-      if (isSidebarVisible.value) {
-        console.log('FALSE')
+    if (isSidebarVisible.value) {
         isSidebarVisible.value = false
         setTimeout(() => {
-          console.log('Delayed')
-          isSidebarVisible.value = true
+            isSidebarVisible.value = true
         }, 100)
-      } else {
-        console.log('FALSE')
+    } else {
         isSidebarVisible.value = true
-      }
     }
+}
 
-    onMounted(async () => {
-      await response.fetchData()
-      header.header = response.content?.head.value
-      state.items = response.content?.body.value
-    })
+const onEditItem = async (item: any) => {
+    console.log('Parent received edit:', item)
+    text.value = `Resource "${item.name}" was edited.`
+    snackbar.value = true
 
-    return {
-      namespaces,
-      header,
-      statuses,
-      ...toRefs(state),
-      filteredItems,
-      isSidebarVisible,
-      selectedRow,
-      onRowClick,
-    }
-  },
+    await response.fetchData()
+    items.value = response.content?.body.value ?? []
+}
+
+const onDeleteItem = async (item: any) => {
+    console.log('Parent received delete:', item)
+    text.value = `Resource "${item.name}" was deleted.`
+    snackbar.value = true
+
+    await response.fetchData()
+    items.value = response.content?.body.value ?? []
+}
+
+// Fetch data on mount
+onMounted(async () => {
+    await response.fetchData()
+    header.header = response.content?.head.value ?? []
+    items.value = response.content?.body.value ?? []
 })
 </script>
 
@@ -111,13 +112,22 @@ export default defineComponent({
         :statuses="statuses"
       />
       <KsGridTable
+        :cluster=props.cluster
         :headers="header.header"
         :items="filteredItems"
         :search="search"
         :sortBy="sortBy"
         @click:row="onRowClick"
+        @delete="onDeleteItem"
+        @edit="onEditItem"
       />
     </v-card>
+      <v-snackbar v-model="snackbar" :timeout="timeout">
+          {{ text }}
+          <template v-slot:actions>
+              <v-btn color="blue" variant="text" @click="snackbar = false">Close</v-btn>
+          </template>
+      </v-snackbar>
     <v-card>
       <KsSidebarDetail
         :isVisible="isSidebarVisible"
