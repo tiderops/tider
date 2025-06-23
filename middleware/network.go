@@ -5,7 +5,6 @@ import (
 	"Kubexplorer/backend/kubeclient"
 	"Kubexplorer/backend/model"
 	"Kubexplorer/backend/usecase"
-	"k8s.io/client-go/kubernetes"
 )
 
 type NetworkMiddleware struct {
@@ -16,41 +15,41 @@ func NewNetworkMiddleware(endpoint *endpoint.NetworkEndpoint) *NetworkMiddleware
 	return &NetworkMiddleware{endpoint: *endpoint}
 }
 
-func (n *NetworkMiddleware) GetServices(namespace string) ([]model.ServiceDto, error) {
-	return n.endpoint.GetServices(namespace)
+func (n *NetworkMiddleware) GetServices(clusterCtx string) ([]model.ServiceDto, error) {
+	return n.endpoint.GetServices(clusterCtx)
 }
 
-func (n *NetworkMiddleware) GetService(name string, namespace string) (model.ServiceDto, error) {
-	return n.endpoint.GetService(name, namespace)
+func (n *NetworkMiddleware) GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error) {
+	return n.endpoint.GetService(name, namespace, clusterCtx)
 }
 
-func (n *NetworkMiddleware) UpdateService(name string, namespace string, dto model.ServiceDto) error {
-	return n.endpoint.UpdateService(name, namespace, dto)
+func (n *NetworkMiddleware) UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error {
+	return n.endpoint.UpdateService(name, namespace, dto, clusterCtx)
 }
 
-func (n *NetworkMiddleware) DeleteService(name string, namespace string) error {
-	return n.endpoint.DeleteService(name, namespace)
+func (n *NetworkMiddleware) DeleteService(name string, namespace string, clusterCtx string) error {
+	return n.endpoint.DeleteService(name, namespace, clusterCtx)
 }
 
-func (n *NetworkMiddleware) GetIngresses(namespace string) ([]model.IngressDto, error) {
-	return n.endpoint.GetIngresses(namespace)
+func (n *NetworkMiddleware) GetIngresses(clusterCtx string) ([]model.IngressDto, error) {
+	return n.endpoint.GetIngresses(clusterCtx)
 }
 
-func (n *NetworkMiddleware) GetIngress(name string, namespace string) (model.IngressDto, error) {
-	return n.endpoint.GetIngress(name, namespace)
+func (n *NetworkMiddleware) GetIngress(name string, namespace string, clusterCtx string) (model.IngressDto, error) {
+	return n.endpoint.GetIngress(name, namespace, clusterCtx)
 }
 
-func (n *NetworkMiddleware) UpdateIngress(name string, namespace string, dto model.IngressDto) error {
-	return n.endpoint.UpdateIngress(name, namespace, dto)
+func (n *NetworkMiddleware) UpdateIngress(name string, namespace string, dto model.IngressDto, clusterCtx string) error {
+	return n.endpoint.UpdateIngress(name, namespace, dto, clusterCtx)
 }
 
-func (n *NetworkMiddleware) DeleteIngress(name string, namespace string) error {
-	return n.endpoint.DeleteIngress(name, namespace)
+func (n *NetworkMiddleware) DeleteIngress(name string, namespace string, clusterCtx string) error {
+	return n.endpoint.DeleteIngress(name, namespace, clusterCtx)
 }
 
-func BuildNetwork(client kubernetes.Interface) *NetworkMiddleware {
-	serviceClient := kubeclient.NewServiceClient(client)
-	ingressClient := kubeclient.NewIngressClient(client)
+func BuildNetwork(manager kubeclient.ClusterResolver) *NetworkMiddleware {
+	serviceClient := kubeclient.NewServiceClient(manager)
+	ingressClient := kubeclient.NewIngressClient(manager)
 
 	serviceUseCase := usecase.NewServiceUseCase(serviceClient)
 	ingressUseCase := usecase.NewIngressUseCase(ingressClient)

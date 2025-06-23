@@ -6,10 +6,10 @@ import (
 )
 
 type ServiceUseCase interface {
-	GetServices(namespace string) ([]model.ServiceDto, error)
-	GetService(name string, namespace string) (model.ServiceDto, error)
-	UpdateService(name string, namespace string, dto model.ServiceDto) error
-	DeleteService(name string, namespace string) error
+	GetServices(clusterCtx string) ([]model.ServiceDto, error)
+	GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error)
+	UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error
+	DeleteService(name string, namespace string, clusterCtx string) error
 }
 
 type serviceUseCase struct {
@@ -20,18 +20,18 @@ func NewServiceUseCase(client kubeclient.ServiceClient) ServiceUseCase {
 	return &serviceUseCase{client: client}
 }
 
-func (s *serviceUseCase) GetServices(namespace string) ([]model.ServiceDto, error) {
-	return s.client.GetServices(namespace)
+func (s *serviceUseCase) GetServices(clusterCtx string) ([]model.ServiceDto, error) {
+	return s.client.GetServices(clusterCtx)
 }
 
-func (s *serviceUseCase) GetService(name string, namespace string) (model.ServiceDto, error) {
-	return s.client.GetService(name, namespace)
+func (s *serviceUseCase) GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error) {
+	return s.client.GetService(name, namespace, clusterCtx)
 }
 
-func (s *serviceUseCase) UpdateService(name string, namespace string, dto model.ServiceDto) error {
-	return s.client.UpdateService(name, namespace, dto)
+func (s *serviceUseCase) UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error {
+	return s.client.UpdateService(name, namespace, dto, clusterCtx)
 }
 
-func (s *serviceUseCase) DeleteService(name string, namespace string) error {
-	return s.client.DeleteService(name, namespace)
+func (s *serviceUseCase) DeleteService(name string, namespace string, clusterCtx string) error {
+	return s.client.DeleteService(name, namespace, clusterCtx)
 }

@@ -52,15 +52,15 @@ type NamespaceClient interface {
 }
 
 type ServiceClient interface {
-	GetServices(namespace string) ([]model.ServiceDto, error)
-	GetService(name string, namespace string) (model.ServiceDto, error)
-	UpdateService(name string, namespace string, dto model.ServiceDto) error
-	DeleteService(name string, namespace string) error
+	GetServices(clusterCtx string) ([]model.ServiceDto, error)
+	GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error)
+	UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error
+	DeleteService(name string, namespace string, clusterCtx string) error
 }
 
 type IngressClient interface {
-	GetIngresses() ([]model.IngressDto, error)
-	GetIngress(name string, namespace string) (model.IngressDto, error)
-	UpdateIngress(name string, namespace string, dto model.IngressDto) error
-	DeleteIngress(name string, namespace string) error
+	GetIngresses(clusterCtx string) ([]model.IngressDto, error)
+	GetIngress(name string, namespace string, clusterCtx string) (model.IngressDto, error)
+	UpdateIngress(name string, namespace string, dto model.IngressDto, clusterCtx string) error
+	DeleteIngress(name string, namespace string, clusterCtx string) error
 }

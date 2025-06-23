@@ -109,7 +109,7 @@ func main() {
 			middleware.BuildEnvironment(),
 			middleware.BuildParameters(),
 			middleware.BuildGeneral(),
-			middleware.BuildNetwork(nil),
+			middleware.BuildNetwork(manager),
 			middleware.BuildStorage(nil),
 			middleware.BuildWorkload(manager),
 		},
