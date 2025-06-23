@@ -4,7 +4,6 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
@@ -14,7 +13,7 @@ import (
 )
 
 type cluster struct {
-	client kubernetes.Interface
+	manager ClusterResolver
 }
 
 func NewCluster() ClusterClient {
@@ -125,7 +124,7 @@ func checkClusterStatus(kubeConfigPath string, contextName string) bool {
 	}
 }
 
-func (c *cluster) GetCurrentCluster() (model.EnvironmentDto, error) {
+func (c *cluster) GetCurrentCluster(name string) (model.EnvironmentDto, error) {
 	dto := model.EnvironmentDto{
 		Name:        "minikube",
 		Description: "minikube description",
@@ -134,50 +133,4 @@ func (c *cluster) GetCurrentCluster() (model.EnvironmentDto, error) {
 	}
 
 	return dto, nil
-}
-
-func (c *cluster) GetNode(name string) (model.NodeDtoV2, error) {
-	node, err := c.client.CoreV1().Nodes().Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return model.NodeDtoV2{
-		Name:      node.Name,
-		Namespace: node.Namespace,
-		Resource: model.Resource{
-			Cpu:    node.Status.Capacity.Cpu().String(),
-			Memory: node.Status.Capacity.Memory().String(),
-		},
-		Version:           node.ResourceVersion,
-		CreationTimestamp: node.CreationTimestamp.String(),
-		Labels:            node.Labels,
-	}, nil
-}
-
-func (c *cluster) GetNodes() ([]model.NodeDtoV2, error) {
-	nodes, err := c.client.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		panic(err.Error())
-	}
-
-	var result []model.NodeDtoV2
-
-	for _, node := range nodes.Items {
-		dto := model.NodeDtoV2{
-			Name:      node.Name,
-			Namespace: node.Namespace,
-			Resource: model.Resource{
-				Cpu:    node.Status.Capacity.Cpu().String(),
-				Memory: node.Status.Capacity.Memory().String(),
-			},
-			Version:           node.ResourceVersion,
-			CreationTimestamp: node.CreationTimestamp.String(),
-			Labels:            node.Labels,
-		}
-
-		result = append(result, dto)
-	}
-
-	return result, nil
 }

@@ -108,7 +108,7 @@ func main() {
 			app,
 			middleware.BuildEnvironment(),
 			middleware.BuildParameters(),
-			middleware.BuildGeneral(),
+			middleware.BuildGeneral(manager),
 			middleware.BuildNetwork(manager),
 			middleware.BuildStorage(manager),
 			middleware.BuildWorkload(manager),

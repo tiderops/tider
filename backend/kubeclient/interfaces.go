@@ -7,9 +7,13 @@ import (
 
 type ClusterClient interface {
 	ListAvailableClusters() ([]model.ClusterInfo, error)
-	GetCurrentCluster() (model.EnvironmentDto, error)
-	GetNode(name string) (model.NodeDtoV2, error)
-	GetNodes() ([]model.NodeDtoV2, error)
+	GetCurrentCluster(name string) (model.EnvironmentDto, error)
+
+}
+
+type NodeClient interface {
+	GetNode(name string, clusterCtx string) (model.NodeDtoV2, error)
+	GetNodes(clusterCtx string) ([]model.NodeDtoV2, error)
 }
 
 type MetricClient interface {
@@ -45,10 +49,10 @@ type StorageClient interface {
 }
 
 type NamespaceClient interface {
-	GetNamespaces() ([]model.NamespaceDto, error)
-	GetNamespace(name string) (model.NamespaceDto, error)
-	UpdateNamespace(name string, dto model.NamespaceDto) error
-	DeleteNamespace(name string) error
+	GetNamespaces(clusterCtx string) ([]model.NamespaceDto, error)
+	GetNamespace(name string, clusterCtx string) (model.NamespaceDto, error)
+	UpdateNamespace(name string, dto model.NamespaceDto, clusterCtx string) error
+	DeleteNamespace(name string, clusterCtx string) error
 }
 
 type ServiceClient interface {
