@@ -5,7 +5,6 @@ import (
 	"Kubexplorer/backend/kubeclient"
 	"Kubexplorer/backend/model"
 	"Kubexplorer/backend/usecase"
-	"k8s.io/client-go/kubernetes"
 )
 
 type StorageMiddleware struct {
@@ -16,40 +15,40 @@ func NewStorageMiddleware(endpoint *endpoint.StorageEndpoint) *StorageMiddleware
 	return &StorageMiddleware{endpoint: *endpoint}
 }
 
-func (s *StorageMiddleware) GetPersistentVolumes() ([]model.PersistentVolumeDto, error) {
-	return s.endpoint.GetPersistentVolumes()
+func (s *StorageMiddleware) GetPersistentVolumes(clusterCtx string) ([]model.PersistentVolumeDto, error) {
+	return s.endpoint.GetPersistentVolumes(clusterCtx)
 }
 
-func (s *StorageMiddleware) GetPersistentVolume(name string) (model.PersistentVolumeDto, error) {
-	return s.endpoint.GetPersistentVolume(name)
+func (s *StorageMiddleware) GetPersistentVolume(name string, clusterCtx string) (model.PersistentVolumeDto, error) {
+	return s.endpoint.GetPersistentVolume(name, clusterCtx)
 }
 
-func (s *StorageMiddleware) UpdatePersistentVolume(name string, dto model.PersistentVolumeDto) error {
-	return s.endpoint.UpdatePersistentVolume(name, dto)
+func (s *StorageMiddleware) UpdatePersistentVolume(name string, dto model.PersistentVolumeDto, clusterCtx string) error {
+	return s.endpoint.UpdatePersistentVolume(name, dto, clusterCtx)
 }
 
-func (s *StorageMiddleware) DeletePersistentVolume(name string) error {
-	return s.endpoint.DeletePersistentVolume(name)
+func (s *StorageMiddleware) DeletePersistentVolume(name string, clusterCtx string) error {
+	return s.endpoint.DeletePersistentVolume(name, clusterCtx)
 }
 
-func (s *StorageMiddleware) GetPersistentVolumesClaim(namespace string) ([]model.PersistentVolumeClaimDto, error) {
-	return s.endpoint.GetPersistentVolumesClaim(namespace)
+func (s *StorageMiddleware) GetPersistentVolumesClaim(clusterCtx string) ([]model.PersistentVolumeClaimDto, error) {
+	return s.endpoint.GetPersistentVolumesClaim(clusterCtx)
 }
 
-func (s *StorageMiddleware) GetPersistentVolumeClaim(name string, namespace string) (model.PersistentVolumeClaimDto, error) {
-	return s.endpoint.GetPersistentVolumeClaim(name, namespace)
+func (s *StorageMiddleware) GetPersistentVolumeClaim(name string, namespace string, clusterCtx string) (model.PersistentVolumeClaimDto, error) {
+	return s.endpoint.GetPersistentVolumeClaim(name, namespace, clusterCtx)
 }
 
-func (s *StorageMiddleware) UpdatePersistentVolumeClaim(name string, namespace string, dto model.PersistentVolumeClaimDto) error {
-	return s.endpoint.UpdatePersistentVolumeClaim(name, namespace, dto)
+func (s *StorageMiddleware) UpdatePersistentVolumeClaim(name string, namespace string, dto model.PersistentVolumeClaimDto, clusterCtx string) error {
+	return s.endpoint.UpdatePersistentVolumeClaim(name, namespace, dto, clusterCtx)
 }
 
-func (s *StorageMiddleware) DeletePersistentVolumeClaim(name string, namespace string) error {
-	return s.endpoint.DeletePersistentVolumeClaim(name, namespace)
+func (s *StorageMiddleware) DeletePersistentVolumeClaim(name string, namespace string, clusterCtx string) error {
+	return s.endpoint.DeletePersistentVolumeClaim(name, namespace, clusterCtx)
 }
 
-func BuildStorage(client kubernetes.Interface) *StorageMiddleware {
-	storageClient := kubeclient.NewStorageClient(client)
+func BuildStorage(manager kubeclient.ClusterResolver) *StorageMiddleware {
+	storageClient := kubeclient.NewStorageClient(manager)
 
 	storageUseCase := usecase.NewStorageUseCase(storageClient)
 

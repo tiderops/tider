@@ -19,36 +19,6 @@ func NewPod(manager ClusterResolver) PodClient {
 	}
 }
 
-func (p *podClient) GetPodsMock() ([]model.PodDto, error) {
-	var pods []model.PodDto
-	for i := 0; i < 10; i++ {
-
-		p := model.PodDto{
-			Name:      fmt.Sprintf("pod %d", i),
-			Namespace: "TODO",
-			Replicas:  1,
-			Container: model.Container{
-				Limit: model.Resource{
-					Cpu:    strconv.Itoa(rand.Intn(1000)) + "mi",
-					Memory: strconv.Itoa(rand.Intn(1000)),
-				},
-				Request: model.Resource{
-					Cpu:    strconv.Itoa(rand.Intn(1000)),
-					Memory: strconv.Itoa(rand.Intn(1000)),
-				},
-			},
-			Status: "Running",
-			Age:    strconv.Itoa(rand.Intn(1000)),
-		}
-
-		pods = append(pods, p)
-	}
-
-	fmt.Println(pods[0].Name)
-
-	return pods, nil
-}
-
 func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
 	client, err := p.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {

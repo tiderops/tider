@@ -52,23 +52,6 @@ func (d deploymentClient) GetDeployments(clusterCtx string) ([]model.DeploymentD
 	return result, errors.New("deployment list is empty")
 }
 
-func (d deploymentClient) GetDeploymentsMock() ([]model.DeploymentDto, error) {
-	var deployments []model.DeploymentDto
-	for i := 0; i < 10; i++ {
-
-		p := model.DeploymentDto{
-			Name:      fmt.Sprintf("Deployment %d", i),
-			Namespace: "TODO",
-			Status:    "Running",
-			Age:       strconv.Itoa(rand.Intn(1000)),
-		}
-
-		deployments = append(deployments, p)
-	}
-
-	return deployments, errors.New("Deployment Not Found")
-}
-
 func (d deploymentClient) GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error) {
 	client, err := d.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {

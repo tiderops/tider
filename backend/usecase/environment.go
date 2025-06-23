@@ -27,7 +27,7 @@ func (e *environmentUseCase) ListAvailableClusters() ([]model.ClusterInfo, error
 }
 
 func (e *environmentUseCase) GetCurrentEnvironment(env string, name string) (model.EnvironmentDto, error) {
-	return e.client.GetCurrentCluster()
+	return e.client.GetCurrentCluster(name)
 }
 
 func (e *environmentUseCase) GetObjectsView() (model.ObjectMapDto, error) {

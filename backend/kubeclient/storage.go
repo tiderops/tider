@@ -4,20 +4,25 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"errors"
+	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
 type storageClient struct {
-	client kubernetes.Interface
+	manager ClusterResolver
 }
 
-func NewStorageClient(client kubernetes.Interface) StorageClient {
-	return &storageClient{client: client}
+func NewStorageClient(manager ClusterResolver) StorageClient {
+	return &storageClient{manager: manager}
 }
 
-func (s storageClient) GetPersistentVolumes() ([]model.PersistentVolumeDto, error) {
-	volumes, err := s.client.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
+func (s storageClient) GetPersistentVolumes(clusterCtx string) ([]model.PersistentVolumeDto, error) {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	volumes, err := client.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
 
 	if err != nil {
 		return nil, err
@@ -70,8 +75,13 @@ func (s storageClient) GetPersistentVolumes() ([]model.PersistentVolumeDto, erro
 	return result, errors.New("Error to get persistent volumes claim")
 }
 
-func (s storageClient) GetPersistentVolume(name string) (model.PersistentVolumeDto, error) {
-	volume, err := s.client.CoreV1().PersistentVolumes().Get(context.TODO(), name, metav1.GetOptions{})
+func (s storageClient) GetPersistentVolume(name string, clusterCtx string) (model.PersistentVolumeDto, error) {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return model.PersistentVolumeDto{}, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	volume, err := client.CoreV1().PersistentVolumes().Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error to get persistent volume")
@@ -116,9 +126,14 @@ func (s storageClient) GetPersistentVolume(name string) (model.PersistentVolumeD
 	}, nil
 }
 
-func (s storageClient) UpdatePersistentVolume(name string, dto model.PersistentVolumeDto) error {
-	client := s.client.CoreV1().PersistentVolumes()
-	volume, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+func (s storageClient) UpdatePersistentVolume(name string, dto model.PersistentVolumeDto, clusterCtx string) error {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	c := client.CoreV1().PersistentVolumes()
+	volume, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error while searching ingress")
@@ -127,17 +142,27 @@ func (s storageClient) UpdatePersistentVolume(name string, dto model.PersistentV
 	volume.Name = dto.Name
 	volume.Namespace = dto.Namespace
 
-	_, err = client.Update(context.TODO(), volume, metav1.UpdateOptions{})
+	_, err = c.Update(context.TODO(), volume, metav1.UpdateOptions{})
 
 	return err
 }
 
-func (s storageClient) DeletePersistentVolume(name string) error {
-	return s.client.CoreV1().PersistentVolumes().Delete(context.TODO(), name, metav1.DeleteOptions{})
+func (s storageClient) DeletePersistentVolume(name string, clusterCtx string) error {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	return client.CoreV1().PersistentVolumes().Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
-func (s storageClient) GetPersistentVolumesClaim(namespace string) ([]model.PersistentVolumeClaimDto, error) {
-	volumeClaims, err := s.client.CoreV1().PersistentVolumeClaims(namespace).List(context.TODO(), metav1.ListOptions{})
+func (s storageClient) GetPersistentVolumesClaim(clusterCtx string) ([]model.PersistentVolumeClaimDto, error) {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	volumeClaims, err := client.CoreV1().PersistentVolumeClaims("").List(context.TODO(), metav1.ListOptions{})
 
 	if err != nil {
 		return nil, err
@@ -178,8 +203,13 @@ func (s storageClient) GetPersistentVolumesClaim(namespace string) ([]model.Pers
 	return result, errors.New("Error to get persistent volumes claim")
 }
 
-func (s storageClient) GetPersistentVolumeClaim(name string, namespace string) (model.PersistentVolumeClaimDto, error) {
-	volumeClaim, err := s.client.CoreV1().PersistentVolumeClaims(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+func (s storageClient) GetPersistentVolumeClaim(name string, namespace string, clusterCtx string) (model.PersistentVolumeClaimDto, error) {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return model.PersistentVolumeClaimDto{}, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	volumeClaim, err := client.CoreV1().PersistentVolumeClaims(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error to get persistent volume claim")
@@ -212,9 +242,14 @@ func (s storageClient) GetPersistentVolumeClaim(name string, namespace string) (
 	}, errors.New("Error to get persistent volumes claim")
 }
 
-func (s storageClient) UpdatePersistentVolumeClaim(name string, namespace string, dto model.PersistentVolumeClaimDto) error {
-	client := s.client.CoreV1().PersistentVolumeClaims(namespace)
-	volumeClaim, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+func (s storageClient) UpdatePersistentVolumeClaim(name string, namespace string, dto model.PersistentVolumeClaimDto, clusterCtx string) error {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	c := client.CoreV1().PersistentVolumeClaims(namespace)
+	volumeClaim, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error while searching ingress")
@@ -223,11 +258,16 @@ func (s storageClient) UpdatePersistentVolumeClaim(name string, namespace string
 	volumeClaim.Name = dto.Name
 	volumeClaim.Namespace = dto.Namespace
 
-	_, err = client.Update(context.TODO(), volumeClaim, metav1.UpdateOptions{})
+	_, err = c.Update(context.TODO(), volumeClaim, metav1.UpdateOptions{})
 
 	return err
 }
 
-func (s storageClient) DeletePersistentVolumeClaim(name string, namespace string) error {
-	return s.client.CoreV1().PersistentVolumeClaims(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+func (s storageClient) DeletePersistentVolumeClaim(name string, namespace string, clusterCtx string) error {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	return client.CoreV1().PersistentVolumeClaims(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
