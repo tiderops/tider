@@ -8,7 +8,6 @@ import (
 type ClusterClient interface {
 	ListAvailableClusters() ([]model.ClusterInfo, error)
 	GetCurrentCluster(name string) (model.EnvironmentDto, error)
-
 }
 
 type NodeClient interface {
@@ -22,7 +21,6 @@ type MetricClient interface {
 }
 
 type PodClient interface {
-	GetPodsMock() ([]model.PodDto, error)
 	GetPods(clusterCtx string) ([]model.PodDto, error)
 	GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error)
 	UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error
@@ -31,7 +29,6 @@ type PodClient interface {
 
 type DeploymentClient interface {
 	GetDeployments(clusterCtx string) ([]model.DeploymentDto, error)
-	GetDeploymentsMock() ([]model.DeploymentDto, error)
 	GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error)
 	UpdateDeployment(name string, namespace string, dto model.DeploymentDto, clusterCtx string) error
 	DeleteDeployment(name string, namespace string, clusterCtx string) error
