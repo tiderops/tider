@@ -34,14 +34,14 @@ type DeploymentClient interface {
 }
 
 type StorageClient interface {
-	GetPersistentVolumes() ([]model.PersistentVolumeDto, error)
-	GetPersistentVolume(name string) (model.PersistentVolumeDto, error)
-	UpdatePersistentVolume(name string, dto model.PersistentVolumeDto) error
-	DeletePersistentVolume(name string) error
-	GetPersistentVolumesClaim(namespace string) ([]model.PersistentVolumeClaimDto, error)
-	GetPersistentVolumeClaim(name string, namespace string) (model.PersistentVolumeClaimDto, error)
-	UpdatePersistentVolumeClaim(name string, namespace string, dto model.PersistentVolumeClaimDto) error
-	DeletePersistentVolumeClaim(name string, namespace string) error
+	GetPersistentVolumes(clusterCtx string) ([]model.PersistentVolumeDto, error)
+	GetPersistentVolume(name string, clusterCtx string) (model.PersistentVolumeDto, error)
+	UpdatePersistentVolume(name string, dto model.PersistentVolumeDto, clusterCtx string) error
+	DeletePersistentVolume(name string, clusterCtx string) error
+	GetPersistentVolumesClaim(clusterCtx string) ([]model.PersistentVolumeClaimDto, error)
+	GetPersistentVolumeClaim(name string, namespace string, clusterCtx string) (model.PersistentVolumeClaimDto, error)
+	UpdatePersistentVolumeClaim(name string, namespace string, dto model.PersistentVolumeClaimDto, clusterCtx string) error
+	DeletePersistentVolumeClaim(name string, namespace string, clusterCtx string) error
 }
 
 type NamespaceClient interface {
