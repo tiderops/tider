@@ -6,22 +6,22 @@ import (
 )
 
 type NodeUseCase interface {
-	GetNodes() ([]model.NodeDtoV2, error)
-	GetNode(name string) (model.NodeDtoV2, error)
+	GetNodes(clusterCtx string) ([]model.NodeDtoV2, error)
+	GetNode(name string, clusterCtx string) (model.NodeDtoV2, error)
 }
 
 type nodeUseCase struct {
-	client kubeclient.ClusterClient
+	client kubeclient.NodeClient
 }
 
-func NewNodeUseCase(client kubeclient.ClusterClient) NodeUseCase {
+func NewNodeUseCase(client kubeclient.NodeClient) NodeUseCase {
 	return &nodeUseCase{client: client}
 }
 
-func (n *nodeUseCase) GetNodes() ([]model.NodeDtoV2, error) {
-	return n.client.GetNodes()
+func (n *nodeUseCase) GetNodes(clusterCtx string) ([]model.NodeDtoV2, error) {
+	return n.client.GetNodes(clusterCtx)
 }
 
-func (n *nodeUseCase) GetNode(name string) (model.NodeDtoV2, error) {
-	return n.client.GetNode(name)
+func (n *nodeUseCase) GetNode(name string, clusterCtx string) (model.NodeDtoV2, error) {
+	return n.client.GetNode(name, clusterCtx)
 }

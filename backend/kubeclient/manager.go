@@ -12,6 +12,7 @@ import (
 
 type ClusterResolver interface {
 	ResolveClusterContext(name string) (*kubernetes.Clientset, error)
+	ResolveClusterContextDynamic(name string) (*dynamic.DynamicClient, error)
 }
 
 var GlobalClusterManager = NewClusterManager()
@@ -35,6 +36,15 @@ func (cm *ClusterManager) ResolveClusterContext(name string) (*kubernetes.Client
 	} else {
 		fmt.Println("GetClusterValue", name)
 		return cm.clients[name], nil
+	}
+}
+
+func (cm *ClusterManager) ResolveClusterContextDynamic(name string) (*dynamic.DynamicClient, error) {
+	if cm.dynamicClients[name] == nil {
+		return nil, errors.New("cluster is not registered")
+	} else {
+		fmt.Println("GetClusterValue", name)
+		return cm.dynamicClients[name], nil
 	}
 }
 

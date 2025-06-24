@@ -4,20 +4,25 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"errors"
+	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
 type serviceClient struct {
-	client kubernetes.Interface
+	manager ClusterResolver
 }
 
-func NewServiceClient(client kubernetes.Interface) ServiceClient {
-	return &serviceClient{client: client}
+func NewServiceClient(manager ClusterResolver) ServiceClient {
+	return &serviceClient{manager: manager}
 }
 
-func (s serviceClient) GetServices(namespace string) ([]model.ServiceDto, error) {
-	services, err := s.client.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{})
+func (s serviceClient) GetServices(clusterCtx string) ([]model.ServiceDto, error) {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	services, err := client.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		panic("Failed to list services")
 	}
@@ -40,8 +45,13 @@ func (s serviceClient) GetServices(namespace string) ([]model.ServiceDto, error)
 	return result, errors.New("No services found")
 }
 
-func (s serviceClient) GetService(name string, namespace string) (model.ServiceDto, error) {
-	service, err := s.client.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+func (s serviceClient) GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error) {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return model.ServiceDto{}, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	service, err := client.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		panic("Failed to get service")
 	}
@@ -56,9 +66,14 @@ func (s serviceClient) GetService(name string, namespace string) (model.ServiceD
 	}, errors.New("No service found")
 }
 
-func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceDto) error {
-	client := s.client.CoreV1().Services(namespace)
-	service, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	c := client.CoreV1().Services(namespace)
+	service, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error while searching ingress")
@@ -68,11 +83,16 @@ func (s serviceClient) UpdateService(name string, namespace string, dto model.Se
 	service.Namespace = dto.Namespace
 	service.Labels = dto.Labels
 
-	_, err = client.Update(context.TODO(), service, metav1.UpdateOptions{})
+	_, err = c.Update(context.TODO(), service, metav1.UpdateOptions{})
 
 	return err
 }
 
-func (s serviceClient) DeleteService(name string, namespace string) error {
-	return s.client.CoreV1().Services(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+func (s serviceClient) DeleteService(name string, namespace string, clusterCtx string) error {
+	client, err := s.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	return client.CoreV1().Services(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }

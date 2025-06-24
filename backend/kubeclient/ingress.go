@@ -4,20 +4,25 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"errors"
+	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
 type ingressClient struct {
-	client kubernetes.Interface
+	manager ClusterResolver
 }
 
-func NewIngressClient(client kubernetes.Interface) IngressClient {
-	return &ingressClient{client: client}
+func NewIngressClient(manager ClusterResolver) IngressClient {
+	return &ingressClient{manager: manager}
 }
 
-func (i ingressClient) GetIngresses() ([]model.IngressDto, error) {
-	ingresses, err := i.client.NetworkingV1().Ingresses("").List(context.TODO(), metav1.ListOptions{})
+func (i ingressClient) GetIngresses(clusterCtx string) ([]model.IngressDto, error) {
+	client, err := i.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	ingresses, err := client.NetworkingV1().Ingresses("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		panic("Error while listing ingresses")
 	}
@@ -48,8 +53,13 @@ func (i ingressClient) GetIngresses() ([]model.IngressDto, error) {
 	return result, errors.New("Error while listing ingresses")
 }
 
-func (i ingressClient) GetIngress(name string, namespace string) (model.IngressDto, error) {
-	ingress, _ := i.client.NetworkingV1().Ingresses(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+func (i ingressClient) GetIngress(name string, namespace string, clusterCtx string) (model.IngressDto, error) {
+	client, err := i.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return model.IngressDto{}, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	ingress, _ := client.NetworkingV1().Ingresses(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 
 	var rulesDto []model.RuleDto
 
@@ -70,9 +80,14 @@ func (i ingressClient) GetIngress(name string, namespace string) (model.IngressD
 	}, errors.New("Error while listing ingresses")
 }
 
-func (i ingressClient) UpdateIngress(name string, namespace string, dto model.IngressDto) error {
-	client := i.client.NetworkingV1().Ingresses(namespace)
-	ingress, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+func (i ingressClient) UpdateIngress(name string, namespace string, dto model.IngressDto, clusterCtx string) error {
+	client, err := i.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	c := client.NetworkingV1().Ingresses(namespace)
+	ingress, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
 		panic("Error while searching ingress")
@@ -82,11 +97,16 @@ func (i ingressClient) UpdateIngress(name string, namespace string, dto model.In
 	ingress.Namespace = dto.Namespace
 	ingress.Labels = dto.Labels
 
-	_, err = client.Update(context.TODO(), ingress, metav1.UpdateOptions{})
+	_, err = c.Update(context.TODO(), ingress, metav1.UpdateOptions{})
 
 	return err
 }
 
-func (i ingressClient) DeleteIngress(name string, namespace string) error {
-	return i.client.NetworkingV1().Ingresses(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+func (i ingressClient) DeleteIngress(name string, namespace string, clusterCtx string) error {
+	client, err := i.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
+	}
+
+	return client.NetworkingV1().Ingresses(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
