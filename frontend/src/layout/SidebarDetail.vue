@@ -2,20 +2,20 @@
 import { defineProps, defineEmits } from 'vue'
 
 const props = defineProps<{
-    isVisible: boolean
-    selectedRow: {
-        name?: string
-        namespace?: string
-        replicas?: number
-        cpu?: string
-        memory?: string
-        age?: string
-        status?: string
-    }
+  isVisible: boolean
+  selectedRow: {
+    name?: string
+    namespace?: string
+    replicas?: number
+    cpu?: string
+    memory?: string
+    age?: string
+    status?: string
+  }
 }>()
 
 const emit = defineEmits<{
-    (e: 'close'): void
+  (e: 'close'): void
 }>()
 </script>
 

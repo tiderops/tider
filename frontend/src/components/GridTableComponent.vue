@@ -2,38 +2,36 @@
 import { gridGeneralComposable } from '@/composables/GridTableComposable'
 
 const props = defineProps<{
-    cluster?: string
-    headers: any[]
-    items: any[]
-    search?: string
-    sortBy?: any[]
+  cluster?: string
+  headers: any[]
+  items: any[]
+  search?: string
+  sortBy?: any[]
 }>()
 
 const emit = defineEmits<{
-    (e: 'rowClick', item: any): void
-    (e: 'edit', item: any): void
-    (e: 'delete', item: any): void
+  (e: 'rowClick', item: any): void
+  (e: 'edit', item: any): void
+  (e: 'delete', item: any): void
 }>()
 
 const editPod = (item: any) => {
-    console.log('EDIT', item)
-    emit('edit', item)
+  console.log('EDIT', item)
+  emit('edit', item)
 }
 
 const deletePod = async (item: any) => {
-    console.log('DELETE', item)
-    console.log('DELETE - NAME', item.name)
-    console.log('DELETE - NS', item.namespace)
-    console.log('DELETE - CLUSTER ID', props.cluster)
+  console.log('DELETE', item)
+  console.log('DELETE - NAME', item.name)
+  console.log('DELETE - NS', item.namespace)
+  console.log('DELETE - CLUSTER ID', props.cluster)
 
-    const { fetchData } = gridGeneralComposable(item.name, item.namespace, props.cluster)
+  const { fetchData } = gridGeneralComposable(item.name, item.namespace, props.cluster)
 
-    await fetchData()
-    emit('delete', item)
+  await fetchData()
+  emit('delete', item)
 }
-
 </script>
-
 
 <template>
   <v-data-table-virtual

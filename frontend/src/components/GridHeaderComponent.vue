@@ -1,19 +1,17 @@
 <script setup lang="ts">
-
 const props = defineProps<{
-    search?: string
-    filterNamespace?: string
-    filterStatus?: string
-    namespaces?: string[]
-    statuses?: string[]
+  search?: string
+  filterNamespace?: string
+  filterStatus?: string
+  namespaces?: string[]
+  statuses?: string[]
 }>()
 
 const emit = defineEmits<{
-    (e: 'update:search', value: string): void,
-    (e: 'update:filterNamespace', value: string): void,
-    (e: 'update:filterStatus', value: string): void
+  (e: 'update:search', value: string): void
+  (e: 'update:filterNamespace', value: string): void
+  (e: 'update:filterStatus', value: string): void
 }>()
-
 </script>
 
 <template>

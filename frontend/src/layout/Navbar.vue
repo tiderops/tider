@@ -11,35 +11,34 @@ interface NavbarState {
 const { objects, fetchData } = navbarComposable()
 
 const props = defineProps<{
-    content: string
+  content: string
 }>()
 
 const state = reactive<NavbarState>({
-    menu: [],
-    objects: [],
+  menu: [],
+  objects: [],
 })
 
 onMounted(async () => {
-    await fetchData()
-    console.log('OBJECTS', objects.value)
+  await fetchData()
+  console.log('OBJECTS', objects.value)
 
-    const dto: NavbarDto[] = objects.value.map((o) => ({
-        Name: o.Name,
-        IsVisible: o.IsVisible,
-        IsEditable: o.IsEditable,
-        K8sObject: o.K8sObject.map((k) => ({
-            Name: k.Name,
-            Link: k.Link,
-            IsEditable: k.IsEditable,
-            IsVisible: k.IsVisible,
-        })),
-    }))
+  const dto: NavbarDto[] = objects.value.map((o) => ({
+    Name: o.Name,
+    IsVisible: o.IsVisible,
+    IsEditable: o.IsEditable,
+    K8sObject: o.K8sObject.map((k) => ({
+      Name: k.Name,
+      Link: k.Link,
+      IsEditable: k.IsEditable,
+      IsVisible: k.IsVisible,
+    })),
+  }))
 
-    const type = dto.find((x) => x.Name === props.content)
-    state.menu = dto
-    state.objects = type?.K8sObject ?? []
+  const type = dto.find((x) => x.Name === props.content)
+  state.menu = dto
+  state.objects = type?.K8sObject ?? []
 })
-
 </script>
 
 <template>

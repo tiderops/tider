@@ -10,24 +10,24 @@ const text = ref('')
 const timeout = ref(2000)
 
 interface GridItem {
-    name: string
-    namespace: string
-    replicas: number
-    cpu: string
-    memory: string
-    age: string
-    status: string
+  name: string
+  namespace: string
+  replicas: number
+  cpu: string
+  memory: string
+  age: string
+  status: string
 }
 
 interface HeadState {
-    header: Array<any>
+  header: Array<any>
 }
 
 // Props
 const props = defineProps<{
-    cluster?: string
-    k8sObject: string
-    namespace: string
+  cluster?: string
+  k8sObject: string
+  namespace: string
 }>()
 
 // Composables & constants
@@ -43,19 +43,18 @@ const filterStatus = ref('')
 const sortBy = ref([{ key: 'name', order: 'asc' }])
 
 const header = reactive<HeadState>({
-    header: [],
+  header: [],
 })
 
 // Filtering logic
 const filteredItems = computed(() =>
-    items.value.filter((item) => {
-        const namespaceMatch =
-            !filterNamespace.value || item.namespace.includes(filterNamespace.value)
-        const statusMatch = !filterStatus.value || item.status.includes(filterStatus.value)
-        const searchMatch =
-            !search.value || item.name.toLowerCase().includes(search.value.toLowerCase())
-        return namespaceMatch && statusMatch && searchMatch
-    })
+  items.value.filter((item) => {
+    const namespaceMatch = !filterNamespace.value || item.namespace.includes(filterNamespace.value)
+    const statusMatch = !filterStatus.value || item.status.includes(filterStatus.value)
+    const searchMatch =
+      !search.value || item.name.toLowerCase().includes(search.value.toLowerCase())
+    return namespaceMatch && statusMatch && searchMatch
+  }),
 )
 
 // Sidebar logic
@@ -63,41 +62,41 @@ const isSidebarVisible = ref(false)
 const selectedRow = ref<any>(null)
 
 const onRowClick = (cellData: any, item: any) => {
-    selectedRow.value = item.item
+  selectedRow.value = item.item
 
-    if (isSidebarVisible.value) {
-        isSidebarVisible.value = false
-        setTimeout(() => {
-            isSidebarVisible.value = true
-        }, 100)
-    } else {
-        isSidebarVisible.value = true
-    }
+  if (isSidebarVisible.value) {
+    isSidebarVisible.value = false
+    setTimeout(() => {
+      isSidebarVisible.value = true
+    }, 100)
+  } else {
+    isSidebarVisible.value = true
+  }
 }
 
 const onEditItem = async (item: any) => {
-    console.log('Parent received edit:', item)
-    text.value = `Resource "${item.name}" was edited.`
-    snackbar.value = true
+  console.log('Parent received edit:', item)
+  text.value = `Resource "${item.name}" was edited.`
+  snackbar.value = true
 
-    await response.fetchData()
-    items.value = response.content?.body.value ?? []
+  await response.fetchData()
+  items.value = response.content?.body.value ?? []
 }
 
 const onDeleteItem = async (item: any) => {
-    console.log('Parent received delete:', item)
-    text.value = `Resource "${item.name}" was deleted.`
-    snackbar.value = true
+  console.log('Parent received delete:', item)
+  text.value = `Resource "${item.name}" was deleted.`
+  snackbar.value = true
 
-    await response.fetchData()
-    items.value = response.content?.body.value ?? []
+  await response.fetchData()
+  items.value = response.content?.body.value ?? []
 }
 
 // Fetch data on mount
 onMounted(async () => {
-    await response.fetchData()
-    header.header = response.content?.head.value ?? []
-    items.value = response.content?.body.value ?? []
+  await response.fetchData()
+  header.header = response.content?.head.value ?? []
+  items.value = response.content?.body.value ?? []
 })
 </script>
 
@@ -112,7 +111,7 @@ onMounted(async () => {
         :statuses="statuses"
       />
       <KsGridTable
-        :cluster=props.cluster
+        :cluster="props.cluster"
         :headers="header.header"
         :items="filteredItems"
         :search="search"
@@ -122,12 +121,12 @@ onMounted(async () => {
         @edit="onEditItem"
       />
     </v-card>
-      <v-snackbar v-model="snackbar" :timeout="timeout">
-          {{ text }}
-          <template v-slot:actions>
-              <v-btn color="blue" variant="text" @click="snackbar = false">Close</v-btn>
-          </template>
-      </v-snackbar>
+    <v-snackbar v-model="snackbar" :timeout="timeout">
+      {{ text }}
+      <template v-slot:actions>
+        <v-btn color="blue" variant="text" @click="snackbar = false">Close</v-btn>
+      </template>
+    </v-snackbar>
     <v-card>
       <KsSidebarDetail
         :isVisible="isSidebarVisible"

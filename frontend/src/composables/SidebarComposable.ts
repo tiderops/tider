@@ -7,7 +7,7 @@ import {
 import { database, model } from '../../wailsjs/go/models'
 import EnvironmentDto = model.EnvironmentDto
 import CommonParameterDto = database.CommonParameterDto
-import ClusterInfo = model.ClusterInfo;
+import ClusterInfo = model.ClusterInfo
 
 export function sidebarComposable() {
   const commonParameters = ref<CommonParameterDto[]>([])
