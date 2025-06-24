@@ -7,7 +7,7 @@ const followingPage = ref<string>('Workload')
 
 const route = useRoute()
 const clusterId = route.params.cluster as string
-console.log("Cluster ID:", clusterId)
+console.log('Cluster ID:', clusterId)
 </script>
 
 <template>

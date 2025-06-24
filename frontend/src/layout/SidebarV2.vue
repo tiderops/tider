@@ -13,37 +13,37 @@ const setting = ref<CommonParameterDto[]>([])
 const openDropdowns = reactive<{ [key: number]: boolean }>({})
 
 const toggleSidebar = () => {
-    isCollapsed.value = !isCollapsed.value
+  isCollapsed.value = !isCollapsed.value
 }
 
 const toggleDropdown = (index: number) => {
-    openDropdowns[index] = !openDropdowns[index]
+  openDropdowns[index] = !openDropdowns[index]
 }
 
 const isDropdownOpen = (index: number) => {
-    return !!openDropdowns[index]
+  return !!openDropdowns[index]
 }
 
 onMounted(async () => {
-    console.log('onMounted triggered sidebar')
-    await fetchData()
+  console.log('onMounted triggered sidebar')
+  await fetchData()
 
-    menu.value = clusters.value.map((e) => ({
-        name: e.Name,
-        cluster: e.Cluster,
-        status: e.Status,
-        options: kubernetesParameters.value.map((k) => ({
-            name: k.Name,
-            link: k.Link,
-            icon: k.Icon,
-        })),
-    }))
+  menu.value = clusters.value.map((e) => ({
+    name: e.Name,
+    cluster: e.Cluster,
+    status: e.Status,
+    options: kubernetesParameters.value.map((k) => ({
+      name: k.Name,
+      link: k.Link,
+      icon: k.Icon,
+    })),
+  }))
 
-    setting.value = commonParameters.value.map((c) => ({
-        Name: c.Name,
-        Link: c.Link,
-        Icon: c.Icon,
-    }))
+  setting.value = commonParameters.value.map((c) => ({
+    Name: c.Name,
+    Link: c.Link,
+    Icon: c.Icon,
+  }))
 })
 </script>
 

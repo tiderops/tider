@@ -15,6 +15,6 @@ export function restartPod(podName: string, namespace: string, clusterCtx: strin
   }
 
   return {
-    fetchData
+    fetchData,
   }
 }

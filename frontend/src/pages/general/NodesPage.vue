@@ -15,8 +15,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <h2>qweqwe</h2>
-
+  <h2>qweqwe</h2>
 </template>
 
 <style scoped></style>
