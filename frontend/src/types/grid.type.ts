@@ -1,7 +1,7 @@
 export interface Header {
-  name: string
+	name: string
 }
 
 export interface Body {
-  col1: string
+	col1: string
 }

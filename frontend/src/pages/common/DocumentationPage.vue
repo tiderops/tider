@@ -1,12 +1,9 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 
-export default defineComponent({
-  name: 'DocumentationPage',
-})
 </script>
+
 <template>
-  <h2>Documentation page</h2>
+	<h2>Documentation page</h2>
 </template>
 
 <style scoped></style>

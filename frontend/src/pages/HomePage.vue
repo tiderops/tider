@@ -1,18 +1,14 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 
-export default defineComponent({
-  name: 'HomePage',
-})
 </script>
 
 <template>
-  <h2>Home page</h2>
+	<h2>Home page</h2>
 </template>
 
 <style scoped>
 h2 {
-  text-align: center;
-  color: rebeccapurple;
+	text-align: center;
+	color: rebeccapurple;
 }
 </style>

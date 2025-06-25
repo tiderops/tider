@@ -9,11 +9,11 @@ import App from './App.vue'
 import '@mdi/font/css/materialdesignicons.css' // Import MDI icons
 
 const vuetify = createVuetify({
-  components,
-  directives,
-  icons: {
-    defaultSet: 'mdi', // Default icon set,
-  },
+	components,
+	directives,
+	icons: {
+		defaultSet: 'mdi', // Default icon set,
+	},
 })
 
 const app = createApp(App)
