@@ -40,8 +40,12 @@ export function gridComposable(clusterCtx: string, k8sObject: string): GridRespo
 			console.log('Get Ingresses')
 			return gridBodyIngresses(k8sObject)
 		}
-		case 'persistentVolumen': {
-			console.log('Get Persistent Volumen')
+		case 'persistentVolume': {
+			console.log('Get Persistent Volume')
+			return gridBodyPersistentVolumes(k8sObject)
+		}
+		case 'persistentVolumeClaim': {
+			console.log('Get Persistent Volume Claim')
 			return gridBodyPersistentVolumes(k8sObject)
 		}
 		case 'deployment': {

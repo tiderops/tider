@@ -15,12 +15,12 @@ const routes: Array<RouteRecordRaw> = [
 			{
 				path: 'node',
 				name: 'node',
-				component: () => import('./pages/general/NodesPage.vue'),
+				component: () => import('./pages/general/NodePage.vue'),
 				children: [
 					{
 						path: 'detail/:id',
 						name: 'nodeDetail',
-						component: () => import('./pages/general/NodesDetailPage.vue'),
+						component: () => import('./pages/general/NodeDetailPage.vue'),
 						props: true,
 					},
 				],
@@ -72,13 +72,13 @@ const routes: Array<RouteRecordRaw> = [
 			{
 				path: 'ingress',
 				name: 'ingress',
-				component: () => import('./pages/network/IngressesPage.vue'),
+				component: () => import('./pages/network/IngressPage.vue'),
 				props: true,
 			},
 			{
 				path: 'service',
 				name: 'service',
-				component: () => import('./pages/network/ServicesPage.vue'),
+				component: () => import('./pages/network/ServicePage.vue'),
 				props: true,
 			},
 		],
@@ -91,7 +91,7 @@ const routes: Array<RouteRecordRaw> = [
 			{
 				path: 'persistentVolumes',
 				name: 'persistentVolumes',
-				component: () => import('./pages/storage/PersistentVolumesPage.vue'),
+				component: () => import('./pages/storage/PersistentVolumePage.vue'),
 				props: true,
 			},
 		],

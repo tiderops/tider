@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import KsNavBar from '../../layout/Navbar.vue'
+import KsNavBar from '../../layouts/Navbar.vue'
 
 const followingPage = ref<string>('Workload')
 

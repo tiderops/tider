@@ -1,10 +1,4 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-	name: 'NodesDetailPage',
-})
-
+<script setup lang="ts">
 console.log('PRUEBA CARGA DETAIL NODE')
 </script>
 

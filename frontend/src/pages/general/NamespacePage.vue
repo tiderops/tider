@@ -1,23 +1,18 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-import KsGridBodyV2 from '../../layout/GridBody2.vue'
-import KsNavBar from '../../layout/Navbar.vue'
+<script setup lang="ts">
+import { ref } from 'vue'
+import KsGridBodyV2 from "@/layouts/GridBody2.vue";
+import {useRoute} from "vue-router";
 
-export default defineComponent({
-	name: 'NamespacePage',
-	components: { KsNavBar, KsGridBody, KsGridBodyV2 },
-	data() {
-		return {
-			k8sObject: 'namespace',
-			namespace: 'mock',
-		}
-	},
-})
+const k8sObject = ref<string>('namespace')
+const namespace = ref<string>('')
+
+const route = useRoute()
+const clusterId = route.params.cluster as string
 console.log('PRUEBA CARGA NS')
 </script>
 
 <template>
-	<ks-grid-body-v2 :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body-v2>
+	<ks-grid-body-v2 :cluster="clusterId" :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body-v2>
 </template>
 
 <style scoped></style>

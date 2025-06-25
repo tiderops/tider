@@ -1,16 +1,8 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-import KsNavBar from '../../layout/Navbar.vue'
+<script setup lang="ts">
+import { ref } from 'vue'
+import KsNavBar from '../../layouts/Navbar.vue'
 
-export default defineComponent({
-	name: 'StoragePage',
-	components: { KsNavBar },
-	data() {
-		return {
-			followingPage: 'Storage',
-		}
-	},
-})
+const followingPage = ref<string>('Storage')
 </script>
 
 <template>

@@ -1,9 +1,4 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-	name: 'NamespacePage',
-})
+<script setup lang="ts">
 console.log('EVENTS PAGE')
 </script>
 
