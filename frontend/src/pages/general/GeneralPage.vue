@@ -11,7 +11,7 @@ const followingPage = ref<string>('General')
 	</div>
 	<div>
 		<router-view></router-view>
-        <h2>General page</h2>
+		<h2>General page</h2>
 	</div>
 </template>
 
