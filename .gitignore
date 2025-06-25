@@ -4,7 +4,6 @@ frontend/dist
 frontend/node_modules
 frontend/package.json.md5
 frontend/package-lock.json
-.idea/*
 .idea
 .env
 backend/backend
@@ -12,3 +11,4 @@ frontend/tsconfig.tsbuildinfo
 frontend/test-results/*
 frontend/playwright-report/*
 Kubexplorer
+frontend/wailsjs
