@@ -2,8 +2,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'PersistentVolumesPage',
-  components: { KsGridBody },
+	name: 'PersistentVolumesPage',
+	components: { KsGridBody },
 })
 </script>
 

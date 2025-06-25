@@ -9,7 +9,6 @@
     "preview": "vite preview",
     "test:unit": "vitest run --environment jsdom",
     "test:e2e": "playwright test",
-    "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
   },

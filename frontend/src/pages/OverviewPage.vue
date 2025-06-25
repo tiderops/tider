@@ -2,12 +2,12 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'OverviewPage',
+	name: 'OverviewPage',
 })
 </script>
 
 <template>
-  <h2>Overview page</h2>
+	<h2>Overview page</h2>
 </template>
 
 <style scoped></style>

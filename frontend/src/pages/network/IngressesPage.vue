@@ -2,8 +2,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'IngressesPage',
-  components: { KsGridBody },
+	name: 'IngressesPage',
+	components: { KsGridBody },
 })
 </script>
 
