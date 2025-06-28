@@ -43,6 +43,11 @@ const routes: Array<RouteRecordRaw> = [
 				name: 'event',
 				component: () => import('./pages/general/EventsPage.vue'),
 			},
+			{
+				path: 'cluster_graph',
+				name: 'cluster_graph',
+				component: () => import('./pages/general/ClusterGraphPage.vue'),
+			},
 		],
 	},
 	{
@@ -89,9 +94,15 @@ const routes: Array<RouteRecordRaw> = [
 		component: () => import('./pages/storage/StoragePage.vue'),
 		children: [
 			{
-				path: 'persistentVolumes',
-				name: 'persistentVolumes',
+				path: 'persistentVolume',
+				name: 'persistentVolume',
 				component: () => import('./pages/storage/PersistentVolumePage.vue'),
+				props: true,
+			},
+			{
+				path: 'persistentVolumeClaim',
+				name: 'persistentVolumeClaim',
+				component: () => import('./pages/storage/PersistentVolumeClaimPage.vue'),
 				props: true,
 			},
 		],

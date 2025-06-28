@@ -652,6 +652,7 @@ export namespace model {
 	    VolumeMode: string;
 	    AccessModes: string[];
 	    DataSourceName: string;
+	    DataSourceRef: string;
 	    StorageClass: string;
 	    VolumeAttributesClassName: string;
 	    Limit: Resource;
@@ -667,6 +668,7 @@ export namespace model {
 	        this.VolumeMode = source["VolumeMode"];
 	        this.AccessModes = source["AccessModes"];
 	        this.DataSourceName = source["DataSourceName"];
+	        this.DataSourceRef = source["DataSourceRef"];
 	        this.StorageClass = source["StorageClass"];
 	        this.VolumeAttributesClassName = source["VolumeAttributesClassName"];
 	        this.Limit = this.convertValues(source["Limit"], Resource);
@@ -697,6 +699,8 @@ export namespace model {
 	    CreationTimestamp: string;
 	    Labels: Record<string, string>;
 	    VolumeClaimSpec: VolumeClaimSpec;
+	    Status: string;
+	    Capacity: Resource;
 	
 	    static createFrom(source: any = {}) {
 	        return new PersistentVolumeClaimDto(source);
@@ -709,6 +713,8 @@ export namespace model {
 	        this.CreationTimestamp = source["CreationTimestamp"];
 	        this.Labels = source["Labels"];
 	        this.VolumeClaimSpec = this.convertValues(source["VolumeClaimSpec"], VolumeClaimSpec);
+	        this.Status = source["Status"];
+	        this.Capacity = this.convertValues(source["Capacity"], Resource);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

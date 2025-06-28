@@ -3,7 +3,6 @@ package kubeclient
 import (
 	"Kubexplorer/backend/model"
 	"context"
-	"errors"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -30,6 +29,7 @@ func (n namespaceClient) GetNamespaces(clusterCtx string) ([]model.NamespaceDto,
 	var result []model.NamespaceDto
 
 	for _, ns := range namespaces.Items {
+		fmt.Println("ns.Name", ns.Name)
 		dto := model.NamespaceDto{
 			Name:         ns.Name,
 			Version:      ns.APIVersion,
@@ -40,7 +40,7 @@ func (n namespaceClient) GetNamespaces(clusterCtx string) ([]model.NamespaceDto,
 		result = append(result, dto)
 	}
 
-	return result, errors.New("No namespaces found")
+	return result, nil
 }
 
 func (n namespaceClient) GetNamespace(name string, clusterCtx string) (model.NamespaceDto, error) {
@@ -60,7 +60,7 @@ func (n namespaceClient) GetNamespace(name string, clusterCtx string) (model.Nam
 		CreationTime: ns.CreationTimestamp.String(),
 		Labels:       ns.Labels,
 		Status:       ns.Status.String(),
-	}, errors.New("No namespace found")
+	}, nil
 }
 
 func (n namespaceClient) UpdateNamespace(name string, dto model.NamespaceDto, clusterCtx string) error {

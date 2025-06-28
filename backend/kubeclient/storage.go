@@ -3,7 +3,6 @@ package kubeclient
 import (
 	"Kubexplorer/backend/model"
 	"context"
-	"errors"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -23,14 +22,14 @@ func (s storageClient) GetPersistentVolumes(clusterCtx string) ([]model.Persiste
 	}
 
 	volumes, err := client.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
-
 	if err != nil {
-		return nil, err
+		panic("Failed to list pv")
 	}
 
 	var result []model.PersistentVolumeDto
-
+	fmt.Println("volume.Name", volumes.Items[0])
 	for _, volume := range volumes.Items {
+
 		var stringAccessModes []string
 		for _, mode := range volume.Spec.AccessModes {
 			stringAccessModes = append(stringAccessModes, string(mode))
@@ -43,13 +42,13 @@ func (s storageClient) GetPersistentVolumes(clusterCtx string) ([]model.Persiste
 			Labels:            volume.Labels,
 			VolumeSpec: model.VolumeSpec{
 				Local: model.Local{
-					Path:   volume.Spec.Local.Path,
-					FSType: *volume.Spec.Local.FSType,
+					//Path: volume.Spec.Local.Path, TODO: Validate null reference
+					//FSType: *volume.Spec.Local.FSType, TODO: Validate null reference
 				},
-				VolumeMode:                    string(*volume.Spec.VolumeMode),
-				AccessModes:                   stringAccessModes,
-				StorageClass:                  volume.Spec.StorageClassName,
-				VolumeAttributesClassName:     *volume.Spec.VolumeAttributesClassName,
+				VolumeMode:   string(*volume.Spec.VolumeMode),
+				AccessModes:  stringAccessModes,
+				StorageClass: volume.Spec.StorageClassName,
+				//VolumeAttributesClassName:     *volume.Spec.VolumeAttributesClassName, TODO: Validate null reference
 				PersistentVolumeReclaimPolicy: string(volume.Spec.PersistentVolumeReclaimPolicy),
 				MountOptions:                  volume.Spec.MountOptions,
 				Capacity: model.Resource{
@@ -63,8 +62,8 @@ func (s storageClient) GetPersistentVolumes(clusterCtx string) ([]model.Persiste
 					Type: string(*volume.Spec.HostPath.Type),
 				},
 				NFS: model.NFS{
-					Server: volume.Spec.NFS.Server,
-					Path:   volume.Spec.NFS.Path,
+					//Server: volume.Spec.NFS.Server, TODO: Valida null reference
+					//Path: volume.Spec.NFS.Path, TODO: Valida null reference
 				},
 			},
 		}
@@ -72,7 +71,7 @@ func (s storageClient) GetPersistentVolumes(clusterCtx string) ([]model.Persiste
 		result = append(result, dto)
 	}
 
-	return result, errors.New("Error to get persistent volumes claim")
+	return result, nil
 }
 
 func (s storageClient) GetPersistentVolume(name string, clusterCtx string) (model.PersistentVolumeDto, error) {
@@ -99,13 +98,13 @@ func (s storageClient) GetPersistentVolume(name string, clusterCtx string) (mode
 		Labels:            volume.Labels,
 		VolumeSpec: model.VolumeSpec{
 			Local: model.Local{
-				Path:   volume.Spec.Local.Path,
-				FSType: *volume.Spec.Local.FSType,
+				//Path:   volume.Spec.Local.Path,
+				//FSType: *volume.Spec.Local.FSType,
 			},
-			VolumeMode:                    string(*volume.Spec.VolumeMode),
-			AccessModes:                   stringAccessModes,
-			StorageClass:                  volume.Spec.StorageClassName,
-			VolumeAttributesClassName:     *volume.Spec.VolumeAttributesClassName,
+			VolumeMode:   string(*volume.Spec.VolumeMode),
+			AccessModes:  stringAccessModes,
+			StorageClass: volume.Spec.StorageClassName,
+			//VolumeAttributesClassName:     *volume.Spec.VolumeAttributesClassName,
 			PersistentVolumeReclaimPolicy: string(volume.Spec.PersistentVolumeReclaimPolicy),
 			MountOptions:                  volume.Spec.MountOptions,
 			Capacity: model.Resource{
@@ -119,8 +118,8 @@ func (s storageClient) GetPersistentVolume(name string, clusterCtx string) (mode
 				Type: string(*volume.Spec.HostPath.Type),
 			},
 			NFS: model.NFS{
-				Server: volume.Spec.NFS.Server,
-				Path:   volume.Spec.NFS.Path,
+				//Server: volume.Spec.NFS.Server,
+				//Path:   volume.Spec.NFS.Path,
 			},
 		},
 	}, nil
@@ -181,26 +180,40 @@ func (s storageClient) GetPersistentVolumesClaim(clusterCtx string) ([]model.Per
 			Namespace:         volumeClaim.Namespace,
 			CreationTimestamp: volumeClaim.CreationTimestamp.String(),
 			Labels:            volumeClaim.Labels,
+			Status:            string(volumeClaim.Status.Phase),
 			VolumeClaimSpec: model.VolumeClaimSpec{
-				VolumeName:                volumeClaim.Spec.VolumeName,
-				VolumeMode:                string(*volumeClaim.Spec.VolumeMode),
-				AccessModes:               stringAccessModes,
-				DataSourceName:            volumeClaim.Spec.DataSource.Name,
-				StorageClass:              *volumeClaim.Spec.StorageClassName,
-				VolumeAttributesClassName: *volumeClaim.Spec.VolumeAttributesClassName,
+				VolumeName:  volumeClaim.Spec.VolumeName,
+				VolumeMode:  string(*volumeClaim.Spec.VolumeMode),
+				AccessModes: stringAccessModes,
+				//DataSourceName: volumeClaim.Spec.DataSource.Name, TODO: Validate null reference
+				StorageClass: *volumeClaim.Spec.StorageClassName,
+				//VolumeAttributesClassName: *volumeClaim.Spec.VolumeAttributesClassName, TODO: Validate null reference
+				//DataSourceRef: volumeClaim.Spec.DataSourceRef.Name, TODO: Validate null reference
 				Limit: model.Resource{
 					Cpu:              volumeClaim.Spec.Resources.Limits.Cpu().String(),
 					Memory:           volumeClaim.Spec.Resources.Limits.Memory().String(),
 					Storage:          volumeClaim.Spec.Resources.Limits.Storage().String(),
 					StorageEphemeral: volumeClaim.Spec.Resources.Limits.StorageEphemeral().String(),
 				},
+				Request: model.Resource{
+					Cpu:              volumeClaim.Spec.Resources.Requests.Cpu().String(),
+					Memory:           volumeClaim.Spec.Resources.Requests.Memory().String(),
+					Storage:          volumeClaim.Spec.Resources.Requests.Storage().String(),
+					StorageEphemeral: volumeClaim.Spec.Resources.Requests.StorageEphemeral().String(),
+				},
+			},
+			Capacity: model.Resource{
+				Cpu:              volumeClaim.Status.Capacity.Cpu().String(),
+				Memory:           volumeClaim.Status.Capacity.Memory().String(),
+				Storage:          volumeClaim.Status.Capacity.Storage().String(),
+				StorageEphemeral: volumeClaim.Status.Capacity.StorageEphemeral().String(),
 			},
 		}
 
 		result = append(result, dto)
 	}
 
-	return result, errors.New("Error to get persistent volumes claim")
+	return result, nil
 }
 
 func (s storageClient) GetPersistentVolumeClaim(name string, namespace string, clusterCtx string) (model.PersistentVolumeClaimDto, error) {
@@ -239,7 +252,7 @@ func (s storageClient) GetPersistentVolumeClaim(name string, namespace string, c
 				StorageEphemeral: volumeClaim.Spec.Resources.Limits.StorageEphemeral().String(),
 			},
 		},
-	}, errors.New("Error to get persistent volumes claim")
+	}, nil
 }
 
 func (s storageClient) UpdatePersistentVolumeClaim(name string, namespace string, dto model.PersistentVolumeClaimDto, clusterCtx string) error {

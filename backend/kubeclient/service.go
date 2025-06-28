@@ -3,7 +3,6 @@ package kubeclient
 import (
 	"Kubexplorer/backend/model"
 	"context"
-	"errors"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -42,7 +41,7 @@ func (s serviceClient) GetServices(clusterCtx string) ([]model.ServiceDto, error
 		result = append(result, dto)
 	}
 
-	return result, errors.New("No services found")
+	return result, nil
 }
 
 func (s serviceClient) GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error) {
@@ -63,7 +62,7 @@ func (s serviceClient) GetService(name string, namespace string, clusterCtx stri
 		Status:            service.Status.String(),
 		CreationTimestamp: service.CreationTimestamp.String(),
 		Spec:              service.Spec.String(),
-	}, errors.New("No service found")
+	}, nil
 }
 
 func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error {

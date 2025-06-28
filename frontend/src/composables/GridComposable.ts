@@ -206,7 +206,7 @@ export function gridBodyServices(clusterCtx: string, k8sObject: string) {
 	const response: GridResponse = {
 		fetchData: fetchData,
 		content: {
-			head: header,
+			head: head,
 			body: body,
 		},
 	}
@@ -253,7 +253,7 @@ export function gridBodyIngresses(clusterCtx: string, k8sObject: string) {
 	const response: GridResponse = {
 		fetchData: fetchData,
 		content: {
-			head: header,
+			head: head,
 			body: body,
 		},
 	}
@@ -298,7 +298,7 @@ export function gridBodyPersistentVolumes(clusterCtx: string, k8sObject: string)
 	const response: GridResponse = {
 		fetchData: fetchData,
 		content: {
-			head: header,
+			head: head,
 			body: body,
 		},
 	}
@@ -320,7 +320,7 @@ export function gridBodyPersistentVolumesClaim(clusterCtx: string, k8sObject: st
 
 			console.log('PVCS: ', persistentVolumeClaim.value)
 
-			body.value = persistentVolume.value.map((p: PersistentVolumeClaimDto) => ({
+			body.value = persistentVolumeClaim.value.map((p: PersistentVolumeClaimDto) => ({
 				name: p.Name,
 				namespace: p.Namespace,
 				age: p.CreationTimestamp,
@@ -343,7 +343,7 @@ export function gridBodyPersistentVolumesClaim(clusterCtx: string, k8sObject: st
 	const response: GridResponse = {
 		fetchData: fetchData,
 		content: {
-			head: header,
+			head: head,
 			body: body,
 		},
 	}
@@ -437,7 +437,7 @@ export function gridBodyNodes(clusterCtx: string, namespace: string) {
 	const response: GridResponse = {
 		fetchData: fetchData,
 		content: {
-			head: header,
+			head: head,
 			body: body,
 		},
 	}
