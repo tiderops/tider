@@ -135,6 +135,12 @@ func (p *parameterImpl) GetK8sObjects() []ObjectType {
 					IsEditable: true,
 					IsVisible:  true,
 				},
+				{
+					Name:       "Cluster Graph",
+					Link:       "cluster_graph",
+					IsEditable: true,
+					IsVisible:  true,
+				},
 			},
 		},
 		{
@@ -180,7 +186,13 @@ func (p *parameterImpl) GetK8sObjects() []ObjectType {
 			K8sObject: []K8sObject{
 				{
 					Name:       "PersistentVolume",
-					Link:       "persistentVolumes",
+					Link:       "persistentVolume",
+					IsEditable: true,
+					IsVisible:  true,
+				},
+				{
+					Name:       "PersistentVolumeClaim",
+					Link:       "persistentVolumeClaim",
 					IsEditable: true,
 					IsVisible:  true,
 				},

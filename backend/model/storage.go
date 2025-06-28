@@ -39,6 +39,8 @@ type PersistentVolumeClaimDto struct {
 	CreationTimestamp string
 	Labels            map[string]string
 	VolumeClaimSpec   VolumeClaimSpec
+	Status            string
+	Capacity          Resource
 }
 
 type VolumeClaimSpec struct {
@@ -46,6 +48,7 @@ type VolumeClaimSpec struct {
 	VolumeMode                string
 	AccessModes               []string
 	DataSourceName            string
+	DataSourceRef             string
 	StorageClass              string
 	VolumeAttributesClassName string
 	Limit                     Resource

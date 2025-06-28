@@ -3,7 +3,6 @@ package kubeclient
 import (
 	"Kubexplorer/backend/model"
 	"context"
-	"errors"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -47,7 +46,7 @@ func (d deploymentClient) GetDeployments(clusterCtx string) ([]model.DeploymentD
 		)
 	}
 
-	return result, errors.New("deployment list is empty")
+	return result, nil
 }
 
 func (d deploymentClient) GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error) {
@@ -63,7 +62,7 @@ func (d deploymentClient) GetDeployment(name string, namespace string, clusterCt
 		Namespace: deployment.Namespace,
 		Status:    string(deployment.Status.Conditions[0].Status),
 		Age:       deployment.CreationTimestamp.String(),
-	}, errors.New("Deployment Not Found")
+	}, nil
 }
 
 func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentDto, clusterCtx string) error {

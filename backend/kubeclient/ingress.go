@@ -3,7 +3,6 @@ package kubeclient
 import (
 	"Kubexplorer/backend/model"
 	"context"
-	"errors"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -50,7 +49,7 @@ func (i ingressClient) GetIngresses(clusterCtx string) ([]model.IngressDto, erro
 		result = append(result, dto)
 	}
 
-	return result, errors.New("Error while listing ingresses")
+	return result, nil
 }
 
 func (i ingressClient) GetIngress(name string, namespace string, clusterCtx string) (model.IngressDto, error) {
@@ -77,7 +76,7 @@ func (i ingressClient) GetIngress(name string, namespace string, clusterCtx stri
 		Creation:  ingress.GetCreationTimestamp().String(),
 		Labels:    ingress.GetLabels(),
 		Rules:     rulesDto,
-	}, errors.New("Error while listing ingresses")
+	}, nil
 }
 
 func (i ingressClient) UpdateIngress(name string, namespace string, dto model.IngressDto, clusterCtx string) error {

@@ -1,15 +1,22 @@
 export interface IService {
 	name: string
 	namespace: string
-	replicas: number
+	labels: Map<string, string>
+	status: string
 	age: string
-	status: boolean
+	spec: string
 }
 
 export interface IIngress {
 	name: string
 	namespace: string
-	replicas: number
+	host: string[]
+	path: string[]
 	age: string
-	status: boolean
+	labels: Map<string, string>
+}
+
+export interface IRules {
+	host: string
+	path: string
 }
