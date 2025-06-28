@@ -1,15 +1,19 @@
 export interface INamespace {
 	name: string
-	namespace: string
-	replicas: number
+	version: number
 	age: string
-	status: boolean
+	status: string
+	labels: Map<string, string>
 }
 
 export interface INode {
 	name: string
 	namespace: string
-	replicas: number
+	memory: string
+	cpu: string
+	storage: string
+	ephemeralStorage: string
+	version: string
 	age: string
-	status: boolean
+	labels: Map<string, string>
 }
