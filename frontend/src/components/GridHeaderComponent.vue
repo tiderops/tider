@@ -5,6 +5,7 @@ const props = defineProps<{
 	filterStatus?: string
 	namespaces?: string[]
 	statuses?: string[]
+	namespaceFilterEnable: boolean
 }>()
 
 const emit = defineEmits<{
@@ -18,8 +19,9 @@ const emit = defineEmits<{
 	<v-toolbar flat>
 		<v-toolbar-title>Filters</v-toolbar-title>
 		<v-spacer></v-spacer>
-		<v-text-field :model-value="props.search" label="Search" clearable class="mx-4" @update:model-value="emit('update:search', $event)"></v-text-field>
+		<v-text-field :model-value="props.search" label="Search By Name" clearable class="mx-4" @update:model-value="emit('update:search', $event)"></v-text-field>
 		<v-select
+			v-show="props.namespaceFilterEnable"
 			:model-value="props.filterNamespace"
 			:items="props.namespaces"
 			label="Namespace"

@@ -3,20 +3,18 @@ import { database, model } from '../../wailsjs/go/models'
 import { fetchGetDeployments, fetchGetPods } from '../services/workload.service'
 import { fetchHeaderParams } from '../services/layout.service'
 import HeadParamsDto = database.HeadParamsDto
-import { fetchGetNamespace, fetchGetNamespaces, fetchGetNodes } from '../services/general.service'
+import { fetchGetNamespaces, fetchGetNodes } from '../services/general.service'
 import NamespaceDto = model.NamespaceDto
 import { fetchGetIngresses, fetchGetServices } from '../services/network.service'
 import ServiceDto = model.ServiceDto
 import IngressDto = model.IngressDto
 import { fetchGetPersistentVolumes, fetchGetPersistentVolumesClaim } from '../services/storage.service'
 import PersistentVolumeDto = model.PersistentVolumeDto
-import NodeDto = model.NodeDto
 import PodDto = model.PodDto
 import DeploymentDto = model.DeploymentDto
 import { IDeployment, IPod } from '../types/workload.type'
 import { IIngress, IService } from '../types/network.type'
 import { IPersistentVolume, IPersistentVolumeClaim } from '../types/storage.type'
-import Ingress = model.Ingress
 import PersistentVolumeClaimDto = model.PersistentVolumeClaimDto
 import { INamespace, INode } from '../types/general.type'
 import NodeDtoV2 = model.NodeDtoV2
@@ -29,7 +27,7 @@ interface GridResponse {
 	}
 }
 
-export function gridComposable(clusterCtx: string, k8sObject: string): GridResponse {
+export function useGridTable(clusterCtx: string, k8sObject: string): GridResponse {
 	switch (k8sObject) {
 		case 'node': {
 			console.log('Get Nodes')
@@ -82,12 +80,8 @@ export function gridBodyPods(clusterCtx: string, k8sObject: string) {
 
 	const fetchData = async () => {
 		try {
-			const header = ref<HeadParamsDto[]>([])
 			const pods = ref<PodDto[]>([])
-
-			header.value = await fetchHeaderParams(k8sObject)
 			pods.value = await fetchGetPods(clusterCtx)
-
 			console.log('PODS: ', pods.value)
 
 			body.value = pods.value.map((p: PodDto) => ({
@@ -101,12 +95,7 @@ export function gridBodyPods(clusterCtx: string, k8sObject: string) {
 				status: p.Status,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching pod data: ', error)
 			throw error
@@ -130,12 +119,8 @@ export function gridBodyDeployments(clusterCtx: string, k8sObject: string) {
 
 	const fetchData = async () => {
 		try {
-			const header = ref<HeadParamsDto[]>([])
 			const deployment = ref<DeploymentDto[]>([])
-
-			header.value = await fetchHeaderParams(k8sObject)
 			deployment.value = await fetchGetDeployments(clusterCtx)
-
 			console.log('DEPLOYMENTS', deployment.value)
 
 			body.value = deployment.value.map((d: DeploymentDto) => ({
@@ -145,12 +130,7 @@ export function gridBodyDeployments(clusterCtx: string, k8sObject: string) {
 				age: d.Age,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching deployment data: ', error)
 			throw error
@@ -174,12 +154,8 @@ export function gridBodyServices(clusterCtx: string, k8sObject: string) {
 
 	const fetchData = async () => {
 		try {
-			const header = ref<HeadParamsDto[]>([])
 			const service = ref<ServiceDto[]>([])
-
-			header.value = await fetchHeaderParams(k8sObject)
 			service.value = await fetchGetServices(clusterCtx)
-
 			console.log('SERVICES', service.value)
 
 			body.value = service.value.map((s: ServiceDto) => ({
@@ -191,12 +167,7 @@ export function gridBodyServices(clusterCtx: string, k8sObject: string) {
 				spec: s.Spec,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching service data: ', error)
 			throw error
@@ -220,12 +191,8 @@ export function gridBodyIngresses(clusterCtx: string, k8sObject: string) {
 
 	const fetchData = async () => {
 		try {
-			const header = ref<HeadParamsDto[]>([])
 			const ingress = ref<IngressDto[]>([])
-
-			header.value = await fetchHeaderParams(k8sObject)
 			ingress.value = await fetchGetIngresses(clusterCtx)
-
 			console.log('INGRESSES: ', ingress.value)
 
 			body.value = ingress.value.map((i: IngressDto) => ({
@@ -238,12 +205,7 @@ export function gridBodyIngresses(clusterCtx: string, k8sObject: string) {
 				label: i.Labels,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching ingress data: ', error)
 			throw error
@@ -267,12 +229,8 @@ export function gridBodyPersistentVolumes(clusterCtx: string, k8sObject: string)
 
 	const fetchData = async () => {
 		try {
-			const header = ref<any[]>([])
 			const persistentVolume = ref<PersistentVolumeDto[]>([])
-
-			header.value = await fetchHeaderParams(k8sObject)
 			persistentVolume.value = await fetchGetPersistentVolumes(clusterCtx)
-
 			console.log('PVS: ', persistentVolume.value)
 
 			body.value = persistentVolume.value.map((p: PersistentVolumeDto) => ({
@@ -283,12 +241,7 @@ export function gridBodyPersistentVolumes(clusterCtx: string, k8sObject: string)
 				spec: p.VolumeSpec,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching pv data: ', error)
 			throw error
@@ -312,12 +265,8 @@ export function gridBodyPersistentVolumesClaim(clusterCtx: string, k8sObject: st
 
 	const fetchData = async () => {
 		try {
-			const header = ref<any[]>([])
 			const persistentVolumeClaim = ref<PersistentVolumeClaimDto[]>([])
-
-			header.value = await fetchHeaderParams(k8sObject)
 			persistentVolumeClaim.value = await fetchGetPersistentVolumesClaim(clusterCtx)
-
 			console.log('PVCS: ', persistentVolumeClaim.value)
 
 			body.value = persistentVolumeClaim.value.map((p: PersistentVolumeClaimDto) => ({
@@ -328,12 +277,7 @@ export function gridBodyPersistentVolumesClaim(clusterCtx: string, k8sObject: st
 				spec: p.VolumeClaimSpec,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching pvc data: ', error)
 			throw error
@@ -357,12 +301,8 @@ export function gridBodyNamespaces(clusterCtx: string, k8sObject: string) {
 
 	const fetchData = async () => {
 		try {
-			const header = ref<HeadParamsDto[]>([])
 			const namespaces = ref<NamespaceDto[]>([])
-
-			header.value = await fetchHeaderParams(k8sObject)
 			namespaces.value = await fetchGetNamespaces(clusterCtx)
-
 			console.log('NAMESPACES: ', namespaces.value)
 
 			body.value = namespaces.value.map((n: NamespaceDto) => ({
@@ -373,12 +313,7 @@ export function gridBodyNamespaces(clusterCtx: string, k8sObject: string) {
 				status: n.Status,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching namespace data: ', error)
 			throw error
@@ -396,18 +331,14 @@ export function gridBodyNamespaces(clusterCtx: string, k8sObject: string) {
 	return response
 }
 
-export function gridBodyNodes(clusterCtx: string, namespace: string) {
+export function gridBodyNodes(clusterCtx: string, k8sObject: string) {
 	const head = ref<any[]>([])
 	const body = ref<INode[]>([])
 
 	const fetchData = async () => {
 		try {
-			const header = ref<any[]>([])
 			const node = ref<NodeDtoV2[]>([])
-
-			header.value = await fetchHeaderParams(namespace)
 			node.value = await fetchGetNodes(clusterCtx)
-
 			console.log('NODE: ', node.value)
 
 			body.value = node.value.map((n: NodeDtoV2) => ({
@@ -422,12 +353,7 @@ export function gridBodyNodes(clusterCtx: string, namespace: string) {
 				labels: n.Labels,
 			}))
 
-			head.value = header.value.map((h: any) => ({
-				title: h.Title,
-				key: h.Key,
-				align: h.Align,
-				sortable: h.Sortable,
-			}))
+			head.value = await gridHead(k8sObject)
 		} catch (error) {
 			console.log('Error fetching node data: ', error)
 			throw error
@@ -443,4 +369,23 @@ export function gridBodyNodes(clusterCtx: string, namespace: string) {
 	}
 
 	return response
+}
+
+async function gridHead(k8sObject: string): ref<any[]> {
+	const head = ref<any[]>([])
+	try {
+		const header = ref<any[]>([])
+		header.value = await fetchHeaderParams(k8sObject)
+
+		head.value = header.value.map((h: any) => ({
+			title: h.Title,
+			key: h.Key,
+			align: h.Align,
+			sortable: h.Sortable,
+		}))
+	} catch (error) {
+		console.log('Error fetching node data: ', error)
+		throw error
+	}
+	return head
 }

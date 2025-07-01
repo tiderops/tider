@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
-import { navbarComposable } from '@/composables/NavbarComposable'
+import { useNavbarParams } from '@/composables/useNavbarParams'
 import { K8sObjectDto, NavbarDto } from '@/types/navbar.type'
 
 interface NavbarState {
@@ -8,7 +8,7 @@ interface NavbarState {
 	objects: K8sObjectDto[]
 }
 
-const { objects, fetchData } = navbarComposable()
+const { objects, fetchData } = useNavbarParams()
 
 const props = defineProps<{
 	content: string

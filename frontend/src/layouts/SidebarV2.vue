@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import { sidebarComposable } from '@/composables/SidebarComposable'
+import { useSidebarParamCluster } from '@/composables/useSidebarParamCluster'
 import { ClusterLayout } from '@/types/layout.type'
 import { database } from '../../wailsjs/go/models'
 import CommonParameterDto = database.CommonParameterDto
 
-const { commonParameters, kubernetesParameters, clusters, fetchData } = sidebarComposable()
+const { commonParameters, kubernetesParameters, clusters, fetchData } = useSidebarParamCluster()
 
 const isCollapsed = ref(false)
 const menu = ref<ClusterLayout[]>([])

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { gridGeneralComposable } from '@/composables/GridTableComposable'
+import { useGridButton } from '@/composables/useGridButton'
 
 const props = defineProps<{
 	cluster?: string
@@ -7,6 +7,7 @@ const props = defineProps<{
 	items: any[]
 	search?: string
 	sortBy?: any[]
+	k8sObject?: string
 }>()
 
 const emit = defineEmits<{
@@ -15,8 +16,11 @@ const emit = defineEmits<{
 	(e: 'delete', item: any): void
 }>()
 
+const { restart, loading, error, success } = useGridButton()
+
 const editPod = (item: any) => {
 	console.log('EDIT', item)
+
 	emit('edit', item)
 }
 
@@ -26,9 +30,7 @@ const deletePod = async (item: any) => {
 	console.log('DELETE - NS', item.namespace)
 	console.log('DELETE - CLUSTER ID', props.cluster)
 
-	const { fetchData } = gridGeneralComposable(item.name, item.namespace, props.cluster)
-
-	await fetchData()
+	await restart(item.name, item.namespace, props.cluster, props.k8sObject)
 	emit('delete', item)
 }
 </script>
@@ -56,9 +58,12 @@ const deletePod = async (item: any) => {
 				<v-icon icon="mdi-pencil" />
 			</v-btn>
 
-			<v-btn @click.stop="deletePod(item)" icon>
+			<v-btn :loading="loading" @click.stop="deletePod(item)" icon>
 				<v-icon icon="mdi-delete" />
 			</v-btn>
+
+			<!--            <v-alert v-if="success" type="success"></v-alert>-->
+			<!--            <v-alert v-if="error"   type="error"> {{ error?.message }} </v-alert>-->
 		</template>
 	</v-data-table-virtual>
 </template>

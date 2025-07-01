@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { gridComposable } from '@/composables/GridComposable'
+import { useGridTable } from '@/composables/useGridTable'
+import { useFilter } from '@/composables/useFilter'
 import KsSidebarDetail from './SidebarDetail.vue'
 import KsGridTable from '../components/GridTableComponent.vue'
 import KsGridHeader from '../components/GridHeaderComponent.vue'
@@ -31,8 +32,8 @@ const props = defineProps<{
 }>()
 
 // Composables & constants
-const response = gridComposable(props.cluster, props.k8sObject)
-const namespaces = ['ns-local', 'ns-dev']
+const response = useGridTable(props.cluster, props.k8sObject)
+const response2 = useFilter(props.cluster, props.k8sObject)
 const statuses = ['Running', 'Succeeded', 'Pending']
 
 // Reactive state
@@ -41,6 +42,7 @@ const search = ref('')
 const filterNamespace = ref('')
 const filterStatus = ref('')
 const sortBy = ref([{ key: 'name', order: 'asc' }])
+const ns = ref<Array<any>>([])
 
 const header = reactive<HeadState>({
 	header: [],
@@ -94,8 +96,12 @@ const onDeleteItem = async (item: any) => {
 // Fetch data on mount
 onMounted(async () => {
 	await response.fetchData()
+	await response2.fetchData()
+
 	header.header = response.content?.head.value ?? []
 	items.value = response.content?.body.value ?? []
+
+	ns.value = response2.content?.body.value ?? []
 })
 </script>
 
@@ -106,8 +112,9 @@ onMounted(async () => {
 				v-model:search="search"
 				v-model:filterNamespace="filterNamespace"
 				v-model:filterStatus="filterStatus"
-				:namespaces="namespaces"
+				:namespaces="ns"
 				:statuses="statuses"
+				:namespaceFilterEnable="true"
 			/>
 			<KsGridTable
 				:cluster="props.cluster"
@@ -118,6 +125,7 @@ onMounted(async () => {
 				@click:row="onRowClick"
 				@delete="onDeleteItem"
 				@edit="onEditItem"
+				:k8sObject="props.k8sObject"
 			/>
 		</v-card>
 		<v-snackbar v-model="snackbar" :timeout="timeout">
