@@ -12,7 +12,7 @@ console.log('DEPLOYMENT CLUSTER_ID:', clusterId)
 </script>
 
 <template>
-	<ks-grid-body-v2 :cluster="clusterId" :namespace="namespace" :k8sObject="k8sObject"></ks-grid-body-v2>
+	<ks-grid-body-v2 :cluster="clusterId" :namespace="namespace" :k8sObject="k8sObject" :hasNamespace="true"></ks-grid-body-v2>
 </template>
 
 <style scoped></style>

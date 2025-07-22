@@ -8,7 +8,7 @@ import (
 type ServiceUseCase interface {
 	GetServices(clusterCtx string) ([]model.ServiceDto, error)
 	GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error)
-	UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error
+	UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error
 	DeleteService(name string, namespace string, clusterCtx string) error
 }
 
@@ -28,7 +28,7 @@ func (s *serviceUseCase) GetService(name string, namespace string, clusterCtx st
 	return s.client.GetService(name, namespace, clusterCtx)
 }
 
-func (s *serviceUseCase) UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error {
+func (s *serviceUseCase) UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error {
 	return s.client.UpdateService(name, namespace, dto, clusterCtx)
 }
 

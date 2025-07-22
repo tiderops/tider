@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { gridComposable } from '@/composables/GridComposable'
+import { useGridTable } from '@/composables/useGridTable'
+import { useFilter } from '@/composables/useFilter'
 import KsSidebarDetail from './SidebarDetail.vue'
+import KsSidebarForm from './SidebarForm.vue'
 import KsGridTable from '../components/GridTableComponent.vue'
 import KsGridHeader from '../components/GridHeaderComponent.vue'
 
@@ -28,11 +30,12 @@ const props = defineProps<{
 	cluster?: string
 	k8sObject: string
 	namespace: string
+	hasNamespace: boolean
 }>()
 
 // Composables & constants
-const response = gridComposable(props.cluster, props.k8sObject)
-const namespaces = ['ns-local', 'ns-dev']
+const response = useGridTable(props.cluster, props.k8sObject)
+const response2 = useFilter(props.cluster, props.k8sObject)
 const statuses = ['Running', 'Succeeded', 'Pending']
 
 // Reactive state
@@ -41,6 +44,7 @@ const search = ref('')
 const filterNamespace = ref('')
 const filterStatus = ref('')
 const sortBy = ref([{ key: 'name', order: 'asc' }])
+const ns = ref<Array<any>>([])
 
 const header = reactive<HeadState>({
 	header: [],
@@ -59,9 +63,11 @@ const filteredItems = computed(() =>
 // Sidebar logic
 const isSidebarVisible = ref(false)
 const selectedRow = ref<any>(null)
+const updateItem = ref<any>(null)
 
-const onRowClick = (cellData: any, item: any) => {
+const onDetailItem = (item: any) => {
 	selectedRow.value = item.item
+	console.log('TEST', item.item)
 
 	if (isSidebarVisible.value) {
 		isSidebarVisible.value = false
@@ -73,8 +79,14 @@ const onRowClick = (cellData: any, item: any) => {
 	}
 }
 
-const onEditItem = async (item: any) => {
+const isSidebarFormVisible = ref(false)
+
+const onEditItem = async (item: any, isOpen: boolean) => {
 	console.log('Parent received edit:', item)
+	isSidebarFormVisible.value = isOpen
+
+	updateItem.value = item
+
 	text.value = `Resource "${item.name}" was edited.`
 	snackbar.value = true
 
@@ -94,8 +106,12 @@ const onDeleteItem = async (item: any) => {
 // Fetch data on mount
 onMounted(async () => {
 	await response.fetchData()
+	await response2.fetchData()
+
 	header.header = response.content?.head.value ?? []
 	items.value = response.content?.body.value ?? []
+
+	ns.value = response2.content?.body.value ?? []
 })
 </script>
 
@@ -106,18 +122,22 @@ onMounted(async () => {
 				v-model:search="search"
 				v-model:filterNamespace="filterNamespace"
 				v-model:filterStatus="filterStatus"
-				:namespaces="namespaces"
+				:namespaces="ns"
 				:statuses="statuses"
+				:namespaceFilterEnable="props.hasNamespace"
 			/>
+		</v-card>
+		<v-card>
 			<KsGridTable
 				:cluster="props.cluster"
 				:headers="header.header"
 				:items="filteredItems"
 				:search="search"
 				:sortBy="sortBy"
-				@click:row="onRowClick"
 				@delete="onDeleteItem"
 				@edit="onEditItem"
+				@detail="onDetailItem"
+				:k8sObject="props.k8sObject"
 			/>
 		</v-card>
 		<v-snackbar v-model="snackbar" :timeout="timeout">
@@ -128,6 +148,7 @@ onMounted(async () => {
 		</v-snackbar>
 		<v-card>
 			<KsSidebarDetail :isVisible="isSidebarVisible" :selectedRow="selectedRow" @close="isSidebarVisible = false" />
+			<KsSidebarForm :isVisible="isSidebarFormVisible" :item="updateItem" @close="isSidebarFormVisible = false" />
 		</v-card>
 	</v-container>
 </template>

@@ -4,7 +4,9 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"strconv"
 )
 
 type deploymentClient struct {
@@ -65,7 +67,7 @@ func (d deploymentClient) GetDeployment(name string, namespace string, clusterCt
 	}, nil
 }
 
-func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentDto, clusterCtx string) error {
+func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentRequest, clusterCtx string) error {
 	client, err := d.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return fmt.Errorf("cluster %s is not registered", clusterCtx)
@@ -78,8 +80,16 @@ func (d deploymentClient) UpdateDeployment(name string, namespace string, dto mo
 		panic("Error while searching ingress")
 	}
 
-	deployment.Name = dto.Name
-	deployment.Namespace = dto.Namespace
+	replicas, _ := strconv.Atoi(dto.Replicas)
+	ptrReplica := int32(replicas)
+	strategyType := v1.DeploymentStrategyType(dto.StrategyType)
+
+	deployment.Spec.Replicas = &ptrReplica
+	deployment.Spec.Selector.MatchLabels["app"] = dto.App
+	deployment.Spec.Strategy.Type = strategyType
+	deployment.Spec.Template.Labels["app"] = dto.Label.App
+	deployment.Spec.Template.Labels["tier"] = dto.Label.Tier
+	deployment.Spec.Template.Labels["tierType"] = dto.Label.TierType
 
 	_, err = c.Update(context.TODO(), deployment, metav1.UpdateOptions{})
 

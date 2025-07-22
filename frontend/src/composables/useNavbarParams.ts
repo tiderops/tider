@@ -3,7 +3,7 @@ import ObjectType = database.ObjectType
 import { onMounted, ref } from 'vue'
 import { fetchObjectsParameter } from '../services/navbar.service'
 
-export function navbarComposable() {
+export function useNavbarParams() {
 	const objects = ref<ObjectType[]>([])
 
 	const fetchData = async (): Promise<ObjectType[]> => {

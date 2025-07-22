@@ -183,6 +183,60 @@ export namespace model {
 		    return a;
 		}
 	}
+	export class ResourceRequest {
+	    RMemory: string;
+	    RCpu: string;
+	    LMemory: string;
+	    LCpu: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ResourceRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.RMemory = source["RMemory"];
+	        this.RCpu = source["RCpu"];
+	        this.LMemory = source["LMemory"];
+	        this.LCpu = source["LCpu"];
+	    }
+	}
+	export class ContainerRequest {
+	    Image: string;
+	    PullPolicy: string;
+	    Port: string;
+	    Resource: ResourceRequest;
+	
+	    static createFrom(source: any = {}) {
+	        return new ContainerRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Image = source["Image"];
+	        this.PullPolicy = source["PullPolicy"];
+	        this.Port = source["Port"];
+	        this.Resource = this.convertValues(source["Resource"], ResourceRequest);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class CronJob {
 	    Name: string;
 	    Namespace: string;
@@ -232,6 +286,60 @@ export namespace model {
 	        this.Status = source["Status"];
 	        this.Age = source["Age"];
 	    }
+	}
+	export class LabelRequest {
+	    App: string;
+	    Tier: string;
+	    TierType: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new LabelRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.App = source["App"];
+	        this.Tier = source["Tier"];
+	        this.TierType = source["TierType"];
+	    }
+	}
+	export class DeploymentRequest {
+	    Replicas: string;
+	    App: string;
+	    StrategyType: string;
+	    Label: LabelRequest;
+	    Container: ContainerRequest;
+	
+	    static createFrom(source: any = {}) {
+	        return new DeploymentRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Replicas = source["Replicas"];
+	        this.App = source["App"];
+	        this.StrategyType = source["StrategyType"];
+	        this.Label = this.convertValues(source["Label"], LabelRequest);
+	        this.Container = this.convertValues(source["Container"], ContainerRequest);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class EnvironmentDto {
 	    Name: string;
@@ -353,6 +461,7 @@ export namespace model {
 	        this.OwnerName = source["OwnerName"];
 	    }
 	}
+	
 	export class Local {
 	    Path: string;
 	    FSType: string;
@@ -862,6 +971,41 @@ export namespace model {
 		    return a;
 		}
 	}
+	export class PodRequest {
+	    Replicas: string;
+	    App: string;
+	    Container: ContainerRequest;
+	
+	    static createFrom(source: any = {}) {
+	        return new PodRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Replicas = source["Replicas"];
+	        this.App = source["App"];
+	        this.Container = this.convertValues(source["Container"], ContainerRequest);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	
 	
 	
@@ -887,6 +1031,26 @@ export namespace model {
 	        this.Status = source["Status"];
 	        this.CreationTimestamp = source["CreationTimestamp"];
 	        this.Spec = source["Spec"];
+	    }
+	}
+	export class ServiceRequest {
+	    LabelApp: string;
+	    SpecType: string;
+	    Port: string;
+	    TargetPort: string;
+	    SelectorApp: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ServiceRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.LabelApp = source["LabelApp"];
+	        this.SpecType = source["SpecType"];
+	        this.Port = source["Port"];
+	        this.TargetPort = source["TargetPort"];
+	        this.SelectorApp = source["SelectorApp"];
 	    }
 	}
 	

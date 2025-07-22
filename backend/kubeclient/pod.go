@@ -4,7 +4,9 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"strconv"
 )
 
 type podClient struct {
@@ -103,7 +105,7 @@ func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (mo
 	}, nil
 }
 
-func (p *podClient) UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error {
+func (p *podClient) UpdatePod(name string, namespace string, dto model.PodRequest, clusterCtx string) error {
 	client, err := p.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return fmt.Errorf("cluster %s is not registered", clusterCtx)
@@ -117,8 +119,21 @@ func (p *podClient) UpdatePod(name string, namespace string, dto model.PodDto, c
 		panic("Error while searching ingress")
 	}
 
-	pod.Name = dto.Name
-	pod.Namespace = dto.Namespace
+	port, _ := strconv.ParseInt(dto.Container.Port, 10, 32)
+	rCpu, _ := strconv.ParseInt(dto.Container.Resource.RCpu, 10, 32)
+	rMemory, _ := strconv.ParseInt(dto.Container.Resource.RMemory, 10, 32)
+	lCpu, _ := strconv.ParseInt(dto.Container.Resource.LCpu, 10, 32)
+	lMemory, _ := strconv.ParseInt(dto.Container.Resource.LMemory, 10, 32)
+	pullPolicy := v1.PullPolicy(dto.Container.PullPolicy)
+
+	pod.ObjectMeta.Labels["app"] = dto.App
+	pod.Spec.Containers[0].Image = dto.Container.Image
+	pod.Spec.Containers[0].ImagePullPolicy = pullPolicy
+	pod.Spec.Containers[0].Ports[0].ContainerPort = int32(port)
+	pod.Spec.Containers[0].Resources.Requests.Cpu().Set(rCpu)
+	pod.Spec.Containers[0].Resources.Requests.Memory().Set(rMemory)
+	pod.Spec.Containers[0].Resources.Limits.Cpu().Set(lCpu)
+	pod.Spec.Containers[0].Resources.Limits.Memory().Set(lMemory)
 
 	_, err = c.Update(context.TODO(), pod, metav1.UpdateOptions{})
 

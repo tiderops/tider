@@ -4,7 +4,10 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
+	"strconv"
 )
 
 type serviceClient struct {
@@ -65,7 +68,7 @@ func (s serviceClient) GetService(name string, namespace string, clusterCtx stri
 	}, nil
 }
 
-func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error {
+func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error {
 	client, err := s.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
@@ -78,9 +81,15 @@ func (s serviceClient) UpdateService(name string, namespace string, dto model.Se
 		panic("Error while searching ingress")
 	}
 
-	service.Name = dto.Name
-	service.Namespace = dto.Namespace
-	service.Labels = dto.Labels
+	port, _ := strconv.ParseInt(dto.Port, 10, 32)
+
+	serviceType := v1.ServiceType(dto.SpecType)
+
+	service.ObjectMeta.Labels["app"] = dto.LabelApp
+	service.Spec.Type = serviceType
+	service.Spec.Ports[0].Port = int32(port)
+	service.Spec.Ports[0].TargetPort = intstr.FromString(dto.TargetPort)
+	service.Spec.Selector["app"] = dto.SelectorApp
 
 	_, err = c.Update(context.TODO(), service, metav1.UpdateOptions{})
 

@@ -26,7 +26,7 @@ func (w *WorkloadMiddleware) GetPod(name string, namespace string, clusterCtx st
 	return w.endpoint.GetPod(name, namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error {
+func (w *WorkloadMiddleware) UpdatePod(name string, namespace string, dto model.PodRequest, clusterCtx string) error {
 	return w.endpoint.UpdatePod(name, namespace, dto, clusterCtx)
 }
 
@@ -45,7 +45,7 @@ func (w *WorkloadMiddleware) GetDeployment(name string, namespace string, cluste
 	return w.endpoint.GetDeployment(name, namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) UpdateDeployment(name string, namespace string, dto model.DeploymentDto, clusterCtx string) error {
+func (w *WorkloadMiddleware) UpdateDeployment(name string, namespace string, dto model.DeploymentRequest, clusterCtx string) error {
 	return w.endpoint.UpdateDeployment(name, namespace, dto, clusterCtx)
 }
 
