@@ -2,7 +2,7 @@ import { fetchDeleteDeployment, fetchRestartPod } from '../services/workload.ser
 import { ref } from 'vue'
 import { fetchDeleteIngress, fetchDeleteService } from '../services/network.service'
 
-export function useGridButton() {
+export function useGridDeleteButton() {
 	const loading = ref(false)
 	const error = ref<unknown>(null)
 	const success = ref(false)
@@ -12,31 +12,14 @@ export function useGridButton() {
 		error.value = null
 		success.value = false
 
-		try {
-			switch (k8sObject) {
-				case 'pod': {
-					await fetchRestartPod(name, namespace, clusterCtx)
-					break
-				}
-				case 'deployment': {
-					await fetchDeleteDeployment(name, namespace, clusterCtx)
-					break
-				}
-				case 'service': {
-					await fetchDeleteService(name, namespace, clusterCtx)
-					break
-				}
-				case 'ingress': {
-					await fetchDeleteIngress(name, namespace, clusterCtx)
-					break
-				}
-				default: {
-					error.value = err
-					console.log('K8s object not found')
-					break
-				}
-			}
+		const k8sComponents = new Map<string, Function>();
+		k8sComponents.set('pod', fetchRestartPod(name, namespace, clusterCtx))
+		k8sComponents.set('deployment', fetchDeleteDeployment(name, namespace, clusterCtx))
+		k8sComponents.set('service', fetchDeleteService(name, namespace, clusterCtx))
+		k8sComponents.set('ingress', fetchDeleteIngress(name, namespace, clusterCtx))
 
+		try {
+			await k8sComponents.get(k8sObject)
 			success.value = true
 		} catch (err) {
 			error.value = err

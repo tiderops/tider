@@ -23,14 +23,14 @@ type MetricClient interface {
 type PodClient interface {
 	GetPods(clusterCtx string) ([]model.PodDto, error)
 	GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error)
-	UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error
+	UpdatePod(name string, namespace string, dto model.PodRequest, clusterCtx string) error
 	DeletePod(name string, namespace string, clusterCtx string) error
 }
 
 type DeploymentClient interface {
 	GetDeployments(clusterCtx string) ([]model.DeploymentDto, error)
 	GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error)
-	UpdateDeployment(name string, namespace string, dto model.DeploymentDto, clusterCtx string) error
+	UpdateDeployment(name string, namespace string, dto model.DeploymentRequest, clusterCtx string) error
 	DeleteDeployment(name string, namespace string, clusterCtx string) error
 }
 
@@ -55,7 +55,7 @@ type NamespaceClient interface {
 type ServiceClient interface {
 	GetServices(clusterCtx string) ([]model.ServiceDto, error)
 	GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error)
-	UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error
+	UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error
 	DeleteService(name string, namespace string, clusterCtx string) error
 }
 

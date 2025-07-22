@@ -44,10 +44,10 @@ const emit = defineEmits<{
 
 <style scoped>
 .custom-sidebar {
-	position: fixed; /* Ensure it's above all other content */
+	position: fixed;
 	top: 0;
 	right: 0;
 	height: 100%;
-	z-index: 1100; /* Higher than navbar */
+	z-index: 1100;
 }
 </style>

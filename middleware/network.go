@@ -23,7 +23,7 @@ func (n *NetworkMiddleware) GetService(name string, namespace string, clusterCtx
 	return n.endpoint.GetService(name, namespace, clusterCtx)
 }
 
-func (n *NetworkMiddleware) UpdateService(name string, namespace string, dto model.ServiceDto, clusterCtx string) error {
+func (n *NetworkMiddleware) UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error {
 	return n.endpoint.UpdateService(name, namespace, dto, clusterCtx)
 }
 

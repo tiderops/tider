@@ -8,3 +8,12 @@ type ServiceDto struct {
 	CreationTimestamp string
 	Spec              string
 }
+
+type ServiceRequest struct {
+	name        string
+	LabelApp    string
+	SpecType    string
+	Port        string
+	TargetPort  string
+	SelectorApp string
+}

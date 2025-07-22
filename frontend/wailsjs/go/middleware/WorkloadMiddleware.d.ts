@@ -20,6 +20,6 @@ export function TroubleshootDeployment(arg1:string,arg2:string,arg3:string):Prom
 
 export function TroubleshootPod(arg1:string,arg2:string,arg3:string):Promise<void>;
 
-export function UpdateDeployment(arg1:string,arg2:string,arg3:model.DeploymentDto,arg4:string):Promise<void>;
+export function UpdateDeployment(arg1:string,arg2:string,arg3:model.DeploymentRequest,arg4:string):Promise<void>;
 
-export function UpdatePod(arg1:string,arg2:string,arg3:model.PodDto,arg4:string):Promise<void>;
+export function UpdatePod(arg1:string,arg2:string,arg3:model.PodRequest,arg4:string):Promise<void>;

@@ -37,6 +37,7 @@ const emit = defineEmits<{
 			class="mx-5"
 			@update:model-value="emit('update:filterStatus', $event)"
 		></v-select>
+        <v-btn><v-icon icon="mdi-plus"/></v-btn>
 	</v-toolbar>
 </template>
 

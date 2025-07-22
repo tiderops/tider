@@ -9,7 +9,7 @@ import (
 type PodUseCase interface {
 	GetPods(clusterCtx string) ([]model.PodDto, error)
 	GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error)
-	UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error
+	UpdatePod(name string, namespace string, dto model.PodRequest, clusterCtx string) error
 	RestartPod(name string, namespace string, clusterCtx string) error
 	TroubleshootPod(name string, namespace string, clusterCtx string)
 }
@@ -31,7 +31,7 @@ func (p *podUseCase) GetPod(name string, namespace string, clusterCtx string) (m
 	return p.client.GetPod(name, namespace, clusterCtx)
 }
 
-func (p *podUseCase) UpdatePod(name string, namespace string, dto model.PodDto, clusterCtx string) error {
+func (p *podUseCase) UpdatePod(name string, namespace string, dto model.PodRequest, clusterCtx string) error {
 	return p.client.UpdatePod(name, namespace, dto, clusterCtx)
 }
 

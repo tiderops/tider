@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useGridTable } from '@/composables/useGridTable'
 import { useFilter } from '@/composables/useFilter'
 import KsSidebarDetail from './SidebarDetail.vue'
+import KsSidebarForm from './SidebarForm.vue'
 import KsGridTable from '../components/GridTableComponent.vue'
 import KsGridHeader from '../components/GridHeaderComponent.vue'
 
@@ -29,6 +30,7 @@ const props = defineProps<{
 	cluster?: string
 	k8sObject: string
 	namespace: string
+    hasNamespace: boolean
 }>()
 
 // Composables & constants
@@ -61,9 +63,11 @@ const filteredItems = computed(() =>
 // Sidebar logic
 const isSidebarVisible = ref(false)
 const selectedRow = ref<any>(null)
+const updateItem = ref<any>(null)
 
-const onRowClick = (cellData: any, item: any) => {
+const onDetailItem = (item: any) => {
 	selectedRow.value = item.item
+    console.log("TEST", item.item)
 
 	if (isSidebarVisible.value) {
 		isSidebarVisible.value = false
@@ -75,10 +79,16 @@ const onRowClick = (cellData: any, item: any) => {
 	}
 }
 
-const onEditItem = async (item: any) => {
+const isSidebarFormVisible = ref(false)
+
+const onEditItem = async (item: any, isOpen: boolean) => {
 	console.log('Parent received edit:', item)
-	text.value = `Resource "${item.name}" was edited.`
-	snackbar.value = true
+    isSidebarFormVisible.value = isOpen
+
+    updateItem.value = item
+
+    text.value = `Resource "${item.name}" was edited.`
+    snackbar.value = true
 
 	await response.fetchData()
 	items.value = response.content?.body.value ?? []
@@ -103,6 +113,7 @@ onMounted(async () => {
 
 	ns.value = response2.content?.body.value ?? []
 })
+
 </script>
 
 <template>
@@ -114,20 +125,23 @@ onMounted(async () => {
 				v-model:filterStatus="filterStatus"
 				:namespaces="ns"
 				:statuses="statuses"
-				:namespaceFilterEnable="true"
+				:namespaceFilterEnable="props.hasNamespace"
 			/>
-			<KsGridTable
-				:cluster="props.cluster"
-				:headers="header.header"
-				:items="filteredItems"
-				:search="search"
-				:sortBy="sortBy"
-				@click:row="onRowClick"
-				@delete="onDeleteItem"
-				@edit="onEditItem"
-				:k8sObject="props.k8sObject"
-			/>
+
 		</v-card>
+        <v-card>
+            <KsGridTable
+                :cluster="props.cluster"
+                :headers="header.header"
+                :items="filteredItems"
+                :search="search"
+                :sortBy="sortBy"
+                @delete="onDeleteItem"
+                @edit="onEditItem"
+                @detail="onDetailItem"
+                :k8sObject="props.k8sObject"
+            />
+        </v-card>
 		<v-snackbar v-model="snackbar" :timeout="timeout">
 			{{ text }}
 			<template v-slot:actions>
@@ -136,6 +150,8 @@ onMounted(async () => {
 		</v-snackbar>
 		<v-card>
 			<KsSidebarDetail :isVisible="isSidebarVisible" :selectedRow="selectedRow" @close="isSidebarVisible = false" />
+            <KsSidebarForm :isVisible="isSidebarFormVisible" :item="updateItem" @close="isSidebarFormVisible = false" />
 		</v-card>
+
 	</v-container>
 </template>
