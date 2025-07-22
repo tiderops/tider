@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useGridDeleteButton } from '@/composables/useGridDeleteButton'
-import {ref} from "vue";
+import { ref } from 'vue'
 
 const props = defineProps<{
 	cluster?: string
@@ -14,7 +14,7 @@ const props = defineProps<{
 const emit = defineEmits<{
 	(e: 'edit', item: any): void
 	(e: 'delete', item: any): void
-    (e: 'detail', item: any): void
+	(e: 'detail', item: any): void
 }>()
 
 const { restart, loading, error, success } = useGridDeleteButton()
@@ -28,25 +28,24 @@ const editPod = (item: any) => {
 }
 
 const confirmDelete = (item: any) => {
-    itemToDelete.value = item
-    dialog.value = true
+	itemToDelete.value = item
+	dialog.value = true
 }
 
 const deleteConfirmed = async () => {
-    if (!itemToDelete.value) return
-    console.log('DELETE CONFIRMED', itemToDelete.value)
-    await restart(itemToDelete.value.name, itemToDelete.value.namespace, props.cluster, props.k8sObject)
+	if (!itemToDelete.value) return
+	console.log('DELETE CONFIRMED', itemToDelete.value)
+	await restart(itemToDelete.value.name, itemToDelete.value.namespace, props.cluster, props.k8sObject)
 
-    emit('delete', itemToDelete.value)
-    dialog.value = false
-    itemToDelete.value = null
+	emit('delete', itemToDelete.value)
+	dialog.value = false
+	itemToDelete.value = null
 }
 
 const onRowClick = (item: any) => {
-    console.log("onRowClick", item)
-    emit('detail', item)
+	console.log('onRowClick', item)
+	emit('detail', item)
 }
-
 </script>
 
 <template>
@@ -55,7 +54,7 @@ const onRowClick = (item: any) => {
 		:items="props.items"
 		:search="props.search"
 		:sort-by="props.sortBy"
-        @click:row="(event, row) => onRowClick(row)"
+		@click:row="(event, row) => onRowClick(row)"
 		height="720"
 		item-value="name"
 		density="compact"
@@ -73,27 +72,27 @@ const onRowClick = (item: any) => {
 				<v-icon icon="mdi-pencil" />
 			</v-btn>
 
-            <v-btn @click.stop="confirmDelete(item)" icon>
-                <v-icon icon="mdi-delete" />
-            </v-btn>
+			<v-btn @click.stop="confirmDelete(item)" icon>
+				<v-icon icon="mdi-delete" />
+			</v-btn>
 		</template>
 	</v-data-table-virtual>
 
-    <v-dialog v-if="dialog" v-model="dialog" max-width="400" persistent>
-        <v-card title="Confirm Deletion">
-            <v-card-text>
-                Are you sure you want to delete
-                <strong>{{ itemToDelete?.name }}</strong>?
-            </v-card-text>
+	<v-dialog v-if="dialog" v-model="dialog" max-width="400" persistent>
+		<v-card title="Confirm Deletion">
+			<v-card-text>
+				Are you sure you want to delete
+				<strong>{{ itemToDelete?.name }}</strong
+				>?
+			</v-card-text>
 
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn @click="dialog = false" text>Cancel</v-btn>
-                <v-btn @click="deleteConfirmed" color="red" :loading="loading" text>Delete</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
-
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn @click="dialog = false" text>Cancel</v-btn>
+				<v-btn @click="deleteConfirmed" color="red" :loading="loading" text>Delete</v-btn>
+			</v-card-actions>
+		</v-card>
+	</v-dialog>
 </template>
 
 <style scoped></style>

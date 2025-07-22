@@ -1,11 +1,6 @@
-import {
-	fetchDeleteDeployment,
-	fetchRestartPod,
-	fetchUpdateDeployment,
-	fetchUpdatePod
-} from '../services/workload.service'
+import { fetchDeleteDeployment, fetchRestartPod, fetchUpdateDeployment, fetchUpdatePod } from '../services/workload.service'
 import { ref } from 'vue'
-import {fetchDeleteIngress, fetchDeleteService, fetchUpdateService} from '../services/network.service'
+import { fetchDeleteIngress, fetchDeleteService, fetchUpdateService } from '../services/network.service'
 
 export function useCreateButton() {
 	const loading = ref(false)

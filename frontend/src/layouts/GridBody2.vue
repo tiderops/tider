@@ -30,7 +30,7 @@ const props = defineProps<{
 	cluster?: string
 	k8sObject: string
 	namespace: string
-    hasNamespace: boolean
+	hasNamespace: boolean
 }>()
 
 // Composables & constants
@@ -67,7 +67,7 @@ const updateItem = ref<any>(null)
 
 const onDetailItem = (item: any) => {
 	selectedRow.value = item.item
-    console.log("TEST", item.item)
+	console.log('TEST', item.item)
 
 	if (isSidebarVisible.value) {
 		isSidebarVisible.value = false
@@ -83,12 +83,12 @@ const isSidebarFormVisible = ref(false)
 
 const onEditItem = async (item: any, isOpen: boolean) => {
 	console.log('Parent received edit:', item)
-    isSidebarFormVisible.value = isOpen
+	isSidebarFormVisible.value = isOpen
 
-    updateItem.value = item
+	updateItem.value = item
 
-    text.value = `Resource "${item.name}" was edited.`
-    snackbar.value = true
+	text.value = `Resource "${item.name}" was edited.`
+	snackbar.value = true
 
 	await response.fetchData()
 	items.value = response.content?.body.value ?? []
@@ -113,7 +113,6 @@ onMounted(async () => {
 
 	ns.value = response2.content?.body.value ?? []
 })
-
 </script>
 
 <template>
@@ -127,21 +126,20 @@ onMounted(async () => {
 				:statuses="statuses"
 				:namespaceFilterEnable="props.hasNamespace"
 			/>
-
 		</v-card>
-        <v-card>
-            <KsGridTable
-                :cluster="props.cluster"
-                :headers="header.header"
-                :items="filteredItems"
-                :search="search"
-                :sortBy="sortBy"
-                @delete="onDeleteItem"
-                @edit="onEditItem"
-                @detail="onDetailItem"
-                :k8sObject="props.k8sObject"
-            />
-        </v-card>
+		<v-card>
+			<KsGridTable
+				:cluster="props.cluster"
+				:headers="header.header"
+				:items="filteredItems"
+				:search="search"
+				:sortBy="sortBy"
+				@delete="onDeleteItem"
+				@edit="onEditItem"
+				@detail="onDetailItem"
+				:k8sObject="props.k8sObject"
+			/>
+		</v-card>
 		<v-snackbar v-model="snackbar" :timeout="timeout">
 			{{ text }}
 			<template v-slot:actions>
@@ -150,8 +148,7 @@ onMounted(async () => {
 		</v-snackbar>
 		<v-card>
 			<KsSidebarDetail :isVisible="isSidebarVisible" :selectedRow="selectedRow" @close="isSidebarVisible = false" />
-            <KsSidebarForm :isVisible="isSidebarFormVisible" :item="updateItem" @close="isSidebarFormVisible = false" />
+			<KsSidebarForm :isVisible="isSidebarFormVisible" :item="updateItem" @close="isSidebarFormVisible = false" />
 		</v-card>
-
 	</v-container>
 </template>

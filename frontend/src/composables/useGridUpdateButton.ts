@@ -1,9 +1,6 @@
-import {
-	fetchUpdateDeployment,
-	fetchUpdatePod
-} from '../services/workload.service'
+import { fetchUpdateDeployment, fetchUpdatePod } from '../services/workload.service'
 import { ref } from 'vue'
-import {fetchUpdateService} from '../services/network.service'
+import { fetchUpdateService } from '../services/network.service'
 
 export function useGridUpdateButton() {
 	const loading = ref(false)
