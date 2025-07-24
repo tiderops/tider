@@ -5,11 +5,14 @@ import { useGridUpdateButton } from '@/composables/useGridUpdateButton'
 const props = defineProps<{
 	isVisible: boolean
 	item: Record<string, any>
+	cluster: string
+	k8sObject: string
 }>()
 
 const formValid = ref(false)
 const submitted = ref(false)
 const form = ref<Record<string, string>>({})
+const data = ref<Record<string, string>>({})
 const { update } = useGridUpdateButton()
 
 // Emit
@@ -21,33 +24,63 @@ const submitForm = async () => {
 	if (formValid.value) {
 		submitted.value = true
 		console.log('Form Data:', form.value)
-		// await update()
+		// console.log('Form Data:', form.value.name)
+		const request = {
+			app: form.value.name,
+			container: {
+				image: form.value.image,
+				pullPolicy: form.value.pullPolicy,
+				port: form.value.port,
+				// resource : {
+				//     rMemory:
+				// }
+			},
+		}
+
+		console.log(request)
+		await update(form.value.name, form.value.namespace, request, props.cluster, props.k8sObject)
 	}
 }
 
 // Flatten object helper
 const flattenObject = (obj: any, prefix = ''): Record<string, string> => {
+	const response: Record<string, any> = {}
 	const flat: Record<string, string> = {}
+	const nonEditable: Record<string, string> = {}
+
 	let i = 0
+	// console.log("OBJ", obj.editable)
+
 	for (const key in obj) {
 		const value = obj[key]
 		const newKey = prefix ? `${prefix}.${key}` : key
 		console.log(i, value, newKey)
 		i++
+
+		// console.log(newKey, obj.editable.includes(newKey))
 		if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
 			Object.assign(flat, flattenObject(value, newKey))
-		} else {
+		} else if (obj.editable.includes(newKey)) {
 			flat[newKey] = String(value ?? '')
+		} else {
+			nonEditable[newKey] = String(value ?? '')
 		}
 	}
-	return flat
+
+	console.log('FLAT', flat)
+	console.log('NONEDIT', nonEditable)
+
+	response['flat'] = nonEditable
+	response['edit'] = flat
+	return response
 }
 
 // Watch item prop and re-populate the form
 watch(
 	() => props.item,
 	(newItem) => {
-		form.value = flattenObject(newItem)
+		form.value = flattenObject(newItem)['edit']
+		data.value = flattenObject(newItem)['flat']
 	},
 	{ immediate: true },
 )
@@ -71,6 +104,8 @@ watch(
 						hide-details="auto"
 						density="compact"
 					></v-text-field>
+
+					<v-text-field disabled v-for="(value, key) in data" :key="key" v-model="data[key]" :label="key" hide-details="auto" density="compact"></v-text-field>
 
 					<v-btn type="submit" :disabled="!formValid" color="primary">Submit</v-btn>
 				</v-form>

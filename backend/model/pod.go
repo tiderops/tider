@@ -3,24 +3,19 @@ package model
 type PodDto struct {
 	Name      string
 	Namespace string
-	Replicas  int32
 	Container Container
 	Age       string
 	Status    string
+	Editable  []string
 }
 
-type PodResponse struct {
+type PodDetail struct {
 	Name      string
 	Namespace string
-	Replicas  int32
 	Container Container
 	Age       string
 	Status    string
-	Editable  EditableOption
-}
-
-type EditableOption struct {
-	Options []string
+	Editable  []string
 }
 
 type PodMetricDto struct {
@@ -29,19 +24,13 @@ type PodMetricDto struct {
 	Consume   Resource
 }
 
-type Container struct {
-	Limit   Resource
-	Request Resource
-}
-
 type CurrentResourcesDto struct {
 	Name      string
 	Namespace string
 	Container Container
 }
 
-type PodRequest struct {
-	Replicas  string
+type PodUpdate struct {
 	App       string
-	Container ContainerRequest
+	Container ContainerUpdate
 }

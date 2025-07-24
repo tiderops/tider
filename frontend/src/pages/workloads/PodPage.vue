@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import KsGridBodyV2 from '../../layouts/GridBody2.vue'
+import KsGridBodyV2 from '../../layouts/GridBody.vue'
 import { useRoute } from 'vue-router'
 import { ref } from 'vue'
 

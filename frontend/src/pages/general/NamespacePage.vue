@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import KsGridBodyV2 from '@/layouts/GridBody2.vue'
+import KsGridBodyV2 from '@/layouts/GridBody.vue'
 import { useRoute } from 'vue-router'
 
 const k8sObject = ref<string>('namespace')

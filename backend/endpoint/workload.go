@@ -23,7 +23,7 @@ func (we *WorkloadEndpoint) GetPod(name string, namespace string, clusterCtx str
 	return we.podUseCase.GetPod(name, namespace, clusterCtx)
 }
 
-func (we *WorkloadEndpoint) UpdatePod(name string, namespace string, dto model.PodRequest, clusterCtx string) error {
+func (we *WorkloadEndpoint) UpdatePod(name string, namespace string, dto model.PodUpdate, clusterCtx string) error {
 	return we.podUseCase.UpdatePod(name, namespace, dto, clusterCtx)
 }
 
@@ -39,7 +39,7 @@ func (we *WorkloadEndpoint) GetDeployment(name string, namespace string, cluster
 	return we.deploymentUseCase.GetDeployment(name, namespace, clusterCtx)
 }
 
-func (we *WorkloadEndpoint) UpdateDeployment(name string, namespace string, dto model.DeploymentRequest, clusterCtx string) error {
+func (we *WorkloadEndpoint) UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error {
 	return we.deploymentUseCase.UpdateDeployment(name, namespace, dto, clusterCtx)
 }
 

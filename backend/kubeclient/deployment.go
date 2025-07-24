@@ -67,7 +67,7 @@ func (d deploymentClient) GetDeployment(name string, namespace string, clusterCt
 	}, nil
 }
 
-func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentRequest, clusterCtx string) error {
+func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error {
 	client, err := d.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return fmt.Errorf("cluster %s is not registered", clusterCtx)

@@ -152,6 +152,9 @@ export namespace model {
 	    }
 	}
 	export class Container {
+	    Image: string;
+	    PullPolicy: string;
+	    Port: string;
 	    Limit: Resource;
 	    Request: Resource;
 	
@@ -161,6 +164,9 @@ export namespace model {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Image = source["Image"];
+	        this.PullPolicy = source["PullPolicy"];
+	        this.Port = source["Port"];
 	        this.Limit = this.convertValues(source["Limit"], Resource);
 	        this.Request = this.convertValues(source["Request"], Resource);
 	    }
@@ -183,14 +189,14 @@ export namespace model {
 		    return a;
 		}
 	}
-	export class ResourceRequest {
+	export class ResourceUpdate {
 	    RMemory: string;
 	    RCpu: string;
 	    LMemory: string;
 	    LCpu: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new ResourceRequest(source);
+	        return new ResourceUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -201,14 +207,14 @@ export namespace model {
 	        this.LCpu = source["LCpu"];
 	    }
 	}
-	export class ContainerRequest {
+	export class ContainerUpdate {
 	    Image: string;
 	    PullPolicy: string;
 	    Port: string;
-	    Resource: ResourceRequest;
+	    Resource: ResourceUpdate;
 	
 	    static createFrom(source: any = {}) {
-	        return new ContainerRequest(source);
+	        return new ContainerUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -216,7 +222,7 @@ export namespace model {
 	        this.Image = source["Image"];
 	        this.PullPolicy = source["PullPolicy"];
 	        this.Port = source["Port"];
-	        this.Resource = this.convertValues(source["Resource"], ResourceRequest);
+	        this.Resource = this.convertValues(source["Resource"], ResourceUpdate);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -287,13 +293,13 @@ export namespace model {
 	        this.Age = source["Age"];
 	    }
 	}
-	export class LabelRequest {
+	export class LabelUpdate {
 	    App: string;
 	    Tier: string;
 	    TierType: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new LabelRequest(source);
+	        return new LabelUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -303,15 +309,15 @@ export namespace model {
 	        this.TierType = source["TierType"];
 	    }
 	}
-	export class DeploymentRequest {
+	export class DeploymentUpdate {
 	    Replicas: string;
 	    App: string;
 	    StrategyType: string;
-	    Label: LabelRequest;
-	    Container: ContainerRequest;
+	    Label: LabelUpdate;
+	    Container: ContainerUpdate;
 	
 	    static createFrom(source: any = {}) {
-	        return new DeploymentRequest(source);
+	        return new DeploymentUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -319,8 +325,8 @@ export namespace model {
 	        this.Replicas = source["Replicas"];
 	        this.App = source["App"];
 	        this.StrategyType = source["StrategyType"];
-	        this.Label = this.convertValues(source["Label"], LabelRequest);
-	        this.Container = this.convertValues(source["Container"], ContainerRequest);
+	        this.Label = this.convertValues(source["Label"], LabelUpdate);
+	        this.Container = this.convertValues(source["Container"], ContainerUpdate);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -934,10 +940,10 @@ export namespace model {
 	export class PodDto {
 	    Name: string;
 	    Namespace: string;
-	    Replicas: number;
 	    Container: Container;
 	    Age: string;
 	    Status: string;
+	    Editable: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new PodDto(source);
@@ -947,10 +953,10 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
 	        this.Namespace = source["Namespace"];
-	        this.Replicas = source["Replicas"];
 	        this.Container = this.convertValues(source["Container"], Container);
 	        this.Age = source["Age"];
 	        this.Status = source["Status"];
+	        this.Editable = source["Editable"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -971,20 +977,18 @@ export namespace model {
 		    return a;
 		}
 	}
-	export class PodRequest {
-	    Replicas: string;
+	export class PodUpdate {
 	    App: string;
-	    Container: ContainerRequest;
+	    Container: ContainerUpdate;
 	
 	    static createFrom(source: any = {}) {
-	        return new PodRequest(source);
+	        return new PodUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Replicas = source["Replicas"];
 	        this.App = source["App"];
-	        this.Container = this.convertValues(source["Container"], ContainerRequest);
+	        this.Container = this.convertValues(source["Container"], ContainerUpdate);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1033,7 +1037,7 @@ export namespace model {
 	        this.Spec = source["Spec"];
 	    }
 	}
-	export class ServiceRequest {
+	export class ServiceUpdate {
 	    LabelApp: string;
 	    SpecType: string;
 	    Port: string;
@@ -1041,7 +1045,7 @@ export namespace model {
 	    SelectorApp: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new ServiceRequest(source);
+	        return new ServiceUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {

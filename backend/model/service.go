@@ -9,7 +9,7 @@ type ServiceDto struct {
 	Spec              string
 }
 
-type ServiceRequest struct {
+type ServiceUpdate struct {
 	name        string
 	LabelApp    string
 	SpecType    string

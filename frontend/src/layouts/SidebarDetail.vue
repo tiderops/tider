@@ -1,22 +1,41 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, ref, watch } from 'vue'
 
 const props = defineProps<{
 	isVisible: boolean
-	selectedRow: {
-		name?: string
-		namespace?: string
-		replicas?: number
-		cpu?: string
-		memory?: string
-		age?: string
-		status?: string
-	}
+	item: Record<string, any>
 }>()
+
+const form = ref<Record<string, string>>({})
 
 const emit = defineEmits<{
 	(e: 'close'): void
 }>()
+
+const flattenObject = (obj: any, prefix = ''): Record<string, string> => {
+	const flat: Record<string, string> = {}
+	let i = 0
+	for (const key in obj) {
+		const value = obj[key]
+		const newKey = prefix ? `${prefix}.${key}` : key
+		console.log(i, value, newKey)
+		i++
+		if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+			Object.assign(flat, flattenObject(value, newKey))
+		} else {
+			flat[newKey] = String(value ?? '')
+		}
+	}
+	return flat
+}
+
+watch(
+	() => props.item,
+	(newItem) => {
+		form.value = flattenObject(newItem)
+	},
+	{ immediate: true },
+)
 </script>
 
 <template>
@@ -28,15 +47,16 @@ const emit = defineEmits<{
 					<v-card-title style="color: black">Object Details</v-card-title>
 				</template>
 				<v-divider></v-divider>
-				<v-card-text v-if="props.selectedRow">
-					<p>Name: {{ props.selectedRow.name }}</p>
-					<p>Namespace: {{ props.selectedRow.namespace }}</p>
-					<p>Replicas: {{ props.selectedRow.replicas }}</p>
-					<p>CPU: {{ props.selectedRow.cpu }}</p>
-					<p>Memory: {{ props.selectedRow.memory }}</p>
-					<p>Age: {{ props.selectedRow.age }}</p>
-					<p>Status: {{ props.selectedRow.status }}</p>
-				</v-card-text>
+				<v-text-field
+					disabled
+					v-for="(value, key) in form"
+					:key="key"
+					v-model="form[key]"
+					:label="key"
+					:rules="[(v) => !!v || 'Required']"
+					hide-details="auto"
+					density="compact"
+				></v-text-field>
 			</v-card>
 		</v-navigation-drawer>
 	</v-layout>

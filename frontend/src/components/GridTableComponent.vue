@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useGridDeleteButton } from '@/composables/useGridDeleteButton'
 import { ref } from 'vue'
+import { useGetDetail } from '@/composables/useGetDetail'
 
 const props = defineProps<{
 	cluster?: string
@@ -22,9 +23,11 @@ const { restart, loading, error, success } = useGridDeleteButton()
 const dialog = ref(false)
 const itemToDelete = ref<any | null>(null)
 
-const editPod = (item: any) => {
+const editPod = async (item: any) => {
 	console.log('EDIT', item)
-	emit('edit', item, true)
+	const dto = await useGetDetail(item.name, item.namespace, props.cluster, props.k8sObject)
+
+	emit('edit', dto, true)
 }
 
 const confirmDelete = (item: any) => {
@@ -42,9 +45,12 @@ const deleteConfirmed = async () => {
 	itemToDelete.value = null
 }
 
-const onRowClick = (item: any) => {
+const onRowClick = async (item: any) => {
 	console.log('onRowClick', item)
-	emit('detail', item)
+	const dto = await useGetDetail(item.item.name, item.item.namespace, props.cluster, props.k8sObject)
+
+	console.log('onRowClick-2', dto)
+	emit('detail', dto)
 }
 </script>
 

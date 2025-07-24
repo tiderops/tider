@@ -16,4 +16,4 @@ export function GetServices(arg1:string):Promise<Array<model.ServiceDto>>;
 
 export function UpdateIngress(arg1:string,arg2:string,arg3:model.IngressDto,arg4:string):Promise<void>;
 
-export function UpdateService(arg1:string,arg2:string,arg3:model.ServiceRequest,arg4:string):Promise<void>;
+export function UpdateService(arg1:string,arg2:string,arg3:model.ServiceUpdate,arg4:string):Promise<void>;

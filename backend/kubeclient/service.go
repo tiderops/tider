@@ -68,7 +68,7 @@ func (s serviceClient) GetService(name string, namespace string, clusterCtx stri
 	}, nil
 }
 
-func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error {
+func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceUpdate, clusterCtx string) error {
 	client, err := s.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
