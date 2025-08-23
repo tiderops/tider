@@ -244,7 +244,7 @@ export function gridBodyPersistentVolumes(clusterCtx: string, k8sObject: string)
 				capacity: p.Capacity,
 				claim: p.Claim,
 				age: p.Age,
-				status: p.Status
+				status: p.Status,
 				// label: p.Labels,
 				// spec: p.VolumeSpec,
 			}))
@@ -285,7 +285,7 @@ export function gridBodyPersistentVolumesClaim(clusterCtx: string, k8sObject: st
 				label: p.Labels,
 				spec: p.VolumeClaimSpec,
 				age: p.Age,
-				status: p.Status
+				status: p.Status,
 			}))
 
 			head.value = await gridHead(k8sObject)

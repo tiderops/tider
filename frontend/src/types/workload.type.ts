@@ -34,6 +34,7 @@ export interface IPodDetail {
 export interface IDeploymentDetail {
 	name: string
 	namespace: string
+	replicas: string
 	age: string
 	status: string
 }
