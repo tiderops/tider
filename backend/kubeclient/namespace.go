@@ -29,13 +29,11 @@ func (n namespaceClient) GetNamespaces(clusterCtx string) ([]model.NamespaceDto,
 	var result []model.NamespaceDto
 
 	for _, ns := range namespaces.Items {
-		fmt.Println("ns.Name", ns.Name)
 		dto := model.NamespaceDto{
-			Name:         ns.Name,
-			Version:      ns.APIVersion,
-			CreationTime: ns.CreationTimestamp.String(),
-			Labels:       ns.Labels,
-			Status:       ns.Status.String(),
+			Name:   ns.Name,
+			Age:    ns.CreationTimestamp.String(),
+			Labels: ns.Labels,
+			Status: string(ns.Status.Phase),
 		}
 		result = append(result, dto)
 	}
@@ -55,11 +53,10 @@ func (n namespaceClient) GetNamespace(name string, clusterCtx string) (model.Nam
 	}
 
 	return model.NamespaceDto{
-		Name:         ns.Name,
-		Version:      ns.APIVersion,
-		CreationTime: ns.CreationTimestamp.String(),
-		Labels:       ns.Labels,
-		Status:       ns.Status.String(),
+		Name:   ns.Name,
+		Age:    ns.CreationTimestamp.String(),
+		Labels: ns.Labels,
+		Status: string(ns.Status.Phase),
 	}, nil
 }
 

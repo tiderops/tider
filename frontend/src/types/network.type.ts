@@ -1,10 +1,14 @@
 export interface IService {
 	name: string
 	namespace: string
+	type: string
+	internalId: string
+	externalId: string
+	port: string
 	labels: Map<string, string>
-	status: string
 	age: string
-	spec: string
+	status: string
+	// spec: string
 }
 
 export interface IIngress {

@@ -54,23 +54,13 @@ func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
 					Memory: pod.Spec.Containers[0].Resources.Requests.Memory().String(),
 				},
 			},
+			Node:   pod.Spec.NodeName,
 			Status: string(pod.Status.Phase),
 			Age:    age,
+			Labels: pod.Labels,
 		}
 
 		podArray = append(podArray, p)
-
-		fmt.Printf("pod name: %s namespace: %s requestCPU: %s limitsCPU: %s requestMemory: %s limitsMemory: %s storage: %s startTime: %s status: %s\n",
-			pod.Name,
-			pod.Namespace,
-			pod.Spec.Containers[0].Resources.Requests.Cpu(),
-			pod.Spec.Containers[0].Resources.Limits.Cpu(),
-			pod.Spec.Containers[0].Resources.Requests.Memory(),
-			pod.Spec.Containers[0].Resources.Limits.Memory(),
-			pod.Spec.Containers[0].Resources.Limits.Storage(),
-			pod.Status.StartTime,
-			pod.Status.Phase,
-		)
 	}
 
 	fmt.Println("podArray[0].Name", podArray[0].Name)
@@ -86,13 +76,27 @@ func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (mo
 
 	pod, _ := client.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 
-	return model.PodDto{
+	age := "0"
+	var port int32 = 0
+
+	if pod.Status.StartTime != nil {
+		age = pod.Status.StartTime.String()
+	}
+
+	for _, c := range pod.Spec.Containers {
+		for _, pr := range c.Ports {
+			fmt.Printf("Port: %d\n", pr.ContainerPort)
+			port = pr.ContainerPort
+		}
+	}
+
+	dto := model.PodDto{
 		Name:      pod.Name,
 		Namespace: pod.Namespace,
 		Container: model.Container{
 			Image:      pod.Spec.Containers[0].Image,
 			PullPolicy: string(pod.Spec.Containers[0].ImagePullPolicy),
-			Port:       string(pod.Spec.Containers[0].Ports[0].ContainerPort),
+			Port:       port,
 			Limit: model.Resource{
 				Cpu:    pod.Spec.Containers[0].Resources.Limits.Cpu().String(),
 				Memory: pod.Spec.Containers[0].Resources.Limits.Memory().String(),
@@ -103,9 +107,11 @@ func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (mo
 			},
 		},
 		Status:   string(pod.Status.Phase),
-		Age:      pod.Status.StartTime.String(),
+		Age:      age,
 		Editable: []string{"name", "namespace", "image", "pullPolicy", "port", "RMemory", "RCpu", "LMemory", "LCpu"},
-	}, nil
+	}
+
+	return dto, nil
 }
 
 func (p *podClient) UpdatePod(name string, namespace string, dto model.PodUpdate, clusterCtx string) error {

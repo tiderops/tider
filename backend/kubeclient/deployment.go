@@ -34,8 +34,10 @@ func (d deploymentClient) GetDeployments(clusterCtx string) ([]model.DeploymentD
 		d := model.DeploymentDto{
 			Name:      deploy.Name,
 			Namespace: deploy.Namespace,
-			Status:    string(deploy.Status.Conditions[0].Status),
+			Replicas:  deploy.Status.Replicas,
 			Age:       deploy.CreationTimestamp.String(),
+			Status:    string(deploy.Status.Conditions[0].Status),
+			Labels:    deploy.Labels,
 		}
 
 		result = append(result, d)

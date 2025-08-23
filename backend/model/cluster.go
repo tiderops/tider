@@ -33,8 +33,9 @@ type NodeDto struct {
 
 type NodeDtoV2 struct {
 	Name              string
-	Namespace         string
 	Resource          Resource
+	KubeletVersion    string
+	OperatingSystem   string
 	Version           string
 	CreationTimestamp string
 	Labels            map[string]string

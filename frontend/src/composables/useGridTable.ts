@@ -87,10 +87,10 @@ export function gridBodyPods(clusterCtx: string, k8sObject: string) {
 			body.value = pods.value.map((p: PodDto) => ({
 				name: p.Name,
 				namespace: p.Namespace,
-				replicas: p.Replicas,
 				cpu: `${p.Container.Limit.Cpu}/${p.Container.Request.Cpu}`,
 				memory: `${p.Container.Limit.Memory}/${p.Container.Request.Memory}`,
 				storage: `${p.Container.Limit.Storage}/${p.Container.Request.Storage}`,
+				node: p.Node,
 				age: p.Age,
 				status: p.Status,
 			}))
@@ -126,6 +126,7 @@ export function gridBodyDeployments(clusterCtx: string, k8sObject: string) {
 			body.value = deployment.value.map((d: DeploymentDto) => ({
 				name: d.Name,
 				namespace: d.Namespace,
+				replicas: d.Replicas,
 				status: d.Status,
 				age: d.Age,
 			}))
@@ -161,10 +162,14 @@ export function gridBodyServices(clusterCtx: string, k8sObject: string) {
 			body.value = service.value.map((s: ServiceDto) => ({
 				name: s.Name,
 				namespace: s.Namespace,
-				labels: s.Labels,
+				type: s.Type,
+				internalId: s.Labels,
+				externalId: s.Labels,
+				port: s.Port,
+				// labels: s.Labels,
 				status: s.Status,
 				age: s.CreationTimestamp,
-				spec: s.Spec,
+				// spec: s.Spec,
 			}))
 
 			head.value = await gridHead(k8sObject)
@@ -198,7 +203,6 @@ export function gridBodyIngresses(clusterCtx: string, k8sObject: string) {
 			body.value = ingress.value.map((i: IngressDto) => ({
 				name: i.Name,
 				namespace: i.Namespace,
-				rules: i.Rules,
 				host: i.Rules.map((r) => r.Host),
 				path: i.Rules.map((r) => r.Path),
 				age: i.Creation,
@@ -236,9 +240,13 @@ export function gridBodyPersistentVolumes(clusterCtx: string, k8sObject: string)
 			body.value = persistentVolume.value.map((p: PersistentVolumeDto) => ({
 				name: p.Name,
 				namespace: p.Namespace,
-				age: p.CreationTimestamp,
-				label: p.Labels,
-				spec: p.VolumeSpec,
+				storageClass: p.StorageClass,
+				capacity: p.Capacity,
+				claim: p.Claim,
+				age: p.Age,
+				status: p.Status
+				// label: p.Labels,
+				// spec: p.VolumeSpec,
 			}))
 
 			head.value = await gridHead(k8sObject)
@@ -272,9 +280,12 @@ export function gridBodyPersistentVolumesClaim(clusterCtx: string, k8sObject: st
 			body.value = persistentVolumeClaim.value.map((p: PersistentVolumeClaimDto) => ({
 				name: p.Name,
 				namespace: p.Namespace,
-				age: p.CreationTimestamp,
+				storageClass: p.StorageClass,
+				size: p.Size,
 				label: p.Labels,
 				spec: p.VolumeClaimSpec,
+				age: p.Age,
+				status: p.Status
 			}))
 
 			head.value = await gridHead(k8sObject)
@@ -307,9 +318,7 @@ export function gridBodyNamespaces(clusterCtx: string, k8sObject: string) {
 
 			body.value = namespaces.value.map((n: NamespaceDto) => ({
 				name: n.Name,
-				version: n.Version,
-				label: n.Labels,
-				age: n.CreationTime,
+				age: n.Age,
 				status: n.Status,
 			}))
 
@@ -348,6 +357,8 @@ export function gridBodyNodes(clusterCtx: string, k8sObject: string) {
 				cpu: n.Resource.Cpu,
 				storage: n.Resource.Storage,
 				ephemeralStorage: n.Resource.StorageEphemeral,
+				kubeletVersion: n.KubeletVersion,
+				operatingSystem: n.OperatingSystem,
 				version: n.Version,
 				age: n.CreationTimestamp,
 				labels: n.Labels,

@@ -1,6 +1,5 @@
 export interface INamespace {
 	name: string
-	version: number
 	age: string
 	status: string
 	labels: Map<string, string>
@@ -13,6 +12,8 @@ export interface INode {
 	cpu: string
 	storage: string
 	ephemeralStorage: string
+	kubeletVersion: string
+	operatingSystem: string
 	version: string
 	age: string
 	labels: Map<string, string>

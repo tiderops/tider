@@ -1,10 +1,10 @@
 export interface IPod {
 	name: string
 	namespace: string
-	replicas: number
 	cpu: string
 	memory: string
 	storage: string
+	node: string
 	age: string
 	status: string
 }
@@ -12,6 +12,7 @@ export interface IPod {
 export interface IDeployment {
 	name: string
 	namespace: string
+	replicas: string
 	age: string
 	status: string
 }

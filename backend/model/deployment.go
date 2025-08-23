@@ -3,8 +3,10 @@ package model
 type DeploymentDto struct {
 	Name      string
 	Namespace string
+	Replicas  int32
 	Status    string
 	Age       string
+	Labels    map[string]string
 }
 
 type DeploymentUpdate struct {

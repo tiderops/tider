@@ -3,7 +3,7 @@ package model
 type Container struct {
 	Image      string
 	PullPolicy string
-	Port       string
+	Port       int32
 	Limit      Resource
 	Request    Resource
 }

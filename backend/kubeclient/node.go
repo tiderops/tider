@@ -30,12 +30,14 @@ func (n *nodeClient) GetNodes(clusterCtx string) ([]model.NodeDtoV2, error) {
 
 	for _, node := range nodes.Items {
 		dto := model.NodeDtoV2{
-			Name:      node.Name,
-			Namespace: node.Namespace,
+			Name: node.Name,
 			Resource: model.Resource{
-				Cpu:    node.Status.Capacity.Cpu().String(),
-				Memory: node.Status.Capacity.Memory().String(),
+				Cpu:     node.Status.Capacity.Cpu().String(),
+				Memory:  node.Status.Capacity.Memory().String(),
+				Storage: node.Status.Capacity.StorageEphemeral().String(),
 			},
+			KubeletVersion:    node.Status.NodeInfo.KubeletVersion,
+			OperatingSystem:   node.Status.NodeInfo.OperatingSystem,
 			Version:           node.ResourceVersion,
 			CreationTimestamp: node.CreationTimestamp.String(),
 			Labels:            node.Labels,
@@ -59,8 +61,7 @@ func (n *nodeClient) GetNode(name string, clusterCtx string) (model.NodeDtoV2, e
 	}
 
 	return model.NodeDtoV2{
-		Name:      node.Name,
-		Namespace: node.Namespace,
+		Name: node.Name,
 		Resource: model.Resource{
 			Cpu:    node.Status.Capacity.Cpu().String(),
 			Memory: node.Status.Capacity.Memory().String(),
