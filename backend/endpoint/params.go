@@ -30,10 +30,10 @@ func (pe *ParameterEndpoint) GetHeadParams(k8sObject string) []database.HeadPara
 		return []database.HeadParamsDto{
 			{Title: "Name", Key: "name", Align: "start", Sortable: true},
 			{Title: "Namespace", Key: "namespace", Align: "start", Sortable: false},
-			{Title: "Replicas", Key: "replicas", Align: "start", Sortable: false},
 			{Title: "Cpu", Key: "cpu", Align: "start", Sortable: false},
 			{Title: "Memory", Key: "memory", Align: "start", Sortable: false},
 			{Title: "Storage", Key: "storage", Align: "start", Sortable: false},
+			{Title: "Node", Key: "node", Align: "start", Sortable: false},
 			{Title: "Age", Key: "age", Align: "start", Sortable: true},
 			{Title: "Status", Key: "status", Align: "start", Sortable: false},
 			{Title: "Actions", Key: "actions", Align: "start", Sortable: false},
@@ -41,21 +41,19 @@ func (pe *ParameterEndpoint) GetHeadParams(k8sObject string) []database.HeadPara
 	} else if k8sObject == "node" {
 		return []database.HeadParamsDto{
 			{Title: "Name", Key: "name", Align: "start", Sortable: true},
-			{Title: "Namespace", Key: "namespace", Align: "start", Sortable: false},
-			{Title: "Replicas", Key: "replicas", Align: "start", Sortable: false},
 			{Title: "Cpu", Key: "cpu", Align: "start", Sortable: false},
 			{Title: "Memory", Key: "memory", Align: "start", Sortable: false},
 			{Title: "Storage", Key: "storage", Align: "start", Sortable: false},
-			{Title: "Ephemeral", Key: "ephemeral", Align: "start", Sortable: false},
+			{Title: "KubeletVersion", Key: "kubeletVersion", Align: "start", Sortable: false},
+			{Title: "OperatingSystem", Key: "operatingSystem", Align: "start", Sortable: false},
+			{Title: "Version", Key: "version", Align: "start", Sortable: false},
 			{Title: "Age", Key: "age", Align: "start", Sortable: true},
 			{Title: "Status", Key: "status", Align: "start", Sortable: false},
-			{Title: "Labels", Key: "labels", Align: "start", Sortable: false},
 			{Title: "Actions", Key: "actions", Align: "start", Sortable: false},
 		}
 	} else if k8sObject == "namespace" {
 		return []database.HeadParamsDto{
 			{Title: "Name", Key: "name", Align: "start", Sortable: true},
-			{Title: "Label", Key: "age", Align: "start", Sortable: true},
 			{Title: "Age", Key: "age", Align: "start", Sortable: true},
 			{Title: "Status", Key: "status", Align: "start", Sortable: false},
 			{Title: "Actions", Key: "actions", Align: "start", Sortable: false},
@@ -65,9 +63,13 @@ func (pe *ParameterEndpoint) GetHeadParams(k8sObject string) []database.HeadPara
 		return []database.HeadParamsDto{
 			{Title: "Name", Key: "name", Align: "start", Sortable: true},
 			{Title: "Namespace", Key: "namespace", Align: "start", Sortable: false},
+			{Title: "Type", Key: "type", Align: "start", Sortable: false},
+
+			{Title: "Internal IP", Key: "intIp", Align: "start", Sortable: false},
+			{Title: "External IP", Key: "extIp", Align: "start", Sortable: false},
+			{Title: "Port", Key: "port", Align: "start", Sortable: false},
+
 			{Title: "Age", Key: "age", Align: "start", Sortable: true},
-			{Title: "Labels", Key: "labels", Align: "start", Sortable: false},
-			{Title: "Status", Key: "status", Align: "start", Sortable: false},
 			{Title: "Actions", Key: "actions", Align: "start", Sortable: false},
 		}
 	} else if k8sObject == "ingress" {
@@ -77,13 +79,15 @@ func (pe *ParameterEndpoint) GetHeadParams(k8sObject string) []database.HeadPara
 			{Title: "host", Key: "host", Align: "start", Sortable: false},
 			{Title: "path", Key: "path", Align: "start", Sortable: false},
 			{Title: "Age", Key: "age", Align: "start", Sortable: true},
-			{Title: "Labels", Key: "labels", Align: "start", Sortable: false},
 			{Title: "Actions", Key: "actions", Align: "start", Sortable: false},
 		}
 	} else if k8sObject == "persistentVolume" {
 		return []database.HeadParamsDto{
 			{Title: "Name", Key: "name", Align: "start", Sortable: true},
 			{Title: "Namespace", Key: "namespace", Align: "start", Sortable: false},
+			{Title: "Storage class", Key: "storageClass", Align: "start", Sortable: false},
+			{Title: "Capacity", Key: "capacity", Align: "start", Sortable: false},
+			{Title: "Claim", Key: "claim", Align: "start", Sortable: true},
 			{Title: "Age", Key: "age", Align: "start", Sortable: true},
 			{Title: "Status", Key: "status", Align: "start", Sortable: false},
 			{Title: "Actions", Key: "actions", Align: "start", Sortable: false},
@@ -92,6 +96,8 @@ func (pe *ParameterEndpoint) GetHeadParams(k8sObject string) []database.HeadPara
 		return []database.HeadParamsDto{
 			{Title: "Name", Key: "name", Align: "start", Sortable: true},
 			{Title: "Namespace", Key: "namespace", Align: "start", Sortable: false},
+			{Title: "Storage class", Key: "storageClass", Align: "start", Sortable: false},
+			{Title: "Size", Key: "size", Align: "start", Sortable: false},
 			{Title: "Age", Key: "age", Align: "start", Sortable: true},
 			{Title: "Status", Key: "status", Align: "start", Sortable: false},
 			{Title: "Actions", Key: "actions", Align: "start", Sortable: false},

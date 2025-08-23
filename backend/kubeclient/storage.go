@@ -36,10 +36,11 @@ func (s storageClient) GetPersistentVolumes(clusterCtx string) ([]model.Persiste
 		}
 
 		dto := model.PersistentVolumeDto{
-			Name:              volume.Name,
-			Namespace:         volume.Namespace,
-			CreationTimestamp: volume.CreationTimestamp.String(),
-			Labels:            volume.Labels,
+			Name:      volume.Name,
+			Namespace: volume.Namespace,
+			Labels:    volume.Labels,
+			Status:    string(volume.Status.Phase),
+			Age:       volume.CreationTimestamp.String(),
 			VolumeSpec: model.VolumeSpec{
 				Local: model.Local{
 					//Path: volume.Spec.Local.Path, TODO: Validate null reference
@@ -92,10 +93,11 @@ func (s storageClient) GetPersistentVolume(name string, clusterCtx string) (mode
 	}
 
 	return model.PersistentVolumeDto{
-		Name:              volume.Name,
-		Namespace:         volume.Namespace,
-		CreationTimestamp: volume.CreationTimestamp.String(),
-		Labels:            volume.Labels,
+		Name:      volume.Name,
+		Namespace: volume.Namespace,
+		Age:       volume.CreationTimestamp.String(),
+		Status:    string(volume.Status.Phase),
+		Labels:    volume.Labels,
 		VolumeSpec: model.VolumeSpec{
 			Local: model.Local{
 				//Path:   volume.Spec.Local.Path,
@@ -176,11 +178,11 @@ func (s storageClient) GetPersistentVolumesClaim(clusterCtx string) ([]model.Per
 		}
 
 		dto := model.PersistentVolumeClaimDto{
-			Name:              volumeClaim.Name,
-			Namespace:         volumeClaim.Namespace,
-			CreationTimestamp: volumeClaim.CreationTimestamp.String(),
-			Labels:            volumeClaim.Labels,
-			Status:            string(volumeClaim.Status.Phase),
+			Name:      volumeClaim.Name,
+			Namespace: volumeClaim.Namespace,
+			Labels:    volumeClaim.Labels,
+			Status:    string(volumeClaim.Status.Phase),
+			Age:       volumeClaim.CreationTimestamp.String(),
 			VolumeClaimSpec: model.VolumeClaimSpec{
 				VolumeName:  volumeClaim.Spec.VolumeName,
 				VolumeMode:  string(*volumeClaim.Spec.VolumeMode),
@@ -234,10 +236,11 @@ func (s storageClient) GetPersistentVolumeClaim(name string, namespace string, c
 	}
 
 	return model.PersistentVolumeClaimDto{
-		Name:              volumeClaim.Name,
-		Namespace:         volumeClaim.Namespace,
-		CreationTimestamp: volumeClaim.CreationTimestamp.String(),
-		Labels:            volumeClaim.Labels,
+		Name:      volumeClaim.Name,
+		Namespace: volumeClaim.Namespace,
+		Age:       volumeClaim.CreationTimestamp.String(),
+		Status:    string(volumeClaim.Status.Phase),
+		Labels:    volumeClaim.Labels,
 		VolumeClaimSpec: model.VolumeClaimSpec{
 			VolumeName:                volumeClaim.Spec.VolumeName,
 			VolumeMode:                string(*volumeClaim.Spec.VolumeMode),

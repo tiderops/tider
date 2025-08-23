@@ -9,6 +9,7 @@ type IngressDto struct {
 }
 
 type RuleDto struct {
-	Host string
-	Path string
+	Host             string
+	Path             string
+	IngressRuleValue string
 }

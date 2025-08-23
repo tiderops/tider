@@ -33,17 +33,18 @@ func (i ingressClient) GetIngresses(clusterCtx string) ([]model.IngressDto, erro
 
 		for _, rule := range ingress.Spec.Rules {
 			dto := model.RuleDto{
-				Host: rule.Host,
-				Path: rule.HTTP.Paths[0].Path,
+				Host:             rule.Host,
+				Path:             rule.HTTP.Paths[0].Path,
+				IngressRuleValue: rule.IngressRuleValue.String(),
 			}
 			rulesDto = append(rulesDto, dto)
 		}
 
 		dto := model.IngressDto{
-			Name:      ingress.GetName(),
-			Namespace: ingress.GetNamespace(),
-			Creation:  ingress.GetCreationTimestamp().String(),
-			Labels:    ingress.GetLabels(),
+			Name:      ingress.Name,
+			Namespace: ingress.Namespace,
+			Creation:  ingress.CreationTimestamp.String(),
+			Labels:    ingress.Labels,
 			Rules:     rulesDto,
 		}
 		result = append(result, dto)

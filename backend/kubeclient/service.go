@@ -36,6 +36,10 @@ func (s serviceClient) GetServices(clusterCtx string) ([]model.ServiceDto, error
 			Name:              service.Name,
 			Namespace:         service.Namespace,
 			Labels:            service.Labels,
+			Type:              string(service.Spec.Type),
+			InternalIp:        service.Spec.ClusterIP,
+			ExternalIp:        service.Spec.ExternalName,
+			Port:              string(service.Spec.Ports[0].Port),
 			Status:            service.Status.String(),
 			CreationTimestamp: service.CreationTimestamp.String(),
 			Spec:              service.Spec.String(),
@@ -68,7 +72,7 @@ func (s serviceClient) GetService(name string, namespace string, clusterCtx stri
 	}, nil
 }
 
-func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error {
+func (s serviceClient) UpdateService(name string, namespace string, dto model.ServiceUpdate, clusterCtx string) error {
 	client, err := s.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return fmt.Errorf("kubeclient: error resolving cluster context: %v", err)

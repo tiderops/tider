@@ -4,9 +4,7 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strconv"
 )
 
 type podClient struct {
@@ -43,8 +41,10 @@ func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
 		p := model.PodDto{
 			Name:      pod.Name,
 			Namespace: pod.Namespace,
-			Replicas:  1,
 			Container: model.Container{
+				//Image:      pod.Spec.Containers[0].Image,
+				PullPolicy: string(pod.Spec.Containers[0].ImagePullPolicy),
+				//Port:       string(pod.Spec.Containers[0].Ports[0].ContainerPort),
 				Limit: model.Resource{
 					Cpu:    pod.Spec.Containers[0].Resources.Limits.Cpu().String(),
 					Memory: pod.Spec.Containers[0].Resources.Limits.Memory().String(),
@@ -54,23 +54,13 @@ func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
 					Memory: pod.Spec.Containers[0].Resources.Requests.Memory().String(),
 				},
 			},
+			Node:   pod.Spec.NodeName,
 			Status: string(pod.Status.Phase),
 			Age:    age,
+			Labels: pod.Labels,
 		}
 
 		podArray = append(podArray, p)
-
-		fmt.Printf("pod name: %s namespace: %s requestCPU: %s limitsCPU: %s requestMemory: %s limitsMemory: %s storage: %s startTime: %s status: %s\n",
-			pod.Name,
-			pod.Namespace,
-			pod.Spec.Containers[0].Resources.Requests.Cpu(),
-			pod.Spec.Containers[0].Resources.Limits.Cpu(),
-			pod.Spec.Containers[0].Resources.Requests.Memory(),
-			pod.Spec.Containers[0].Resources.Limits.Memory(),
-			pod.Spec.Containers[0].Resources.Limits.Storage(),
-			pod.Status.StartTime,
-			pod.Status.Phase,
-		)
 	}
 
 	fmt.Println("podArray[0].Name", podArray[0].Name)
@@ -86,11 +76,27 @@ func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (mo
 
 	pod, _ := client.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 
-	return model.PodDto{
+	age := "0"
+	var port int32 = 0
+
+	if pod.Status.StartTime != nil {
+		age = pod.Status.StartTime.String()
+	}
+
+	for _, c := range pod.Spec.Containers {
+		for _, pr := range c.Ports {
+			fmt.Printf("Port: %d\n", pr.ContainerPort)
+			port = pr.ContainerPort
+		}
+	}
+
+	dto := model.PodDto{
 		Name:      pod.Name,
 		Namespace: pod.Namespace,
-		Replicas:  1,
 		Container: model.Container{
+			Image:      pod.Spec.Containers[0].Image,
+			PullPolicy: string(pod.Spec.Containers[0].ImagePullPolicy),
+			Port:       port,
 			Limit: model.Resource{
 				Cpu:    pod.Spec.Containers[0].Resources.Limits.Cpu().String(),
 				Memory: pod.Spec.Containers[0].Resources.Limits.Memory().String(),
@@ -100,12 +106,15 @@ func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (mo
 				Memory: pod.Spec.Containers[0].Resources.Requests.Memory().String(),
 			},
 		},
-		Status: string(pod.Status.Phase),
-		Age:    pod.Status.StartTime.String(),
-	}, nil
+		Status:   string(pod.Status.Phase),
+		Age:      age,
+		Editable: []string{"name", "namespace", "image", "pullPolicy", "port", "RMemory", "RCpu", "LMemory", "LCpu"},
+	}
+
+	return dto, nil
 }
 
-func (p *podClient) UpdatePod(name string, namespace string, dto model.PodRequest, clusterCtx string) error {
+func (p *podClient) UpdatePod(name string, namespace string, dto model.PodUpdate, clusterCtx string) error {
 	client, err := p.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
 		return fmt.Errorf("cluster %s is not registered", clusterCtx)
@@ -116,24 +125,24 @@ func (p *podClient) UpdatePod(name string, namespace string, dto model.PodReques
 	pod, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
 	if err != nil {
-		panic("Error while searching ingress")
+		panic("Error while searching pod")
 	}
 
-	port, _ := strconv.ParseInt(dto.Container.Port, 10, 32)
-	rCpu, _ := strconv.ParseInt(dto.Container.Resource.RCpu, 10, 32)
-	rMemory, _ := strconv.ParseInt(dto.Container.Resource.RMemory, 10, 32)
-	lCpu, _ := strconv.ParseInt(dto.Container.Resource.LCpu, 10, 32)
-	lMemory, _ := strconv.ParseInt(dto.Container.Resource.LMemory, 10, 32)
-	pullPolicy := v1.PullPolicy(dto.Container.PullPolicy)
+	//port, _ := strconv.ParseInt(dto.Container.Port, 10, 32)
+	//rCpu, _ := strconv.ParseInt(dto.Container.Resource.RCpu, 10, 32)
+	//rMemory, _ := strconv.ParseInt(dto.Container.Resource.RMemory, 10, 32)
+	//lCpu, _ := strconv.ParseInt(dto.Container.Resource.LCpu, 10, 32)
+	//lMemory, _ := strconv.ParseInt(dto.Container.Resource.LMemory, 10, 32)
+	//pullPolicy := v1.PullPolicy(dto.Container.PullPolicy)
 
 	pod.ObjectMeta.Labels["app"] = dto.App
 	pod.Spec.Containers[0].Image = dto.Container.Image
-	pod.Spec.Containers[0].ImagePullPolicy = pullPolicy
-	pod.Spec.Containers[0].Ports[0].ContainerPort = int32(port)
-	pod.Spec.Containers[0].Resources.Requests.Cpu().Set(rCpu)
-	pod.Spec.Containers[0].Resources.Requests.Memory().Set(rMemory)
-	pod.Spec.Containers[0].Resources.Limits.Cpu().Set(lCpu)
-	pod.Spec.Containers[0].Resources.Limits.Memory().Set(lMemory)
+	//pod.Spec.Containers[0].ImagePullPolicy = pullPolicy
+	//pod.Spec.Containers[0].Ports[0].ContainerPort = int32(port)
+	//pod.Spec.Containers[0].Resources.Requests.Cpu().Set(rCpu)
+	//pod.Spec.Containers[0].Resources.Requests.Memory().Set(rMemory)
+	//pod.Spec.Containers[0].Resources.Limits.Cpu().Set(lCpu)
+	//pod.Spec.Containers[0].Resources.Limits.Memory().Set(lMemory)
 
 	_, err = c.Update(context.TODO(), pod, metav1.UpdateOptions{})
 

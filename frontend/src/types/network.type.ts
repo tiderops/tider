@@ -1,10 +1,14 @@
 export interface IService {
 	name: string
 	namespace: string
+	type: string
+	internalId: string
+	externalId: string
+	port: string
 	labels: Map<string, string>
-	status: string
 	age: string
-	spec: string
+	status: string
+	// spec: string
 }
 
 export interface IIngress {
@@ -19,4 +23,13 @@ export interface IIngress {
 export interface IRules {
 	host: string
 	path: string
+}
+
+export interface IServiceDetail {
+	name: string
+	namespace: string
+	labels: Map<string, string>
+	status: string
+	age: string
+	spec: string
 }

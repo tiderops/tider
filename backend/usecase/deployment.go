@@ -9,7 +9,7 @@ import (
 type DeploymentUseCase interface {
 	GetDeployments(clusterCtx string) ([]model.DeploymentDto, error)
 	GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error)
-	UpdateDeployment(name string, namespace string, dto model.DeploymentRequest, clusterCtx string) error
+	UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error
 	DeleteDeployment(name string, namespace string, clusterCtx string) error
 	TroubleshootDeployment(name string, namespace string, clusterCtx string)
 }
@@ -31,7 +31,7 @@ func (d *deploymentUseCase) GetDeployment(name string, namespace string, cluster
 	return d.client.GetDeployment(name, namespace, clusterCtx)
 }
 
-func (d *deploymentUseCase) UpdateDeployment(name string, namespace string, dto model.DeploymentRequest, clusterCtx string) error {
+func (d *deploymentUseCase) UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error {
 	return d.client.UpdateDeployment(name, namespace, dto, clusterCtx)
 }
 

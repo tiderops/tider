@@ -1,11 +1,15 @@
 package model
 
 type PersistentVolumeDto struct {
-	Name              string
-	Namespace         string
-	CreationTimestamp string
-	Labels            map[string]string
-	VolumeSpec        VolumeSpec
+	Name         string
+	Namespace    string
+	StorageClass string
+	Capacity     string
+	Claim        string
+	Labels       map[string]string
+	VolumeSpec   VolumeSpec
+	Age          string
+	Status       string
 }
 
 type VolumeSpec struct {
@@ -34,13 +38,15 @@ type NFS struct {
 }
 
 type PersistentVolumeClaimDto struct {
-	Name              string
-	Namespace         string
-	CreationTimestamp string
-	Labels            map[string]string
-	VolumeClaimSpec   VolumeClaimSpec
-	Status            string
-	Capacity          Resource
+	Name            string
+	Namespace       string
+	storageClass    string
+	size            string
+	Labels          map[string]string
+	VolumeClaimSpec VolumeClaimSpec
+	Status          string
+	Capacity        Resource
+	Age             string
 }
 
 type VolumeClaimSpec struct {

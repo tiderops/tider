@@ -66,8 +66,8 @@ const selectedRow = ref<any>(null)
 const updateItem = ref<any>(null)
 
 const onDetailItem = (item: any) => {
-	selectedRow.value = item.item
-	console.log('TEST', item.item)
+	selectedRow.value = item.value
+	console.log('onDetailItem', item.value)
 
 	if (isSidebarVisible.value) {
 		isSidebarVisible.value = false
@@ -85,7 +85,7 @@ const onEditItem = async (item: any, isOpen: boolean) => {
 	console.log('Parent received edit:', item)
 	isSidebarFormVisible.value = isOpen
 
-	updateItem.value = item
+	updateItem.value = item.value
 
 	text.value = `Resource "${item.name}" was edited.`
 	snackbar.value = true
@@ -147,8 +147,14 @@ onMounted(async () => {
 			</template>
 		</v-snackbar>
 		<v-card>
-			<KsSidebarDetail :isVisible="isSidebarVisible" :selectedRow="selectedRow" @close="isSidebarVisible = false" />
-			<KsSidebarForm :isVisible="isSidebarFormVisible" :item="updateItem" @close="isSidebarFormVisible = false" />
+			<KsSidebarDetail :isVisible="isSidebarVisible" :item="selectedRow" @close="isSidebarVisible = false" />
+			<KsSidebarForm
+				:isVisible="isSidebarFormVisible"
+				:item="updateItem"
+				:cluster="props.cluster"
+				:k8sObject="props.k8sObject"
+				@close="isSidebarFormVisible = false"
+			/>
 		</v-card>
 	</v-container>
 </template>

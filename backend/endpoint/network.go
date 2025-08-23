@@ -22,7 +22,7 @@ func (ne *NetworkEndpoint) GetService(name string, namespace string, clusterCtx 
 	return ne.serviceUseCase.GetService(name, namespace, clusterCtx)
 }
 
-func (ne *NetworkEndpoint) UpdateService(name string, namespace string, dto model.ServiceRequest, clusterCtx string) error {
+func (ne *NetworkEndpoint) UpdateService(name string, namespace string, dto model.ServiceUpdate, clusterCtx string) error {
 	return ne.serviceUseCase.UpdateService(name, namespace, dto, clusterCtx)
 }
 

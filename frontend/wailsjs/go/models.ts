@@ -152,6 +152,9 @@ export namespace model {
 	    }
 	}
 	export class Container {
+	    Image: string;
+	    PullPolicy: string;
+	    Port: number;
 	    Limit: Resource;
 	    Request: Resource;
 	
@@ -161,6 +164,9 @@ export namespace model {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Image = source["Image"];
+	        this.PullPolicy = source["PullPolicy"];
+	        this.Port = source["Port"];
 	        this.Limit = this.convertValues(source["Limit"], Resource);
 	        this.Request = this.convertValues(source["Request"], Resource);
 	    }
@@ -183,14 +189,14 @@ export namespace model {
 		    return a;
 		}
 	}
-	export class ResourceRequest {
+	export class ResourceUpdate {
 	    RMemory: string;
 	    RCpu: string;
 	    LMemory: string;
 	    LCpu: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new ResourceRequest(source);
+	        return new ResourceUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -201,14 +207,14 @@ export namespace model {
 	        this.LCpu = source["LCpu"];
 	    }
 	}
-	export class ContainerRequest {
+	export class ContainerUpdate {
 	    Image: string;
 	    PullPolicy: string;
 	    Port: string;
-	    Resource: ResourceRequest;
+	    Resource: ResourceUpdate;
 	
 	    static createFrom(source: any = {}) {
-	        return new ContainerRequest(source);
+	        return new ContainerUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -216,7 +222,7 @@ export namespace model {
 	        this.Image = source["Image"];
 	        this.PullPolicy = source["PullPolicy"];
 	        this.Port = source["Port"];
-	        this.Resource = this.convertValues(source["Resource"], ResourceRequest);
+	        this.Resource = this.convertValues(source["Resource"], ResourceUpdate);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -272,8 +278,10 @@ export namespace model {
 	export class DeploymentDto {
 	    Name: string;
 	    Namespace: string;
+	    Replicas: number;
 	    Status: string;
 	    Age: string;
+	    Labels: Record<string, string>;
 	
 	    static createFrom(source: any = {}) {
 	        return new DeploymentDto(source);
@@ -283,17 +291,19 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
 	        this.Namespace = source["Namespace"];
+	        this.Replicas = source["Replicas"];
 	        this.Status = source["Status"];
 	        this.Age = source["Age"];
+	        this.Labels = source["Labels"];
 	    }
 	}
-	export class LabelRequest {
+	export class LabelUpdate {
 	    App: string;
 	    Tier: string;
 	    TierType: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new LabelRequest(source);
+	        return new LabelUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -303,15 +313,15 @@ export namespace model {
 	        this.TierType = source["TierType"];
 	    }
 	}
-	export class DeploymentRequest {
+	export class DeploymentUpdate {
 	    Replicas: string;
 	    App: string;
 	    StrategyType: string;
-	    Label: LabelRequest;
-	    Container: ContainerRequest;
+	    Label: LabelUpdate;
+	    Container: ContainerUpdate;
 	
 	    static createFrom(source: any = {}) {
-	        return new DeploymentRequest(source);
+	        return new DeploymentUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -319,8 +329,8 @@ export namespace model {
 	        this.Replicas = source["Replicas"];
 	        this.App = source["App"];
 	        this.StrategyType = source["StrategyType"];
-	        this.Label = this.convertValues(source["Label"], LabelRequest);
-	        this.Container = this.convertValues(source["Container"], ContainerRequest);
+	        this.Label = this.convertValues(source["Label"], LabelUpdate);
+	        this.Container = this.convertValues(source["Container"], ContainerUpdate);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -392,6 +402,7 @@ export namespace model {
 	export class RuleDto {
 	    Host: string;
 	    Path: string;
+	    IngressRuleValue: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RuleDto(source);
@@ -401,6 +412,7 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Host = source["Host"];
 	        this.Path = source["Path"];
+	        this.IngressRuleValue = source["IngressRuleValue"];
 	    }
 	}
 	export class IngressDto {
@@ -509,7 +521,7 @@ export namespace model {
 	export class NamespaceDto {
 	    Name: string;
 	    Version: string;
-	    CreationTime: string;
+	    Age: string;
 	    Labels: Record<string, string>;
 	    Status: string;
 	
@@ -521,7 +533,7 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
 	        this.Version = source["Version"];
-	        this.CreationTime = source["CreationTime"];
+	        this.Age = source["Age"];
 	        this.Labels = source["Labels"];
 	        this.Status = source["Status"];
 	    }
@@ -542,8 +554,9 @@ export namespace model {
 	}
 	export class NodeDtoV2 {
 	    Name: string;
-	    Namespace: string;
 	    Resource: Resource;
+	    KubeletVersion: string;
+	    OperatingSystem: string;
 	    Version: string;
 	    CreationTimestamp: string;
 	    Labels: Record<string, string>;
@@ -555,8 +568,9 @@ export namespace model {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
-	        this.Namespace = source["Namespace"];
 	        this.Resource = this.convertValues(source["Resource"], Resource);
+	        this.KubeletVersion = source["KubeletVersion"];
+	        this.OperatingSystem = source["OperatingSystem"];
 	        this.Version = source["Version"];
 	        this.CreationTimestamp = source["CreationTimestamp"];
 	        this.Labels = source["Labels"];
@@ -805,11 +819,11 @@ export namespace model {
 	export class PersistentVolumeClaimDto {
 	    Name: string;
 	    Namespace: string;
-	    CreationTimestamp: string;
 	    Labels: Record<string, string>;
 	    VolumeClaimSpec: VolumeClaimSpec;
 	    Status: string;
 	    Capacity: Resource;
+	    Age: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new PersistentVolumeClaimDto(source);
@@ -819,11 +833,11 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
 	        this.Namespace = source["Namespace"];
-	        this.CreationTimestamp = source["CreationTimestamp"];
 	        this.Labels = source["Labels"];
 	        this.VolumeClaimSpec = this.convertValues(source["VolumeClaimSpec"], VolumeClaimSpec);
 	        this.Status = source["Status"];
 	        this.Capacity = this.convertValues(source["Capacity"], Resource);
+	        this.Age = source["Age"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -895,9 +909,13 @@ export namespace model {
 	export class PersistentVolumeDto {
 	    Name: string;
 	    Namespace: string;
-	    CreationTimestamp: string;
+	    StorageClass: string;
+	    Capacity: string;
+	    Claim: string;
 	    Labels: Record<string, string>;
 	    VolumeSpec: VolumeSpec;
+	    Age: string;
+	    Status: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new PersistentVolumeDto(source);
@@ -907,9 +925,13 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
 	        this.Namespace = source["Namespace"];
-	        this.CreationTimestamp = source["CreationTimestamp"];
+	        this.StorageClass = source["StorageClass"];
+	        this.Capacity = source["Capacity"];
+	        this.Claim = source["Claim"];
 	        this.Labels = source["Labels"];
 	        this.VolumeSpec = this.convertValues(source["VolumeSpec"], VolumeSpec);
+	        this.Age = source["Age"];
+	        this.Status = source["Status"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -934,10 +956,12 @@ export namespace model {
 	export class PodDto {
 	    Name: string;
 	    Namespace: string;
-	    Replicas: number;
 	    Container: Container;
+	    Node: string;
 	    Age: string;
 	    Status: string;
+	    Editable: string[];
+	    Labels: Record<string, string>;
 	
 	    static createFrom(source: any = {}) {
 	        return new PodDto(source);
@@ -947,10 +971,12 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
 	        this.Namespace = source["Namespace"];
-	        this.Replicas = source["Replicas"];
 	        this.Container = this.convertValues(source["Container"], Container);
+	        this.Node = source["Node"];
 	        this.Age = source["Age"];
 	        this.Status = source["Status"];
+	        this.Editable = source["Editable"];
+	        this.Labels = source["Labels"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -971,20 +997,18 @@ export namespace model {
 		    return a;
 		}
 	}
-	export class PodRequest {
-	    Replicas: string;
+	export class PodUpdate {
 	    App: string;
-	    Container: ContainerRequest;
+	    Container: ContainerUpdate;
 	
 	    static createFrom(source: any = {}) {
-	        return new PodRequest(source);
+	        return new PodUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Replicas = source["Replicas"];
 	        this.App = source["App"];
-	        this.Container = this.convertValues(source["Container"], ContainerRequest);
+	        this.Container = this.convertValues(source["Container"], ContainerUpdate);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1014,10 +1038,14 @@ export namespace model {
 	export class ServiceDto {
 	    Name: string;
 	    Namespace: string;
-	    Labels: Record<string, string>;
+	    Type: string;
+	    InternalIp: string;
+	    ExternalIp: string;
+	    Port: string;
 	    Status: string;
 	    CreationTimestamp: string;
 	    Spec: string;
+	    Labels: Record<string, string>;
 	
 	    static createFrom(source: any = {}) {
 	        return new ServiceDto(source);
@@ -1027,13 +1055,17 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Name = source["Name"];
 	        this.Namespace = source["Namespace"];
-	        this.Labels = source["Labels"];
+	        this.Type = source["Type"];
+	        this.InternalIp = source["InternalIp"];
+	        this.ExternalIp = source["ExternalIp"];
+	        this.Port = source["Port"];
 	        this.Status = source["Status"];
 	        this.CreationTimestamp = source["CreationTimestamp"];
 	        this.Spec = source["Spec"];
+	        this.Labels = source["Labels"];
 	    }
 	}
-	export class ServiceRequest {
+	export class ServiceUpdate {
 	    LabelApp: string;
 	    SpecType: string;
 	    Port: string;
@@ -1041,7 +1073,7 @@ export namespace model {
 	    SelectorApp: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new ServiceRequest(source);
+	        return new ServiceUpdate(source);
 	    }
 	
 	    constructor(source: any = {}) {

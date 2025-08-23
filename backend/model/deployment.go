@@ -3,34 +3,22 @@ package model
 type DeploymentDto struct {
 	Name      string
 	Namespace string
+	Replicas  int32
 	Status    string
 	Age       string
+	Labels    map[string]string
 }
 
-type DeploymentRequest struct {
+type DeploymentUpdate struct {
 	Replicas     string
 	App          string
 	StrategyType string
-	Label        LabelRequest
-	Container    ContainerRequest
+	Label        LabelUpdate
+	Container    ContainerUpdate
 }
 
-type LabelRequest struct {
+type LabelUpdate struct {
 	App      string
 	Tier     string
 	TierType string
-}
-
-type ContainerRequest struct {
-	Image      string
-	PullPolicy string
-	Port       string
-	Resource   ResourceRequest
-}
-
-type ResourceRequest struct {
-	RMemory string
-	RCpu    string
-	LMemory string
-	LCpu    string
 }
