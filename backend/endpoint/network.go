@@ -45,3 +45,11 @@ func (ne *NetworkEndpoint) UpdateIngress(name string, namespace string, dto mode
 func (ne *NetworkEndpoint) DeleteIngress(name string, namespace string, clusterCtx string) error {
 	return ne.ingressUseCase.DeleteIngress(name, namespace, clusterCtx)
 }
+
+func (ne *NetworkEndpoint) ExportManifest(name string, namespace string, clusterCtx string, object string) ([]byte, error) {
+	if object == "service" {
+		return ne.serviceUseCase.ExportManifest(name, namespace, clusterCtx)
+	} else {
+		return ne.ingressUseCase.ExportManifest(name, namespace, clusterCtx)
+	}
+}

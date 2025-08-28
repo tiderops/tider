@@ -32,6 +32,7 @@ type DeploymentClient interface {
 	GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error)
 	UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error
 	DeleteDeployment(name string, namespace string, clusterCtx string) error
+	ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error)
 }
 
 type StorageClient interface {
@@ -57,6 +58,7 @@ type ServiceClient interface {
 	GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error)
 	UpdateService(name string, namespace string, dto model.ServiceUpdate, clusterCtx string) error
 	DeleteService(name string, namespace string, clusterCtx string) error
+	ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error)
 }
 
 type IngressClient interface {
@@ -64,4 +66,5 @@ type IngressClient interface {
 	GetIngress(name string, namespace string, clusterCtx string) (model.IngressDto, error)
 	UpdateIngress(name string, namespace string, dto model.IngressDto, clusterCtx string) error
 	DeleteIngress(name string, namespace string, clusterCtx string) error
+	ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error)
 }

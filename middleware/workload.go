@@ -65,6 +65,10 @@ func (w *WorkloadMiddleware) TroubleshootDeployment(name string, namespace strin
 	w.endpoint.TroubleshootDeployment(name, namespace, clusterCtx)
 }
 
+func (w *WorkloadMiddleware) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	return w.endpoint.ExportManifest(name, namespace, clusterCtx)
+}
+
 func BuildWorkload(manager kubeclient.ClusterResolver) *WorkloadMiddleware {
 	deploymentClient := kubeclient.NewDeployment(manager)
 	podClient := kubeclient.NewPod(manager)

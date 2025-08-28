@@ -6,6 +6,8 @@ export function DeleteIngress(arg1:string,arg2:string,arg3:string):Promise<void>
 
 export function DeleteService(arg1:string,arg2:string,arg3:string):Promise<void>;
 
+export function ExportManifest(arg1:string,arg2:string,arg3:string,arg4:string):Promise<Array<number>>;
+
 export function GetIngress(arg1:string,arg2:string,arg3:string):Promise<model.IngressDto>;
 
 export function GetIngresses(arg1:string):Promise<Array<model.IngressDto>>;

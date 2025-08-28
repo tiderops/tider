@@ -1,20 +1,24 @@
 import { fetchGetDeployment, fetchGetPod } from '../services/workload.service'
 import { ref } from 'vue'
-import { fetchGetService } from '../services/network.service'
+import {fetchGetIngress, fetchGetService} from '../services/network.service'
 import { IDeploymentDetail, IPodDetail } from '../types/workload.type'
 import { IServiceDetail } from '../types/network.type'
 import { model } from '../../wailsjs/go/models'
 import PodDto = model.PodDto
 import DeploymentDto = model.DeploymentDto
 import ServiceDto = model.ServiceDto
+import {fetchGetNamespace, fetchGetNode} from "../services/general.service";
 
 export function useGetDetail(name: string, namespace: string, clusterCtx: string, k8sObject: string) {
 	const k8sComponents = new Map<string, Function>()
 	k8sComponents.set('pod', getPod(name, namespace, clusterCtx))
 	k8sComponents.set('deployment', getDeployment(name, namespace, clusterCtx))
 	k8sComponents.set('service', getService(name, namespace, clusterCtx))
+	k8sComponents.set('ingress', getIngress(name, namespace, clusterCtx))
+	k8sComponents.set('namespace', getNamespace(name, clusterCtx))
+	k8sComponents.set('node', getNode(name, clusterCtx))
 
-	// return getPod(name, namespace, clusterCtx)
+
 	console.log('OBJECT:: ', k8sObject)
 	return k8sComponents.get(k8sObject)
 }
@@ -78,6 +82,75 @@ export async function getService(name: string, namespace: string, clusterCtx: st
 	try {
 		const service = ref<ServiceDto>([])
 		service.value = await fetchGetService(name, namespace, clusterCtx)
+		const s = service.value
+
+		body.value = {
+			name: s.Name,
+			namespace: s.Namespace,
+			age: s.Age,
+			status: s.Status,
+		}
+	} catch (error) {
+		console.log('Error fetching pod data: ', error)
+		throw error
+	}
+
+	return body
+}
+
+// TODO: is pending to finish
+export async function getIngress(name: string, namespace: string, clusterCtx: string) {
+	const body = ref<IServiceDetail[]>()
+
+	try {
+		const service = ref<ServiceDto>([])
+		service.value = await fetchGetIngress(name, namespace, clusterCtx)
+		const s = service.value
+
+		body.value = {
+			name: s.Name,
+			namespace: s.Namespace,
+			age: s.Age,
+			status: s.Status,
+		}
+	} catch (error) {
+		console.log('Error fetching pod data: ', error)
+		throw error
+	}
+
+	return body
+}
+
+// TODO: is pending to finish
+export async function getNamespace(name: string, clusterCtx: string) {
+	const body = ref<IServiceDetail[]>()
+
+	try {
+		const service = ref<ServiceDto>([])
+		service.value = await fetchGetNamespace(name, clusterCtx)
+		const s = service.value
+
+		body.value = {
+			name: s.Name,
+			namespace: s.Namespace,
+			age: s.Age,
+			status: s.Status,
+		}
+	} catch (error) {
+		console.log('Error fetching pod data: ', error)
+		throw error
+	}
+
+	return body
+}
+
+// TODO: is pending to finish
+export async function getNode(name: string, clusterCtx: string) {
+	const body = ref<IServiceDetail[]>()
+
+	try {
+		const service = ref<ServiceDto>([])
+		service.value = await fetchGetNode(name, clusterCtx)
 		const s = service.value
 
 		body.value = {

@@ -4,6 +4,8 @@ import {model} from '../models';
 
 export function DeleteDeployment(arg1:string,arg2:string,arg3:string):Promise<void>;
 
+export function ExportManifest(arg1:string,arg2:string,arg3:string):Promise<Array<number>>;
+
 export function GetDeployment(arg1:string,arg2:string,arg3:string):Promise<model.DeploymentDto>;
 
 export function GetDeployments(arg1:string):Promise<Array<model.DeploymentDto>>;

@@ -419,7 +419,7 @@ export namespace model {
 	    Name: string;
 	    Namespace: string;
 	    Rules: RuleDto[];
-	    Creation: string;
+	    Age: string;
 	    Labels: Record<string, string>;
 	
 	    static createFrom(source: any = {}) {
@@ -431,7 +431,7 @@ export namespace model {
 	        this.Name = source["Name"];
 	        this.Namespace = source["Namespace"];
 	        this.Rules = this.convertValues(source["Rules"], RuleDto);
-	        this.Creation = source["Creation"];
+	        this.Age = source["Age"];
 	        this.Labels = source["Labels"];
 	    }
 	
@@ -1041,7 +1041,7 @@ export namespace model {
 	    Type: string;
 	    InternalIp: string;
 	    ExternalIp: string;
-	    Port: string;
+	    Port: number;
 	    Status: string;
 	    CreationTimestamp: string;
 	    Spec: string;
@@ -1068,7 +1068,7 @@ export namespace model {
 	export class ServiceUpdate {
 	    LabelApp: string;
 	    SpecType: string;
-	    Port: string;
+	    Port: number;
 	    TargetPort: string;
 	    SelectorApp: string;
 	

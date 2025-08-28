@@ -12,6 +12,7 @@ type DeploymentUseCase interface {
 	UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error
 	DeleteDeployment(name string, namespace string, clusterCtx string) error
 	TroubleshootDeployment(name string, namespace string, clusterCtx string)
+	ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error)
 }
 
 type deploymentUseCase struct {
@@ -41,4 +42,8 @@ func (d *deploymentUseCase) DeleteDeployment(name string, namespace string, clus
 
 func (d *deploymentUseCase) TroubleshootDeployment(name string, namespace string, clusterCtx string) {
 	d.service.Analyse(name, namespace, service.Deployment)
+}
+
+func (d *deploymentUseCase) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	return d.client.ExportManifest(name, namespace, clusterCtx)
 }

@@ -101,6 +101,7 @@ func checkClusterStatus(kubeConfigPath string, contextName string) bool {
 
 	fmt.Printf("Init cluster register %s, %s \n", contextName, kubeConfigPath)
 	_, err = GlobalClusterManager.GetClient(contextName, kubeConfigPath)
+	_, err = GlobalClusterManager.GetDynamicClient(contextName, kubeConfigPath)
 
 	if err != nil {
 		fmt.Println("Error register cluster")

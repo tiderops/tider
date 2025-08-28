@@ -10,6 +10,7 @@ type ServiceUseCase interface {
 	GetService(name string, namespace string, clusterCtx string) (model.ServiceDto, error)
 	UpdateService(name string, namespace string, dto model.ServiceUpdate, clusterCtx string) error
 	DeleteService(name string, namespace string, clusterCtx string) error
+	ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error)
 }
 
 type serviceUseCase struct {
@@ -34,4 +35,8 @@ func (s *serviceUseCase) UpdateService(name string, namespace string, dto model.
 
 func (s *serviceUseCase) DeleteService(name string, namespace string, clusterCtx string) error {
 	return s.client.DeleteService(name, namespace, clusterCtx)
+}
+
+func (s *serviceUseCase) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	return s.client.ExportManifest(name, namespace, clusterCtx)
 }

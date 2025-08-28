@@ -6,6 +6,9 @@ import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/yaml"
 	"strconv"
 )
 
@@ -51,6 +54,32 @@ func (d deploymentClient) GetDeployments(clusterCtx string) ([]model.DeploymentD
 	}
 
 	return result, nil
+}
+
+func (d deploymentClient) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	client, err := d.manager.ResolveClusterContextDynamic(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	gvr := schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
+	res, err := client.Resource(gvr).Namespace(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+
+	if err != nil {
+		return nil, fmt.Errorf("Error when get deployment %s in namespace %s\n", name, namespace)
+	}
+
+	unstructured.RemoveNestedField(res.Object, "metadata", "managedFields")
+	unstructured.RemoveNestedField(res.Object, "metadata", "resourceVersion")
+	unstructured.RemoveNestedField(res.Object, "metadata", "uid")
+	unstructured.RemoveNestedField(res.Object, "metadata", "selfLink")
+	unstructured.RemoveNestedField(res.Object, "metadata", "creationTimestamp")
+	unstructured.RemoveNestedField(res.Object, "metadata", "generation")
+	unstructured.RemoveNestedField(res.Object, "status")
+
+	data, _ := yaml.Marshal(res)
+	fmt.Println(string(data))
+	return data, nil
 }
 
 func (d deploymentClient) GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error) {

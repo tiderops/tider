@@ -10,6 +10,7 @@ type IngressUseCase interface {
 	GetIngress(name string, namespace string, clusterCtx string) (model.IngressDto, error)
 	UpdateIngress(name string, namespace string, dto model.IngressDto, clusterCtx string) error
 	DeleteIngress(name string, namespace string, clusterCtx string) error
+	ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error)
 }
 
 type ingressUseCase struct {
@@ -34,4 +35,8 @@ func (i *ingressUseCase) UpdateIngress(name string, namespace string, dto model.
 
 func (i *ingressUseCase) DeleteIngress(name string, namespace string, clusterCtx string) error {
 	return i.client.DeleteIngress(name, namespace, clusterCtx)
+}
+
+func (i *ingressUseCase) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	return i.client.ExportManifest(name, namespace, clusterCtx)
 }

@@ -43,7 +43,7 @@ func (cm *ClusterManager) ResolveClusterContextDynamic(name string) (*dynamic.Dy
 	if cm.dynamicClients[name] == nil {
 		return nil, errors.New("cluster is not registered")
 	} else {
-		fmt.Println("GetClusterValue", name)
+		fmt.Println("GetDynamicClusterValue", name)
 		return cm.dynamicClients[name], nil
 	}
 }
