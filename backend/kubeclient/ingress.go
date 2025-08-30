@@ -130,7 +130,6 @@ func (i ingressClient) ExportManifest(name string, namespace string, clusterCtx 
 	unstructured.RemoveNestedField(res.Object, "metadata", "managedFields")
 	unstructured.RemoveNestedField(res.Object, "metadata", "resourceVersion")
 	unstructured.RemoveNestedField(res.Object, "metadata", "uid")
-	unstructured.RemoveNestedField(res.Object, "metadata", "selfLink")
 	unstructured.RemoveNestedField(res.Object, "metadata", "creationTimestamp")
 	unstructured.RemoveNestedField(res.Object, "metadata", "generation")
 	unstructured.RemoveNestedField(res.Object, "status")
