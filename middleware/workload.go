@@ -53,8 +53,8 @@ func (w *WorkloadMiddleware) DeleteDeployment(name string, namespace string, clu
 	return w.endpoint.DeleteDeployment(name, namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) ResourceTuning(namespace string) {
-	w.endpoint.ResourceTuning(namespace)
+func (w *WorkloadMiddleware) ResourceTuning(namespace string, clusterCtx string) {
+	w.endpoint.ResourceTuning(namespace, clusterCtx)
 }
 
 func (w *WorkloadMiddleware) TroubleshootPod(name string, namespace string, clusterCtx string) {

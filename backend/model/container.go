@@ -16,8 +16,8 @@ type ContainerUpdate struct {
 }
 
 type ResourceUpdate struct {
-	RMemory string
-	RCpu    string
-	LMemory string
-	LCpu    string
+	RMemory int64
+	RCpu    int64
+	LMemory int64
+	LCpu    int64
 }

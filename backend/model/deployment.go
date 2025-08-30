@@ -3,6 +3,7 @@ package model
 type DeploymentDto struct {
 	Name      string
 	Namespace string
+	Container Container
 	Replicas  int32
 	Status    string
 	Age       string

@@ -17,7 +17,7 @@ type NodeClient interface {
 
 type MetricClient interface {
 	GetPodMetrics(namespace string, chMetricDto <-chan []model.PodMetricDto) []model.PodMetricDto
-	GetPodMetricsV2(namespace string) *v1beta1.PodMetricsList
+	GetPodMetricsV2(namespace string, clusterCtx string) (*v1beta1.PodMetricsList, error)
 }
 
 type PodClient interface {

@@ -14,7 +14,7 @@ export function GetPod(arg1:string,arg2:string,arg3:string):Promise<model.PodDto
 
 export function GetPods(arg1:string):Promise<Array<model.PodDto>>;
 
-export function ResourceTuning(arg1:string):Promise<void>;
+export function ResourceTuning(arg1:string,arg2:string):Promise<void>;
 
 export function RestartPod(arg1:string,arg2:string,arg3:string):Promise<void>;
 

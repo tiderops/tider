@@ -4,6 +4,7 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -32,9 +33,9 @@ func (n *nodeClient) GetNodes(clusterCtx string) ([]model.NodeDtoV2, error) {
 		dto := model.NodeDtoV2{
 			Name: node.Name,
 			Resource: model.Resource{
-				Cpu:     node.Status.Capacity.Cpu().String(),
-				Memory:  node.Status.Capacity.Memory().String(),
-				Storage: node.Status.Capacity.StorageEphemeral().String(),
+				Cpu:     node.Status.Capacity.Cpu().Value(),
+				Memory:  node.Status.Capacity.Memory().ScaledValue(resource.Giga),
+				Storage: node.Status.Capacity.StorageEphemeral().ScaledValue(resource.Giga),
 			},
 			KubeletVersion:    node.Status.NodeInfo.KubeletVersion,
 			OperatingSystem:   node.Status.NodeInfo.OperatingSystem,
@@ -63,8 +64,9 @@ func (n *nodeClient) GetNode(name string, clusterCtx string) (model.NodeDtoV2, e
 	return model.NodeDtoV2{
 		Name: node.Name,
 		Resource: model.Resource{
-			Cpu:    node.Status.Capacity.Cpu().String(),
-			Memory: node.Status.Capacity.Memory().String(),
+			Cpu:     node.Status.Capacity.Cpu().Value(),
+			Memory:  node.Status.Capacity.Memory().ScaledValue(resource.Giga),
+			Storage: node.Status.Capacity.StorageEphemeral().ScaledValue(resource.Giga),
 		},
 		Version:           node.ResourceVersion,
 		CreationTimestamp: node.CreationTimestamp.String(),

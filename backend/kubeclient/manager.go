@@ -7,12 +7,14 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
 	"sync"
 )
 
 type ClusterResolver interface {
 	ResolveClusterContext(name string) (*kubernetes.Clientset, error)
 	ResolveClusterContextDynamic(name string) (*dynamic.DynamicClient, error)
+	ResolveClusterMetric(name string) (*metricsv.Clientset, error)
 }
 
 var GlobalClusterManager = NewClusterManager()
@@ -21,12 +23,14 @@ type ClusterManager struct {
 	mu             sync.RWMutex
 	clients        map[string]*kubernetes.Clientset
 	dynamicClients map[string]*dynamic.DynamicClient
+	metricClients  map[string]*metricsv.Clientset
 }
 
 func NewClusterManager() *ClusterManager {
 	return &ClusterManager{
 		clients:        make(map[string]*kubernetes.Clientset),
 		dynamicClients: make(map[string]*dynamic.DynamicClient),
+		metricClients:  make(map[string]*metricsv.Clientset),
 	}
 }
 
@@ -45,6 +49,15 @@ func (cm *ClusterManager) ResolveClusterContextDynamic(name string) (*dynamic.Dy
 	} else {
 		fmt.Println("GetDynamicClusterValue", name)
 		return cm.dynamicClients[name], nil
+	}
+}
+
+func (cm *ClusterManager) ResolveClusterMetric(name string) (*metricsv.Clientset, error) {
+	if cm.metricClients[name] == nil {
+		return nil, errors.New("cluster is not registered")
+	} else {
+		fmt.Println("GetMetricClusterValue", name)
+		return cm.metricClients[name], nil
 	}
 }
 
@@ -108,6 +121,20 @@ func (cm *ClusterManager) GetDynamicClient(clusterName string, kubeConfigPath st
 	return dynamicClient, nil
 }
 
+func (cm *ClusterManager) GetMetricClient(clusterName string, conf *rest.Config) (*metricsv.Clientset, error) {
+	//config, err := buildRestConfig(kubeConfigPath, clusterName)
+	//if err != nil {
+	//	return nil, fmt.Errorf("error building config: %s", err)
+	//}
+
+	metricClient, err := metricsv.NewForConfig(conf)
+
+	cm.metricClients[clusterName] = metricClient
+
+	return metricClient, err
+}
+
+// TODO: review this code and refactor
 func buildRestConfig(kubeConfigPath, context string) (*rest.Config, error) {
 	loadingRules := &clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeConfigPath}
 	configOverrides := &clientcmd.ConfigOverrides{CurrentContext: context}

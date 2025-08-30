@@ -47,8 +47,8 @@ func (we *WorkloadEndpoint) DeleteDeployment(name string, namespace string, clus
 	return we.deploymentUseCase.DeleteDeployment(name, namespace, clusterCtx)
 }
 
-func (we *WorkloadEndpoint) ResourceTuning(namespace string) {
-	we.resourceUseCase.Invoke(namespace)
+func (we *WorkloadEndpoint) ResourceTuning(namespace string, clusterCtx string) {
+	we.resourceUseCase.Invoke(namespace, clusterCtx)
 }
 
 func (we *WorkloadEndpoint) TroubleshootPod(name string, namespace string, clusterCtx string) {

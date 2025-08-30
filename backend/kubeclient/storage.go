@@ -4,6 +4,7 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -53,10 +54,10 @@ func (s storageClient) GetPersistentVolumes(clusterCtx string) ([]model.Persiste
 				PersistentVolumeReclaimPolicy: string(volume.Spec.PersistentVolumeReclaimPolicy),
 				MountOptions:                  volume.Spec.MountOptions,
 				Capacity: model.Resource{
-					Cpu:              volume.Spec.Capacity.Cpu().String(),
-					Memory:           volume.Spec.Capacity.Memory().String(),
-					Storage:          volume.Spec.Capacity.Storage().String(),
-					StorageEphemeral: volume.Spec.Capacity.StorageEphemeral().String(),
+					Cpu:              volume.Spec.Capacity.Cpu().MilliValue(),
+					Memory:           volume.Spec.Capacity.Memory().ScaledValue(resource.Mega),
+					Storage:          volume.Spec.Capacity.Storage().ScaledValue(resource.Mega),
+					StorageEphemeral: volume.Spec.Capacity.StorageEphemeral().ScaledValue(resource.Mega),
 				},
 				Host: model.Host{
 					Path: volume.Spec.HostPath.Path,
@@ -110,10 +111,10 @@ func (s storageClient) GetPersistentVolume(name string, clusterCtx string) (mode
 			PersistentVolumeReclaimPolicy: string(volume.Spec.PersistentVolumeReclaimPolicy),
 			MountOptions:                  volume.Spec.MountOptions,
 			Capacity: model.Resource{
-				Cpu:              volume.Spec.Capacity.Cpu().String(),
-				Memory:           volume.Spec.Capacity.Memory().String(),
-				Storage:          volume.Spec.Capacity.Storage().String(),
-				StorageEphemeral: volume.Spec.Capacity.StorageEphemeral().String(),
+				Cpu:              volume.Spec.Capacity.Cpu().MilliValue(),
+				Memory:           volume.Spec.Capacity.Memory().ScaledValue(resource.Mega),
+				Storage:          volume.Spec.Capacity.Storage().ScaledValue(resource.Mega),
+				StorageEphemeral: volume.Spec.Capacity.StorageEphemeral().ScaledValue(resource.Mega),
 			},
 			Host: model.Host{
 				Path: volume.Spec.HostPath.Path,
@@ -192,23 +193,23 @@ func (s storageClient) GetPersistentVolumesClaim(clusterCtx string) ([]model.Per
 				//VolumeAttributesClassName: *volumeClaim.Spec.VolumeAttributesClassName, TODO: Validate null reference
 				//DataSourceRef: volumeClaim.Spec.DataSourceRef.Name, TODO: Validate null reference
 				Limit: model.Resource{
-					Cpu:              volumeClaim.Spec.Resources.Limits.Cpu().String(),
-					Memory:           volumeClaim.Spec.Resources.Limits.Memory().String(),
-					Storage:          volumeClaim.Spec.Resources.Limits.Storage().String(),
-					StorageEphemeral: volumeClaim.Spec.Resources.Limits.StorageEphemeral().String(),
+					Cpu:              volumeClaim.Spec.Resources.Limits.Cpu().MilliValue(),
+					Memory:           volumeClaim.Spec.Resources.Limits.Memory().ScaledValue(resource.Mega),
+					Storage:          volumeClaim.Spec.Resources.Limits.Storage().ScaledValue(resource.Mega),
+					StorageEphemeral: volumeClaim.Spec.Resources.Limits.StorageEphemeral().ScaledValue(resource.Mega),
 				},
 				Request: model.Resource{
-					Cpu:              volumeClaim.Spec.Resources.Requests.Cpu().String(),
-					Memory:           volumeClaim.Spec.Resources.Requests.Memory().String(),
-					Storage:          volumeClaim.Spec.Resources.Requests.Storage().String(),
-					StorageEphemeral: volumeClaim.Spec.Resources.Requests.StorageEphemeral().String(),
+					Cpu:              volumeClaim.Spec.Resources.Requests.Cpu().MilliValue(),
+					Memory:           volumeClaim.Spec.Resources.Requests.Memory().ScaledValue(resource.Mega),
+					Storage:          volumeClaim.Spec.Resources.Requests.Storage().ScaledValue(resource.Mega),
+					StorageEphemeral: volumeClaim.Spec.Resources.Requests.StorageEphemeral().ScaledValue(resource.Mega),
 				},
 			},
 			Capacity: model.Resource{
-				Cpu:              volumeClaim.Status.Capacity.Cpu().String(),
-				Memory:           volumeClaim.Status.Capacity.Memory().String(),
-				Storage:          volumeClaim.Status.Capacity.Storage().String(),
-				StorageEphemeral: volumeClaim.Status.Capacity.StorageEphemeral().String(),
+				Cpu:              volumeClaim.Status.Capacity.Cpu().MilliValue(),
+				Memory:           volumeClaim.Status.Capacity.Memory().ScaledValue(resource.Mega),
+				Storage:          volumeClaim.Status.Capacity.Storage().ScaledValue(resource.Mega),
+				StorageEphemeral: volumeClaim.Status.Capacity.StorageEphemeral().ScaledValue(resource.Mega),
 			},
 		}
 
@@ -249,10 +250,10 @@ func (s storageClient) GetPersistentVolumeClaim(name string, namespace string, c
 			StorageClass:              *volumeClaim.Spec.StorageClassName,
 			VolumeAttributesClassName: *volumeClaim.Spec.VolumeAttributesClassName,
 			Limit: model.Resource{
-				Cpu:              volumeClaim.Spec.Resources.Limits.Cpu().String(),
-				Memory:           volumeClaim.Spec.Resources.Limits.Memory().String(),
-				Storage:          volumeClaim.Spec.Resources.Limits.Storage().String(),
-				StorageEphemeral: volumeClaim.Spec.Resources.Limits.StorageEphemeral().String(),
+				Cpu:              volumeClaim.Spec.Resources.Limits.Cpu().MilliValue(),
+				Memory:           volumeClaim.Spec.Resources.Limits.Memory().ScaledValue(resource.Mega),
+				Storage:          volumeClaim.Spec.Resources.Limits.Storage().ScaledValue(resource.Mega),
+				StorageEphemeral: volumeClaim.Spec.Resources.Limits.StorageEphemeral().ScaledValue(resource.Mega),
 			},
 		},
 	}, nil
