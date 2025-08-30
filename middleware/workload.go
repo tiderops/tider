@@ -53,8 +53,8 @@ func (w *WorkloadMiddleware) DeleteDeployment(name string, namespace string, clu
 	return w.endpoint.DeleteDeployment(name, namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) ResourceTuning(namespace string) {
-	w.endpoint.ResourceTuning(namespace)
+func (w *WorkloadMiddleware) ResourceTuning(namespace string, clusterCtx string) {
+	w.endpoint.ResourceTuning(namespace, clusterCtx)
 }
 
 func (w *WorkloadMiddleware) TroubleshootPod(name string, namespace string, clusterCtx string) {
@@ -63,6 +63,10 @@ func (w *WorkloadMiddleware) TroubleshootPod(name string, namespace string, clus
 
 func (w *WorkloadMiddleware) TroubleshootDeployment(name string, namespace string, clusterCtx string) {
 	w.endpoint.TroubleshootDeployment(name, namespace, clusterCtx)
+}
+
+func (w *WorkloadMiddleware) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	return w.endpoint.ExportManifest(name, namespace, clusterCtx)
 }
 
 func BuildWorkload(manager kubeclient.ClusterResolver) *WorkloadMiddleware {

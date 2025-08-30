@@ -47,6 +47,10 @@ func (n *NetworkMiddleware) DeleteIngress(name string, namespace string, cluster
 	return n.endpoint.DeleteIngress(name, namespace, clusterCtx)
 }
 
+func (n *NetworkMiddleware) ExportManifest(name string, namespace string, clusterCtx string, object string) ([]byte, error) {
+	return n.endpoint.ExportManifest(name, namespace, clusterCtx, object)
+}
+
 func BuildNetwork(manager kubeclient.ClusterResolver) *NetworkMiddleware {
 	serviceClient := kubeclient.NewServiceClient(manager)
 	ingressClient := kubeclient.NewIngressClient(manager)

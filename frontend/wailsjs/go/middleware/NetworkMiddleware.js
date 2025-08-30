@@ -10,6 +10,10 @@ export function DeleteService(arg1, arg2, arg3) {
   return window['go']['middleware']['NetworkMiddleware']['DeleteService'](arg1, arg2, arg3);
 }
 
+export function ExportManifest(arg1, arg2, arg3, arg4) {
+  return window['go']['middleware']['NetworkMiddleware']['ExportManifest'](arg1, arg2, arg3, arg4);
+}
+
 export function GetIngress(arg1, arg2, arg3) {
   return window['go']['middleware']['NetworkMiddleware']['GetIngress'](arg1, arg2, arg3);
 }

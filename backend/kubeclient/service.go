@@ -6,8 +6,10 @@ import (
 	"fmt"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"strconv"
+	"sigs.k8s.io/yaml"
 )
 
 type serviceClient struct {
@@ -39,7 +41,7 @@ func (s serviceClient) GetServices(clusterCtx string) ([]model.ServiceDto, error
 			Type:              string(service.Spec.Type),
 			InternalIp:        service.Spec.ClusterIP,
 			ExternalIp:        service.Spec.ExternalName,
-			Port:              string(service.Spec.Ports[0].Port),
+			Port:              service.Spec.Ports[0].Port,
 			Status:            service.Status.String(),
 			CreationTimestamp: service.CreationTimestamp.String(),
 			Spec:              service.Spec.String(),
@@ -85,13 +87,11 @@ func (s serviceClient) UpdateService(name string, namespace string, dto model.Se
 		panic("Error while searching ingress")
 	}
 
-	port, _ := strconv.ParseInt(dto.Port, 10, 32)
-
 	serviceType := v1.ServiceType(dto.SpecType)
 
 	service.ObjectMeta.Labels["app"] = dto.LabelApp
 	service.Spec.Type = serviceType
-	service.Spec.Ports[0].Port = int32(port)
+	service.Spec.Ports[0].Port = dto.Port
 	service.Spec.Ports[0].TargetPort = intstr.FromString(dto.TargetPort)
 	service.Spec.Selector["app"] = dto.SelectorApp
 
@@ -107,4 +107,28 @@ func (s serviceClient) DeleteService(name string, namespace string, clusterCtx s
 	}
 
 	return client.CoreV1().Services(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+}
+
+func (s serviceClient) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	client, err := s.manager.ResolveClusterContextDynamic(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	gvr := schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}
+	res, err := client.Resource(gvr).Namespace(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+
+	if err != nil {
+		return nil, fmt.Errorf("Error when get services %s in namespace %s\n", name, namespace)
+	}
+
+	unstructured.RemoveNestedField(res.Object, "metadata", "managedFields")
+	unstructured.RemoveNestedField(res.Object, "metadata", "resourceVersion")
+	unstructured.RemoveNestedField(res.Object, "metadata", "uid")
+	unstructured.RemoveNestedField(res.Object, "metadata", "creationTimestamp")
+	unstructured.RemoveNestedField(res.Object, "status")
+
+	data, _ := yaml.Marshal(res)
+	fmt.Println(string(data))
+	return data, nil
 }

@@ -4,25 +4,28 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/metrics/pkg/apis/metrics/v1beta1"
 	metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 type metric struct {
-	client metricsv.Interface
+	manager ClusterResolver
 }
 
-func NewMetric() MetricClient {
-	return &metric{}
+func NewMetric(manager ClusterResolver) MetricClient {
+	return &metric{manager: manager}
 }
-func (m *metric) GetPodMetricsV2(namespace string) *v1beta1.PodMetricsList {
-	metrics, err := m.client.MetricsV1beta1().PodMetricses(namespace).List(context.Background(), metav1.ListOptions{})
+func (m *metric) GetPodMetricsV2(namespace string, clusterCtx string) (*v1beta1.PodMetricsList, error) {
+	client, err := m.manager.ResolveClusterMetric(clusterCtx)
 	if err != nil {
-		fmt.Println(err)
+		return nil, fmt.Errorf("kubeclient: error resolving cluster context: %v", err)
 	}
 
-	return metrics
+	metrics, err := client.MetricsV1beta1().PodMetricses(namespace).List(context.Background(), metav1.ListOptions{})
+
+	return metrics, nil
 }
 
 func (m *metric) GetPodMetrics(namespace string, chMetricDto <-chan []model.PodMetricDto) []model.PodMetricDto {
@@ -36,7 +39,7 @@ func (m *metric) GetPodMetrics(namespace string, chMetricDto <-chan []model.PodM
 	//	fmt.Print(err)
 	//}
 
-	return pollMetrics(m.client, namespace)
+	return pollMetrics(nil, namespace)
 }
 
 func pollMetrics(metricsClient metricsv.Interface, namespace string) []model.PodMetricDto {
@@ -53,10 +56,10 @@ func pollMetrics(metricsClient metricsv.Interface, namespace string) []model.Pod
 				Name:      podMetric.Name,
 				Namespace: podMetric.Namespace,
 				Consume: model.Resource{
-					Cpu:              container.Usage.Cpu().String(),
-					Memory:           container.Usage.Memory().String(),
-					Storage:          container.Usage.Storage().String(),
-					StorageEphemeral: container.Usage.StorageEphemeral().String(),
+					Cpu:              container.Usage.Cpu().MilliValue(),
+					Memory:           container.Usage.Memory().ScaledValue(resource.Mega),
+					Storage:          container.Usage.Storage().ScaledValue(resource.Mega),
+					StorageEphemeral: container.Usage.StorageEphemeral().ScaledValue(resource.Mega),
 				},
 			})
 		}

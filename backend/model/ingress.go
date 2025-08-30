@@ -4,7 +4,7 @@ type IngressDto struct {
 	Name      string
 	Namespace string
 	Rules     []RuleDto
-	Creation  string
+	Age       string
 	Labels    map[string]string
 }
 

@@ -6,7 +6,7 @@ type ServiceDto struct {
 	Type              string
 	InternalIp        string
 	ExternalIp        string
-	Port              string
+	Port              int32
 	Status            string
 	CreationTimestamp string
 	Spec              string
@@ -17,7 +17,7 @@ type ServiceUpdate struct {
 	name        string
 	LabelApp    string
 	SpecType    string
-	Port        string
+	Port        int32
 	TargetPort  string
 	SelectorApp string
 }

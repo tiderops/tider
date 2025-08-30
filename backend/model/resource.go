@@ -1,8 +1,8 @@
 package model
 
 type Resource struct {
-	Cpu              string
-	Memory           string
-	Storage          string
-	StorageEphemeral string
+	Cpu              int64
+	Memory           int64
+	Storage          int64
+	StorageEphemeral int64
 }

@@ -5,6 +5,9 @@ import (
 	"context"
 	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/yaml"
 )
 
 type ingressClient struct {
@@ -43,7 +46,7 @@ func (i ingressClient) GetIngresses(clusterCtx string) ([]model.IngressDto, erro
 		dto := model.IngressDto{
 			Name:      ingress.Name,
 			Namespace: ingress.Namespace,
-			Creation:  ingress.CreationTimestamp.String(),
+			Age:       ingress.CreationTimestamp.String(),
 			Labels:    ingress.Labels,
 			Rules:     rulesDto,
 		}
@@ -74,7 +77,7 @@ func (i ingressClient) GetIngress(name string, namespace string, clusterCtx stri
 	return model.IngressDto{
 		Name:      ingress.GetName(),
 		Namespace: ingress.GetNamespace(),
-		Creation:  ingress.GetCreationTimestamp().String(),
+		Age:       ingress.GetCreationTimestamp().String(),
 		Labels:    ingress.GetLabels(),
 		Rules:     rulesDto,
 	}, nil
@@ -109,4 +112,29 @@ func (i ingressClient) DeleteIngress(name string, namespace string, clusterCtx s
 	}
 
 	return client.NetworkingV1().Ingresses(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+}
+
+func (i ingressClient) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	client, err := i.manager.ResolveClusterContextDynamic(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	gvr := schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ingresses"}
+	res, err := client.Resource(gvr).Namespace(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+
+	if err != nil {
+		return nil, fmt.Errorf("Error when get ingresses %s in namespace %s\n", name, namespace)
+	}
+
+	unstructured.RemoveNestedField(res.Object, "metadata", "managedFields")
+	unstructured.RemoveNestedField(res.Object, "metadata", "resourceVersion")
+	unstructured.RemoveNestedField(res.Object, "metadata", "uid")
+	unstructured.RemoveNestedField(res.Object, "metadata", "creationTimestamp")
+	unstructured.RemoveNestedField(res.Object, "metadata", "generation")
+	unstructured.RemoveNestedField(res.Object, "status")
+
+	data, _ := yaml.Marshal(res)
+	fmt.Println(string(data))
+	return data, nil
 }

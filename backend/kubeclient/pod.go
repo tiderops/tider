@@ -4,6 +4,7 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -46,12 +47,12 @@ func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
 				PullPolicy: string(pod.Spec.Containers[0].ImagePullPolicy),
 				//Port:       string(pod.Spec.Containers[0].Ports[0].ContainerPort),
 				Limit: model.Resource{
-					Cpu:    pod.Spec.Containers[0].Resources.Limits.Cpu().String(),
-					Memory: pod.Spec.Containers[0].Resources.Limits.Memory().String(),
+					Cpu:    pod.Spec.Containers[0].Resources.Limits.Cpu().MilliValue(),
+					Memory: pod.Spec.Containers[0].Resources.Limits.Memory().ScaledValue(resource.Mega),
 				},
 				Request: model.Resource{
-					Cpu:    pod.Spec.Containers[0].Resources.Requests.Cpu().String(),
-					Memory: pod.Spec.Containers[0].Resources.Requests.Memory().String(),
+					Cpu:    pod.Spec.Containers[0].Resources.Requests.Cpu().MilliValue(),
+					Memory: pod.Spec.Containers[0].Resources.Requests.Memory().ScaledValue(resource.Mega),
 				},
 			},
 			Node:   pod.Spec.NodeName,
@@ -98,12 +99,12 @@ func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (mo
 			PullPolicy: string(pod.Spec.Containers[0].ImagePullPolicy),
 			Port:       port,
 			Limit: model.Resource{
-				Cpu:    pod.Spec.Containers[0].Resources.Limits.Cpu().String(),
-				Memory: pod.Spec.Containers[0].Resources.Limits.Memory().String(),
+				Cpu:    pod.Spec.Containers[0].Resources.Limits.Cpu().MilliValue(),
+				Memory: pod.Spec.Containers[0].Resources.Limits.Memory().ScaledValue(resource.Mega),
 			},
 			Request: model.Resource{
-				Cpu:    pod.Spec.Containers[0].Resources.Requests.Cpu().String(),
-				Memory: pod.Spec.Containers[0].Resources.Requests.Memory().String(),
+				Cpu:    pod.Spec.Containers[0].Resources.Requests.Cpu().MilliValue(),
+				Memory: pod.Spec.Containers[0].Resources.Requests.Memory().ScaledValue(resource.Mega),
 			},
 		},
 		Status:   string(pod.Status.Phase),

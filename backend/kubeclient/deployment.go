@@ -4,9 +4,12 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
-	v1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strconv"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/yaml"
 )
 
 type deploymentClient struct {
@@ -53,6 +56,31 @@ func (d deploymentClient) GetDeployments(clusterCtx string) ([]model.DeploymentD
 	return result, nil
 }
 
+func (d deploymentClient) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
+	client, err := d.manager.ResolveClusterContextDynamic(clusterCtx)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	gvr := schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
+	res, err := client.Resource(gvr).Namespace(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+
+	if err != nil {
+		return nil, fmt.Errorf("Error when get deployment %s in namespace %s\n", name, namespace)
+	}
+
+	unstructured.RemoveNestedField(res.Object, "metadata", "managedFields")
+	unstructured.RemoveNestedField(res.Object, "metadata", "resourceVersion")
+	unstructured.RemoveNestedField(res.Object, "metadata", "uid")
+	unstructured.RemoveNestedField(res.Object, "metadata", "creationTimestamp")
+	unstructured.RemoveNestedField(res.Object, "metadata", "generation")
+	unstructured.RemoveNestedField(res.Object, "status")
+
+	data, _ := yaml.Marshal(res)
+	fmt.Println(string(data))
+	return data, nil
+}
+
 func (d deploymentClient) GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error) {
 	client, err := d.manager.ResolveClusterContext(clusterCtx)
 	if err != nil {
@@ -61,11 +89,25 @@ func (d deploymentClient) GetDeployment(name string, namespace string, clusterCt
 
 	deployment, _ := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 
+	depSpec := deployment.Spec.Template.Spec
+
 	return model.DeploymentDto{
 		Name:      deployment.Name,
 		Namespace: deployment.Namespace,
-		Status:    string(deployment.Status.Conditions[0].Status),
-		Age:       deployment.CreationTimestamp.String(),
+		Container: model.Container{
+			Image:      depSpec.Containers[0].Image,
+			PullPolicy: string(depSpec.Containers[0].ImagePullPolicy),
+			Limit: model.Resource{
+				Cpu:    depSpec.Containers[0].Resources.Limits.Cpu().MilliValue(),
+				Memory: depSpec.Containers[0].Resources.Limits.Memory().ScaledValue(resource.Mega),
+			},
+			Request: model.Resource{
+				Cpu:    depSpec.Containers[0].Resources.Requests.Cpu().MilliValue(),
+				Memory: depSpec.Containers[0].Resources.Requests.Memory().ScaledValue(resource.Mega),
+			},
+		},
+		Status: string(deployment.Status.Conditions[0].Status),
+		Age:    deployment.CreationTimestamp.String(),
 	}, nil
 }
 
@@ -78,20 +120,32 @@ func (d deploymentClient) UpdateDeployment(name string, namespace string, dto mo
 	c := client.AppsV1().Deployments(namespace)
 	deployment, err := c.Get(context.TODO(), name, metav1.GetOptions{})
 
+	fmt.Println("deployment.Name: ", deployment.Name)
+
 	if err != nil {
 		panic("Error while searching ingress")
 	}
 
-	replicas, _ := strconv.Atoi(dto.Replicas)
-	ptrReplica := int32(replicas)
-	strategyType := v1.DeploymentStrategyType(dto.StrategyType)
+	//replicas, _ := strconv.Atoi(dto.Replicas)
+	//ptrReplica := int32(replicas)
+	//strategyType := v1.DeploymentStrategyType(dto.StrategyType)
 
-	deployment.Spec.Replicas = &ptrReplica
-	deployment.Spec.Selector.MatchLabels["app"] = dto.App
-	deployment.Spec.Strategy.Type = strategyType
-	deployment.Spec.Template.Labels["app"] = dto.Label.App
-	deployment.Spec.Template.Labels["tier"] = dto.Label.Tier
-	deployment.Spec.Template.Labels["tierType"] = dto.Label.TierType
+	//deployment.Spec.Replicas = &ptrReplica
+	//deployment.Spec.Selector.MatchLabels["app"] = dto.App
+	//deployment.Spec.Strategy.Type = strategyType
+	//deployment.Spec.Template.Labels["app"] = dto.Label.App
+	//deployment.Spec.Template.Labels["tier"] = dto.Label.Tier
+	//deployment.Spec.Template.Labels["tierType"] = dto.Label.TierType
+
+	// TODO: finish update feature
+	cpu := resource.MustParse(fmt.Sprintf("%dm", dto.Container.Resource.LCpu))
+	mem := resource.MustParse(fmt.Sprintf("%dMi", dto.Container.Resource.LMemory))
+
+	deployment.Spec.Template.Spec.Containers[0].Resources.Limits[v1.ResourceCPU] = cpu
+	deployment.Spec.Template.Spec.Containers[0].Resources.Limits[v1.ResourceMemory] = mem
+
+	fmt.Println("deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Memory(): ", deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Memory())
+	fmt.Println("dto.Container.Resource.LMemory: ", dto.Container.Resource.LMemory)
 
 	_, err = c.Update(context.TODO(), deployment, metav1.UpdateOptions{})
 
