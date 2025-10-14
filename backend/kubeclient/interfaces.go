@@ -2,6 +2,9 @@ package kubeclient
 
 import (
 	"Kubexplorer/backend/model"
+	v1_apps "k8s.io/api/apps/v1"
+	v1_batch "k8s.io/api/batch/v1"
+	v1_core "k8s.io/api/core/v1"
 	"k8s.io/metrics/pkg/apis/metrics/v1beta1"
 )
 
@@ -23,13 +26,20 @@ type MetricClient interface {
 type PodClient interface {
 	GetPods(clusterCtx string) ([]model.PodDto, error)
 	GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error)
+	GetPodV2(name string, namespace string, clusterCtx string) (*v1_core.Pod, error)
+
 	UpdatePod(name string, namespace string, dto model.PodUpdate, clusterCtx string) error
 	DeletePod(name string, namespace string, clusterCtx string) error
+}
+
+type JobClient interface {
+	GetJob(name string, namespace string, clusterCtx string) (*v1_batch.Job, error)
 }
 
 type DeploymentClient interface {
 	GetDeployments(clusterCtx string) ([]model.DeploymentDto, error)
 	GetDeployment(name string, namespace string, clusterCtx string) (model.DeploymentDto, error)
+	GetDeploymentV2(name string, namespace string, clusterCtx string) (*v1_apps.Deployment, error)
 	UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error
 	DeleteDeployment(name string, namespace string, clusterCtx string) error
 	ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error)

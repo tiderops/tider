@@ -6,9 +6,10 @@ import (
 )
 
 type WorkloadEndpoint struct {
-	podUseCase        usecase.PodUseCase
-	deploymentUseCase usecase.DeploymentUseCase
-	resourceUseCase   usecase.ResourceUseCase
+	podUseCase          usecase.PodUseCase
+	deploymentUseCase   usecase.DeploymentUseCase
+	resourceUseCase     usecase.ResourceUseCase
+	troubleshootUseCase usecase.TroubleshootUseCase
 }
 
 func NewWorkloadEndpoint(podUseCase usecase.PodUseCase, deploymentUseCase usecase.DeploymentUseCase) *WorkloadEndpoint {
@@ -51,12 +52,8 @@ func (we *WorkloadEndpoint) ResourceTuning(namespace string, clusterCtx string) 
 	we.resourceUseCase.Invoke(namespace, clusterCtx)
 }
 
-func (we *WorkloadEndpoint) TroubleshootPod(name string, namespace string, clusterCtx string) {
-	we.podUseCase.TroubleshootPod(name, namespace, clusterCtx)
-}
-
-func (we *WorkloadEndpoint) TroubleshootDeployment(name string, namespace string, clusterCtx string) {
-	we.deploymentUseCase.TroubleshootDeployment(name, namespace, clusterCtx)
+func (we *WorkloadEndpoint) AutoTroubleshoot(name string, namespace string, clusterCtx string, resource string) {
+	we.troubleshootUseCase.Invoke(name, namespace, clusterCtx, resource)
 }
 
 func (we *WorkloadEndpoint) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {

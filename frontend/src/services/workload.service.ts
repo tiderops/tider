@@ -1,4 +1,5 @@
 import {
+	AutoTroubleshoot,
 	DeleteDeployment,
 	GetDeployment,
 	GetDeployments,
@@ -23,5 +24,4 @@ export const fetchUpdateDeployment = async (name: string, namespace: string, dto
 export const fetchDeleteDeployment = async (name: string, namespace: string, clusterCtx: string) => DeleteDeployment(name, namespace, clusterCtx)
 
 export const fetchResourceTuning = async (namespace: string) => ResourceTuning(namespace)
-export const fetchTroubleshootPod = async (name: string, namespace: string, clusterCtx: string) => TroubleshootPod(name, namespace, clusterCtx)
-export const fetchTroubleshootDeployment = async (name: string, namespace: string, clusterCtx: string) => TroubleshootDeployment(name, namespace, clusterCtx)
+export const fetchAutoTroubleshoot = async (name: string, namespace: string, clusterCtx: string, resource: string) => AutoTroubleshoot(name, namespace, clusterCtx, resource)

@@ -4,6 +4,7 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -67,6 +68,17 @@ func (p *podClient) GetPods(clusterCtx string) ([]model.PodDto, error) {
 	fmt.Println("podArray[0].Name", podArray[0].Name)
 
 	return podArray, nil
+}
+
+func (p *podClient) GetPodV2(clusterCtx string, name string, namespace string) (*v1.Pod, error) {
+	client, err := p.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return &v1.Pod{}, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	pod, _ := client.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+
+	return pod, nil
 }
 
 func (p *podClient) GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error) {
