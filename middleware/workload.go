@@ -57,12 +57,8 @@ func (w *WorkloadMiddleware) ResourceTuning(namespace string, clusterCtx string)
 	w.endpoint.ResourceTuning(namespace, clusterCtx)
 }
 
-func (w *WorkloadMiddleware) TroubleshootPod(name string, namespace string, clusterCtx string) {
-	w.endpoint.TroubleshootPod(name, namespace, clusterCtx)
-}
-
-func (w *WorkloadMiddleware) TroubleshootDeployment(name string, namespace string, clusterCtx string) {
-	w.endpoint.TroubleshootDeployment(name, namespace, clusterCtx)
+func (w *WorkloadMiddleware) AutoTroubleshoot(name string, namespace string, clusterCtx string, resource string) {
+	w.endpoint.AutoTroubleshoot(name, namespace, clusterCtx, resource)
 }
 
 func (w *WorkloadMiddleware) ExportManifest(name string, namespace string, clusterCtx string) ([]byte, error) {
@@ -72,7 +68,9 @@ func (w *WorkloadMiddleware) ExportManifest(name string, namespace string, clust
 func BuildWorkload(manager kubeclient.ClusterResolver) *WorkloadMiddleware {
 	deploymentClient := kubeclient.NewDeployment(manager)
 	podClient := kubeclient.NewPod(manager)
-	diagnosticService := service.NewDiagnosticService(nil)
+	jobClient := kubeclient.NewJob(manager)
+
+	diagnosticService := service.NewDiagnosticService(podClient, deploymentClient, jobClient)
 
 	deploymentUseCase := usecase.NewDeploymentUseCase(deploymentClient, diagnosticService)
 	podUseCase := usecase.NewPodUseCase(podClient, diagnosticService)

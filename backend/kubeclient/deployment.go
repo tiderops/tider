@@ -4,6 +4,7 @@ import (
 	"Kubexplorer/backend/model"
 	"context"
 	"fmt"
+	v1_apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -109,6 +110,17 @@ func (d deploymentClient) GetDeployment(name string, namespace string, clusterCt
 		Status: string(deployment.Status.Conditions[0].Status),
 		Age:    deployment.CreationTimestamp.String(),
 	}, nil
+}
+
+func (d deploymentClient) GetDeploymentV2(name string, namespace string, clusterCtx string) (*v1_apps.Deployment, error) {
+	client, err := d.manager.ResolveClusterContext(clusterCtx)
+	if err != nil {
+		return &v1_apps.Deployment{}, fmt.Errorf("cluster %s is not registered", clusterCtx)
+	}
+
+	deployment, _ := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+
+	return deployment, nil
 }
 
 func (d deploymentClient) UpdateDeployment(name string, namespace string, dto model.DeploymentUpdate, clusterCtx string) error {

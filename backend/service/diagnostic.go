@@ -1,13 +1,13 @@
 package service
 
 import (
-	"context"
+	"Kubexplorer/backend/kubeclient"
+	"Kubexplorer/backend/model"
 	"fmt"
-	app "k8s.io/api/apps/v1"
-	batch "k8s.io/api/batch/v1"
-	core "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
+
+	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
 )
 
 type SourceObject string
@@ -20,10 +20,7 @@ const (
 
 type WellKnownPodError string
 type WellKnownDeploymentError string
-
 type WellKnownJobError string
-type WellKnowServiceError string
-type WellKnowSecretError string
 
 const (
 	// Pod-level
@@ -36,133 +33,245 @@ const (
 	Unschedulable              WellKnownPodError = "Unschedulable"
 	Evicted                    WellKnownPodError = "Evicted"
 	NodeLost                   WellKnownPodError = "NodeLost"
+	Completed                  WellKnownPodError = "Completed"
+	Pending                    WellKnownPodError = "Pending"
+	Terminating                WellKnownPodError = "Terminating"
 
 	// Deployment-level
 	UnavailableReplicas        WellKnownDeploymentError = "UnavailableReplicas"
 	MinimumReplicasUnavailable WellKnownDeploymentError = "MinimumReplicasUnavailable"
+	ProgressDeadlineExceeded   WellKnownDeploymentError = "ProgressDeadlineExceeded"
 
 	// Job-level
 	DeadlineExceeded     WellKnownJobError = "DeadlineExceeded"
 	BackoffLimitExceeded WellKnownJobError = "BackoffLimitExceeded"
 )
 
+var PodErrorMessages = map[WellKnownPodError]string{
+	CrashLoopBackOff:           "The container keeps crashing on startup. Check container logs with `kubectl logs` and verify entrypoint, configs, or dependencies.",
+	OOMKilled:                  "The container was killed due to exceeding memory limits. Increase memory limits/requests or optimize application memory usage.",
+	ImagePullBackOff:           "Kubernetes cannot pull the container image. Verify image name, tag, registry credentials, or network access.",
+	ErrImagePull:               "The image could not be pulled. Check that the image exists and that the registry is accessible.",
+	CreateContainerConfigError: "Invalid container configuration. Review environment variables, volume mounts, and container spec.",
+	ContainerCannotRun:         "The container failed to start. Check entrypoint, permissions, or binary compatibility.",
+	Unschedulable:              "The pod cannot be scheduled. Verify resource requests, node selectors, taints, or affinity rules.",
+	Evicted:                    "The pod was evicted due to resource pressure. Reduce requests/limits or add more cluster resources.",
+	NodeLost:                   "The node running this pod is unreachable. Check node health and networking.",
+	Completed:                  "The pod has successfully finished execution (Job/Pod complete). No action needed unless it was expected to keep running.",
+	Pending:                    "The pod is stuck in Pending. Check scheduler logs, resource availability, or PVC binding.",
+	Terminating:                "The pod is stuck in Terminating. Check for finalizers, stuck volumes, or force delete with `kubectl delete pod --force --grace-period=0`.",
+}
+
+var DeploymentErrorMessages = map[WellKnownDeploymentError]string{
+	UnavailableReplicas:        "Not enough replicas are available. Check pod errors, resource limits, or scheduling constraints.",
+	MinimumReplicasUnavailable: "Minimum replicas not met. Scale your cluster or adjust replica settings.",
+	ProgressDeadlineExceeded:   "Deployment rollout is stuck. Check pod logs, events, and ensure readiness/liveness probes are correct.",
+}
+
+var JobErrorMessages = map[WellKnownJobError]string{
+	DeadlineExceeded:     "The Job exceeded its active deadline. Increase `.spec.activeDeadlineSeconds` or optimize the job workload.",
+	BackoffLimitExceeded: "The Job retried too many times and failed. Investigate pod logs and fix underlying issues.",
+}
+
 type DiagnosticService interface {
-	Analyse(name string, namespace string, object SourceObject)
+	Analyse(name string, namespace string, clusterCtx string, resource string) model.Troubleshoot
 }
 
 type diagnosticService struct {
-	client kubernetes.Interface
+	pod        kubeclient.PodClient
+	deployment kubeclient.DeploymentClient
+	job        kubeclient.JobClient
 }
 
-func NewDiagnosticService(client kubernetes.Interface) DiagnosticService {
-	return &diagnosticService{client: client}
+func NewDiagnosticService(pod kubeclient.PodClient, deployment kubeclient.DeploymentClient, job kubeclient.JobClient) DiagnosticService {
+	return &diagnosticService{pod: pod, deployment: deployment, job: job}
 }
 
-func (d *diagnosticService) Analyse(name string, namespace string, object SourceObject) {
+func (d *diagnosticService) Analyse(name string, namespace string, clusterCtx string, resource string) model.Troubleshoot {
+	switch resource {
+	case string(Pod):
+		pod, err := d.pod.GetPodV2(name, namespace, clusterCtx)
+		if err != nil {
+			return model.Troubleshoot{Meaning: fmt.Sprintf("Error retrieving Pod: %v", err)}
+		}
+		return CheckPodErrors(*pod)
 
-	switch object {
-	case Pod:
-		pod, err := d.client.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+	case string(Deployment):
+		dep, err := d.deployment.GetDeploymentV2(name, namespace, clusterCtx)
 		if err != nil {
-			fmt.Printf("Error retrieving Pod: %v\n", err)
-			return
+			return model.Troubleshoot{Meaning: fmt.Sprintf("Error retrieving Deployment: %v", err)}
 		}
-		identifyPodPotentialError(pod)
-	case Job:
-		job, err := d.client.BatchV1().Jobs(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+		return CheckDeploymentErrors(*dep)
+
+	case string(Job):
+		job, err := d.job.GetJob(name, namespace, clusterCtx)
 		if err != nil {
-			fmt.Printf("Error retrieving Job: %v\n", err)
-			return
+			return model.Troubleshoot{Meaning: fmt.Sprintf("Error retrieving Job: %v", err)}
 		}
-		identifyJobPotentialError(job)
-	case Deployment:
-		deployment, err := d.client.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
-		if err != nil {
-			fmt.Printf("Error retrieving Deployment: %v\n", err)
-			return
-		}
-		identifyDeploymentPotentialError(deployment)
+		return CheckJobErrors(*job)
+
 	default:
-		fmt.Println("Not a valid object")
+		return model.Troubleshoot{Meaning: "Unsupported object type"}
 	}
-
 }
 
-func identifyPodPotentialError(pod *core.Pod) {
-	fmt.Println("Pod:", pod.Name)
-	fmt.Println("Phase:", pod.Status.Phase)
-	fmt.Println("PodIP:", pod.Status.PodIP)
-	fmt.Println("Message:", pod.Status.Message)
-	fmt.Println("Reason:", pod.Status.Reason)
-
-	switch pod.Status.Reason {
-	case string(Evicted):
-		fmt.Println("Evicted")
-	case string(NodeLost):
-		fmt.Println("NodeLost")
-	}
-
-	for _, container := range pod.Status.ContainerStatuses {
-		fmt.Println("ContainerID:", container.ContainerID)
-		fmt.Println("State:", container.State)
-		fmt.Println("Name:", container.Name)
-		fmt.Println("Image:", container.Image)
-		fmt.Println("ImageID:", container.ImageID)
-
-		if container.State.Terminated != nil {
-			if container.LastTerminationState.Terminated.Reason == string(OOMKilled) {
-				fmt.Println("Container is crashing. Suggest increase memory usage.")
+func CheckPodErrors(pod corev1.Pod) model.Troubleshoot {
+	// Check phase-level
+	switch pod.Status.Phase {
+	case corev1.PodPending:
+		if msg, ok := PodErrorMessages[Pending]; ok {
+			return model.Troubleshoot{
+				Meaning:        string(Pending),
+				Recommendation: msg,
 			}
 		}
-
-		if container.State.Waiting != nil {
-			fmt.Println("Waiting.Message:", container.State.Waiting.Message)
-			reason := container.State.Waiting.Reason
-			fmt.Println("Waiting.Reason:", reason)
-
-			switch reason {
-			case string(CrashLoopBackOff):
-				fmt.Println("Container is crashing. Suggest checking logs.")
-			case string(ImagePullBackOff):
-				fmt.Println("Container is crashing. Suggest check out the image policy.")
-			case string(ErrImagePull):
-				fmt.Println("Container is crashing. Suggest check out the image repository.")
-			case string(ContainerCannotRun):
-				fmt.Println("Container is crashing. Probably the Container Cannot Run")
-			case string(CreateContainerConfigError):
-				fmt.Println("Container is crashing. Probably the Create Container Config Error")
+	case corev1.PodSucceeded:
+		if msg, ok := PodErrorMessages[Completed]; ok {
+			return model.Troubleshoot{
+				Meaning:        string(Completed),
+				Recommendation: msg,
+			}
+		}
+	case corev1.PodFailed:
+		if msg, ok := PodErrorMessages[Terminating]; ok {
+			return model.Troubleshoot{
+				Meaning:        string(Terminating),
+				Recommendation: msg,
 			}
 		}
 	}
 
-	for _, condition := range pod.Status.Conditions {
-		if condition.Reason == string(Unschedulable) {
-			fmt.Println("Container is crashing. Unschedulable state")
+	// Check conditions
+	for _, cond := range pod.Status.Conditions {
+		if cond.Type == corev1.PodScheduled && cond.Status == corev1.ConditionFalse {
+			if msg, ok := PodErrorMessages[Unschedulable]; ok {
+				return model.Troubleshoot{
+					Meaning:        string(Unschedulable),
+					Recommendation: msg,
+				}
+			}
+		}
+		if cond.Reason == "Evicted" {
+			if msg, ok := PodErrorMessages[Evicted]; ok {
+				return model.Troubleshoot{
+					Meaning:        string(Evicted),
+					Recommendation: msg,
+				}
+			}
+		}
+		if cond.Reason == "NodeLost" {
+			if msg, ok := PodErrorMessages[NodeLost]; ok {
+				return model.Troubleshoot{
+					Meaning:        string(NodeLost),
+					Recommendation: msg,
+				}
+			}
 		}
 	}
 
+	// Check container states
+	for _, cs := range pod.Status.ContainerStatuses {
+		if cs.State.Waiting != nil {
+			if msg, ok := PodErrorMessages[WellKnownPodError(cs.State.Waiting.Reason)]; ok {
+				return model.Troubleshoot{
+					Meaning:        cs.State.Waiting.Reason,
+					Recommendation: msg,
+				}
+			}
+		}
+		if cs.State.Terminated != nil {
+			if msg, ok := PodErrorMessages[WellKnownPodError(cs.State.Terminated.Reason)]; ok {
+				return model.Troubleshoot{
+					Meaning:        cs.State.Terminated.Reason,
+					Recommendation: msg,
+				}
+			}
+		}
+		if cs.LastTerminationState.Terminated != nil {
+			if msg, ok := PodErrorMessages[WellKnownPodError(cs.LastTerminationState.Terminated.Reason)]; ok {
+				return model.Troubleshoot{
+					Meaning:        cs.State.Terminated.Reason,
+					Recommendation: msg,
+				}
+			}
+		}
+	}
+
+	// Fallback: if pod.Status.Reason is set
+	if pod.Status.Reason != "" {
+		if msg, ok := PodErrorMessages[WellKnownPodError(pod.Status.Reason)]; ok {
+			return model.Troubleshoot{
+				Meaning:        pod.Status.Reason,
+				Recommendation: msg,
+			}
+		}
+	}
+
+	return model.Troubleshoot{Meaning: "No known pod errors detected."}
 }
 
-func identifyJobPotentialError(job *batch.Job) {
+func CheckDeploymentErrors(dep appsv1.Deployment) model.Troubleshoot {
+	desired := int32(1)
+	if dep.Spec.Replicas != nil {
+		desired = *dep.Spec.Replicas
+	}
+	available := dep.Status.AvailableReplicas
+	ready := dep.Status.ReadyReplicas
 
-	for _, condition := range job.Status.Conditions {
-		if condition.Reason == string(BackoffLimitExceeded) {
-			fmt.Println("Container is crashing. BackoffLimitExceeded.")
-		}
-		if condition.Reason == string(DeadlineExceeded) {
-			fmt.Println("Container is crashing. DeadlineExceeded.")
+	if available < desired {
+		if msg, ok := DeploymentErrorMessages[UnavailableReplicas]; ok {
+			return model.Troubleshoot{
+				Meaning:        string(UnavailableReplicas),
+				Recommendation: msg,
+			}
 		}
 	}
+	if ready < desired {
+		if msg, ok := DeploymentErrorMessages[MinimumReplicasUnavailable]; ok {
+			return model.Troubleshoot{
+				Meaning:        string(MinimumReplicasUnavailable),
+				Recommendation: msg,
+			}
+		}
+	}
+
+	for _, cond := range dep.Status.Conditions {
+		if cond.Type == appsv1.DeploymentProgressing && cond.Reason == "ProgressDeadlineExceeded" {
+			if msg, ok := DeploymentErrorMessages[ProgressDeadlineExceeded]; ok {
+				return model.Troubleshoot{
+					Meaning:        string(ProgressDeadlineExceeded),
+					Recommendation: msg,
+				}
+			}
+		}
+	}
+
+	return model.Troubleshoot{Meaning: "No known deployment errors detected."}
 }
 
-func identifyDeploymentPotentialError(deployment *app.Deployment) {
-	if deployment.Status.UnavailableReplicas > 0 {
-		fmt.Println("Deployment is unavailable")
-	}
-
-	for _, condition := range deployment.Status.Conditions {
-		if condition.Reason == string(MinimumReplicasUnavailable) {
-			fmt.Println("Deployment error. MinimumReplicasUnavailable.")
+func CheckJobErrors(job batchv1.Job) model.Troubleshoot {
+	for _, cond := range job.Status.Conditions {
+		if cond.Type == batchv1.JobFailed && cond.Status == corev1.ConditionTrue {
+			switch cond.Reason {
+			case "BackoffLimitExceeded":
+				if msg, ok := JobErrorMessages[BackoffLimitExceeded]; ok {
+					return model.Troubleshoot{
+						Meaning:        string(BackoffLimitExceeded),
+						Recommendation: msg,
+					}
+				}
+			case "DeadlineExceeded":
+				if msg, ok := JobErrorMessages[DeadlineExceeded]; ok {
+					return model.Troubleshoot{
+						Meaning:        string(DeadlineExceeded),
+						Recommendation: msg,
+					}
+				}
+			default:
+				return model.Troubleshoot{Meaning: cond.Message}
+			}
 		}
 	}
+
+	return model.Troubleshoot{Meaning: "No known job errors detected."}
 }

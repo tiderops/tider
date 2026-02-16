@@ -11,7 +11,6 @@ type PodUseCase interface {
 	GetPod(name string, namespace string, clusterCtx string) (model.PodDto, error)
 	UpdatePod(name string, namespace string, dto model.PodUpdate, clusterCtx string) error
 	RestartPod(name string, namespace string, clusterCtx string) error
-	TroubleshootPod(name string, namespace string, clusterCtx string)
 }
 
 type podUseCase struct {
@@ -37,8 +36,4 @@ func (p *podUseCase) UpdatePod(name string, namespace string, dto model.PodUpdat
 
 func (p *podUseCase) RestartPod(name string, namespace string, clusterCtx string) error {
 	return p.client.DeletePod(name, namespace, clusterCtx)
-}
-
-func (p *podUseCase) TroubleshootPod(name string, namespace string, clusterCtx string) {
-	p.service.Analyse(name, namespace, service.Pod)
 }
