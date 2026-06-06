@@ -1,21 +1,32 @@
 package usecase
 
+import (
+	"Kubexplorer/backend/model"
+	"Kubexplorer/backend/service"
+)
+
 type MetricUseCase interface {
 	GetPodMetric(namespace string)
 	GetNodeMetric(namespace string)
+	EnableMetrics(dto model.MetricEnableDto)
 }
 
-type metricImpl struct {
+type metricUseCase struct {
+	service service.MetricV2Service
 }
 
-func NewMetricUseCase() MetricUseCase {
-	return &metricImpl{}
+func NewMetricUseCase(service service.MetricV2Service) MetricUseCase {
+	return &metricUseCase{service: service}
 }
 
-func (m *metricImpl) GetPodMetric(namespace string) {
+func (m *metricUseCase) GetPodMetric(namespace string) {
 	//return m.service.GetPodMetrics(namespace)
 }
 
-func (m *metricImpl) GetNodeMetric(namespace string) {
+func (m *metricUseCase) GetNodeMetric(namespace string) {
 	//return m.service.GetNodeMetrics(namespace)
+}
+
+func (m *metricUseCase) EnableMetrics(dto model.MetricEnableDto) {
+	m.service.EnableMetrics(dto)
 }

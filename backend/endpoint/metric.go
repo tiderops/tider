@@ -1,6 +1,9 @@
 package endpoint
 
-import "Kubexplorer/backend/usecase"
+import (
+	"Kubexplorer/backend/model"
+	"Kubexplorer/backend/usecase"
+)
 
 type MetricEndpoint struct {
 	metricUseCase usecase.MetricUseCase
@@ -17,4 +20,8 @@ func (m *MetricEndpoint) GetPodMetric(namespace string) {
 func (m *MetricEndpoint) GetNodeMetric(namespace string) {
 	//go async.PodMetricsThread(namespace)
 	//return m.metricUseCase.GetNodeMetric(namespace)
+}
+
+func (m *MetricEndpoint) EnableMetrics(metricEnableDto model.MetricEnableDto) {
+	m.metricUseCase.EnableMetrics(metricEnableDto)
 }
