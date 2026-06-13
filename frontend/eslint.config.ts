@@ -30,5 +30,12 @@ export default defineConfigWithVueTs(
         ...pluginPlaywright.configs['flat/recommended'],
         files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     },
+
+    {
+        name: 'app/rules',
+        rules: {
+            'no-console': ['error', { allow: ['warn', 'error'] }],
+        },
+    },
     skipFormatting,
 )
