@@ -1,35 +1,18 @@
-export interface IService {
+export interface ServiceRow {
 	name: string
 	namespace: string
 	type: string
-	internalId: string
-	externalId: string
-	port: string
-	labels: Map<string, string>
-	age: string
+	intIp: string
+	extIp: string
+	port: number
 	status: string
-	// spec: string
+	age: string
 }
 
-export interface IIngress {
+export interface IngressRow {
 	name: string
 	namespace: string
 	host: string[]
 	path: string[]
 	age: string
-	labels: Map<string, string>
-}
-
-export interface IRules {
-	host: string
-	path: string
-}
-
-export interface IServiceDetail {
-	name: string
-	namespace: string
-	labels: Map<string, string>
-	status: string
-	age: string
-	spec: string
 }

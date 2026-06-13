@@ -1,20 +1,24 @@
-export interface INamespace {
+export interface NamespaceRow {
 	name: string
 	age: string
 	status: string
-	labels: Map<string, string>
 }
 
-export interface INode {
+export interface NodeRow {
 	name: string
-	namespace: string
-	memory: string
-	cpu: string
-	storage: string
-	ephemeralStorage: string
+	memory: number
+	cpu: number
+	storage: number
+	ephemeralStorage: number
 	kubeletVersion: string
 	operatingSystem: string
 	version: string
 	age: string
-	labels: Map<string, string>
+}
+
+export interface ResourceSummary {
+	name: string
+	namespace?: string
+	age?: string
+	status?: string
 }
