@@ -1,16 +1,16 @@
-import { database } from '../wailsjs/go/models'
+import { config } from '../wailsjs/go/models'
 
 export {}
 
 // TODO: Se agrego para Wails events
 declare global {
-	import CommonParameterDto = database.CommonParameterDto
+	import CommonParameterDto = config.CommonParameterDto
 
 	interface Window {
 		runtime: {
-			EventsOn(event: string, callback: (data: any) => void): void
-			EventsEmit(event: string, data?: any): void
-			Call(method: string, ...args: any[]): Promise<any>
+			EventsOn(event: string, callback: (data: unknown) => void): void
+			EventsEmit(event: string, data?: unknown): void
+			Call(method: string, ...args: unknown[]): Promise<unknown>
 		}
 		go: {
 			middleware: {

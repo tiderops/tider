@@ -1,14 +1,13 @@
-export interface IPersistentVolumeClaim {
+export interface PersistentVolumeClaimRow {
 	name: string
 	namespace: string
 	storageClass: string
 	size: string
 	age: string
 	status: string
-	label: string
 }
 
-export interface IPersistentVolume {
+export interface PersistentVolumeRow {
 	name: string
 	namespace: string
 	storageClass: string
@@ -16,5 +15,4 @@ export interface IPersistentVolume {
 	claim: string
 	age: string
 	status: string
-	label: string
 }

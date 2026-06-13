@@ -9,7 +9,6 @@
     "eslint.config.*"
   ],
   "compilerOptions": {
-    "noEmit": false,
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
 

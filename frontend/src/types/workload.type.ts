@@ -1,4 +1,4 @@
-export interface IPod {
+export interface PodRow {
 	name: string
 	namespace: string
 	cpu: string
@@ -9,20 +9,20 @@ export interface IPod {
 	status: string
 }
 
-export interface IDeployment {
+export interface DeploymentRow {
 	name: string
 	namespace: string
-	replicas: string
+	replicas: number
 	age: string
 	status: string
 }
 
-export interface IPodDetail {
+export interface PodDetail {
 	name: string
 	namespace: string
-	image: string
-	pullPolicy: string
-	port: string
+	image?: string
+	pullPolicy?: string
+	port?: number
 	cpu: string
 	memory: string
 	storage: string
@@ -31,10 +31,10 @@ export interface IPodDetail {
 	editable: string[]
 }
 
-export interface IDeploymentDetail {
+export interface DeploymentDetail {
 	name: string
 	namespace: string
-	replicas: string
+	replicas: number
 	age: string
 	status: string
 }
