@@ -15,6 +15,24 @@ const vuetify = createVuetify({
 	icons: {
 		defaultSet: 'mdi',
 	},
+	theme: {
+		defaultTheme: 'kxLight',
+		themes: {
+			kxLight: {
+				dark: false,
+				colors: {
+					primary: '#1583E6',
+					secondary: '#10B6C2',
+					background: '#EEF4F9',
+					surface: '#FFFFFF',
+					error: '#CF222E',
+					info: '#0C93A0',
+					success: '#1A7F37',
+					warning: '#9A6700',
+				},
+			},
+		},
+	},
 })
 
 const app = createApp(App)
