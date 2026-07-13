@@ -9,7 +9,7 @@ export const defaultRestoreScope: RestoreScopeItem[] = [
 ]
 
 // TODO-1: Consume backend. Take as a reference tools like velero for manifest snapshots
-export async function fetchBackup(_cluster: string): Promise<BackupData> {
+export async function fetchBackup(cluster: string): Promise<BackupData> {
 	await delay(300)
 	return {
 		summary: {

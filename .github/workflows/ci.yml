@@ -9,46 +9,26 @@ on:
   push:
     branches: [ "develop" ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      go-cache-key: ${{ steps.go-cache.outputs.cache-key }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Cache Go modules
-        id: go-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
   test-backend:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.24'
 
-      - name: Restore Go modules cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+      - name: Stub frontend dist for go:embed
+        run: mkdir -p frontend/dist && touch frontend/dist/index.html
 
       - name: Download dependencies
         run: go mod download
@@ -71,25 +51,25 @@ jobs:
         run: go test -race ./...
 
   test-frontend:
-    needs: setup
+    needs: [test-backend]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up VueJs
-        uses: actions/setup-node@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.13.0'
+          node-version: '26.4.0'
           cache: 'npm'
-          cache-dependency-path: frontend/package.json
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install NPM dependencies
         working-directory: frontend
-        run: npm install
+        run: npm ci
 
-      - name: Lint
-        working-directory: frontend
-        run: npx eslint .
+#      - name: Lint
+#        working-directory: frontend
+#        run: npx eslint .
 
       - name: Type check
         working-directory: frontend

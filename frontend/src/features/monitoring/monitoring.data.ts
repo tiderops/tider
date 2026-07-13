@@ -4,7 +4,7 @@ import type { MonitoringData } from './types'
 export const ranges = ['Last 1h', 'Last 6h', 'Last 24h']
 
 // TODO-8: Consume backend.
-export async function fetchMonitoring(_cluster: string, _range: string): Promise<MonitoringData> {
+export async function fetchMonitoring(cluster: string, range: string): Promise<MonitoringData> {
 	await delay(300)
 	return {
 		kpis: [

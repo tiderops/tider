@@ -1,5 +1,5 @@
-# Welcome to Kubexplorer docs contributing guide
-Kubexplorer is an Open-Source Software (OSS), so if you would like to contribute with fixes, new features, integrations, or other improvements, I will guide you step by step.
+# Welcome to Tider docs contributing guide
+Tider is an Open-Source Software (OSS), so if you would like to contribute with fixes, new features, integrations, or other improvements, I will guide you step by step.
 
 1. You must check the feature backlog or ticket issues.
 2. Choose an activity you would like to develop.

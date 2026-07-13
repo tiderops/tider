@@ -16,7 +16,7 @@ import (
 var assets embed.FS
 
 const (
-	PROGRAM_NAME = "Kubexplorer"
+	PROGRAM_NAME = "Tider"
 	WIDTH        = 1024
 	HEIGHT       = 768
 )
