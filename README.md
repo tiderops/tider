@@ -1,4 +1,4 @@
-# Kubexplorer
+# Tider
 [![GoMod](https://img.shields.io/github/go-mod/go-version/beto20/kubexplorer)](https://github.com/beto20/kubexplorer)
 [![Size](https://img.shields.io/github/languages/code-size/tiderops/tider)](https://github.com/tiderops/tider)
 [![License](https://img.shields.io/github/license/tiderops/tider)](./LICENSE)
