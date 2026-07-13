@@ -20,7 +20,7 @@ Tider is a desktop application that simplifies Kubernetes management. It offers 
 ## Getting Started - TBD
 - Requires: 
   - Go version 1.24
-  - Node version 18.12.0
+  - Node version 26.4.0
   - Wails version 2.10
 
 1. Clone the repository
