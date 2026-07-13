@@ -1,16 +1,31 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useSidebarParamCluster } from '@/composables/useSidebarParamCluster'
-import { ClusterLayout } from '@/types/layout.type'
-import { database } from '../../wailsjs/go/models'
-import CommonParameterDto = database.CommonParameterDto
+import { useClusterStore } from '@/stores/cluster.store'
+import type { ClusterLayout } from '@/types/layout.type'
 
-const { commonParameters, kubernetesParameters, clusters, fetchData } = useSidebarParamCluster()
+const { commonParameters, kubernetesParameters, fetchData } = useSidebarParamCluster()
+const clusterStore = useClusterStore()
+const { clusters } = storeToRefs(clusterStore)
 
 const isCollapsed = ref(false)
-const menu = ref<ClusterLayout[]>([])
-const setting = ref<CommonParameterDto[]>([])
 const openDropdowns = reactive<{ [key: number]: boolean }>({})
+
+const menu = computed<ClusterLayout[]>(() =>
+	clusters.value.map((e) => ({
+		name: e.Name,
+		cluster: e.Cluster,
+		status: e.Status,
+		options: kubernetesParameters.value.map((k) => ({
+			name: k.Name,
+			link: k.Link,
+			icon: k.Icon,
+		})),
+	})),
+)
+
+const setting = computed(() => commonParameters.value)
 
 const toggleSidebar = () => {
 	isCollapsed.value = !isCollapsed.value
@@ -25,25 +40,7 @@ const isDropdownOpen = (index: number) => {
 }
 
 onMounted(async () => {
-	console.log('onMounted triggered sidebar')
-	await fetchData()
-
-	menu.value = clusters.value.map((e) => ({
-		name: e.Name,
-		cluster: e.Cluster,
-		status: e.Status,
-		options: kubernetesParameters.value.map((k) => ({
-			name: k.Name,
-			link: k.Link,
-			icon: k.Icon,
-		})),
-	}))
-
-	setting.value = commonParameters.value.map((c) => ({
-		Name: c.Name,
-		Link: c.Link,
-		Icon: c.Icon,
-	}))
+	await Promise.all([fetchData(), clusterStore.loadClusters()])
 })
 </script>
 
@@ -60,7 +57,7 @@ onMounted(async () => {
 					<div class="env-info">
 						<span class="icon">📊</span>
 						<span class="link-text" :class="{ hidden: isCollapsed }">
-							{{ item.cluster }}
+							{{ item.name }}
 							<span class="status-indicator" :class="{ 'status-active': item.status }"></span>
 						</span>
 					</div>
@@ -75,7 +72,7 @@ onMounted(async () => {
 					}"
 				>
 					<li v-for="(option, index) in item.options" :key="index">
-						<router-link :to="{ name: option.link, params: { cluster: item.cluster } }" class="nav-link">
+						<router-link :to="{ name: option.link, params: { cluster: item.name } }" class="nav-link">
 							<span class="icon">{{ option.icon }}</span>
 							<span class="link-text" :class="{ hidden: isCollapsed }">
 								{{ option.name }}

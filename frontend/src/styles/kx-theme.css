@@ -1,0 +1,124 @@
+/* Shared design tokens for the bespoke "kx" screens (Resource Explorer,
+   Cluster overview, …). Scoped to .kx-surface so they never leak into
+   the rest of the Vuetify app; every descendant inherits the variables.
+
+   Brand palette — TiderOps logo system:
+     Abyss #07182A · Deep Sea #0E2A40 · Tide Blue #1583E6 · Azure #4EA8F0
+     Teal #10B6C2 · Aqua #25D6BE · Ink #0E2A40 · Page #EEF4F9
+   Light theme is anchored directly on Page/Ink; the dark theme below
+   derives a navy ramp from Abyss/Deep Sea. */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+.kx-surface {
+	/* Dark theme — Abyss/Deep-Sea navy ramp; brand lightened for contrast. */
+	--brand: #4ea8f0;
+	--brand-deep: #1583e6;
+	--brand-soft: rgba(78, 168, 240, 0.16);
+	--accent: #25d6be;
+	--accent-deep: #10b6c2;
+	--accent-soft: rgba(37, 214, 190, 0.16);
+	--accent-bg: rgba(37, 214, 190, 0.14);
+
+	--bg: #07182a;
+	--bg-rail: #050f1d;
+	--surface: #0e2a40;
+	--surface-2: #14344e;
+	--surface-3: #1b405e;
+	--overlay: rgba(3, 10, 18, 0.66);
+
+	--border: #24455f;
+	--border-soft: #182f45;
+
+	--text: #e9f1f8;
+	--text-dim: #9fb4c8;
+	--text-faint: #64798e;
+
+	--ok: #3fb950;
+	--ok-bg: rgba(63, 185, 80, 0.14);
+	--warn: #d29922;
+	--warn-bg: rgba(210, 153, 34, 0.15);
+	--err: #f85149;
+	--err-bg: rgba(248, 81, 73, 0.14);
+	--info: var(--accent);
+	--info-bg: var(--accent-bg);
+	--idle: #6b7785;
+	--idle-bg: rgba(107, 119, 133, 0.16);
+
+	/* Cluster environment coding — prod must never look like staging/dev. */
+	--env-prod: #f0653e;
+	--env-prod-bg: rgba(240, 101, 62, 0.16);
+	--env-staging: #d29922;
+	--env-staging-bg: rgba(210, 153, 34, 0.16);
+	--env-dev: #25d6be;
+	--env-dev-bg: rgba(37, 214, 190, 0.14);
+
+	--hover: rgba(255, 255, 255, 0.05);
+	--row-hover: rgba(78, 168, 240, 0.06);
+
+	--sans: 'Manrope', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+	--display: 'Space Grotesk', var(--sans);
+	--mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--r-sm: 6px;
+	--r-md: 9px;
+	--r-lg: 14px;
+
+	font-family: var(--sans);
+	color: var(--text);
+}
+
+/* Headings carry the display face across every kx screen. */
+.kx-surface h1,
+.kx-surface h2,
+.kx-surface h3 {
+	font-family: var(--display);
+}
+
+/* Light theme — a single class re-map of the token layer, anchored on the
+   brand palette: Page #EEF4F9 as page bg, Ink #0E2A40 as text,
+   Muted #5B7186 as dimmed text. The shell root toggles .theme-light. */
+.kx-surface.theme-light {
+	--brand: #1583e6;
+	--brand-deep: #0f6bc4;
+	--brand-soft: rgba(21, 131, 230, 0.1);
+	--accent: #10b6c2;
+	--accent-deep: #0c93a0;
+	--accent-soft: rgba(16, 182, 194, 0.12);
+	--accent-bg: rgba(16, 182, 194, 0.12);
+
+	--bg: #eef4f9;
+	--bg-rail: #ffffff;
+	--surface: #ffffff;
+	--surface-2: #e6eef5;
+	--surface-3: #d6e3ee;
+	--overlay: rgba(14, 42, 64, 0.35);
+
+	--border: #d6e3ee;
+	--border-soft: #eaf1f7;
+
+	--text: #0e2a40;
+	--text-dim: #5b7186;
+	--text-faint: #8a9fb1;
+
+	--ok: #1a7f37;
+	--ok-bg: rgba(26, 127, 55, 0.12);
+	--warn: #9a6700;
+	--warn-bg: rgba(191, 135, 0, 0.15);
+	--err: #cf222e;
+	--err-bg: rgba(207, 34, 46, 0.1);
+	--info: #0c93a0;
+	--info-bg: rgba(16, 182, 194, 0.12);
+	--idle: #6b7785;
+	--idle-bg: rgba(107, 119, 133, 0.13);
+
+	--env-prod: #d6412b;
+	--env-prod-bg: rgba(214, 65, 43, 0.12);
+	--env-staging: #9a6700;
+	--env-staging-bg: rgba(154, 103, 0, 0.13);
+	--env-dev: #0c93a0;
+	--env-dev-bg: rgba(16, 182, 194, 0.12);
+
+	--hover: rgba(14, 42, 64, 0.05);
+	--row-hover: rgba(21, 131, 230, 0.06);
+}
