@@ -1,9 +1,12 @@
 package main
 
 import (
-	"Kubexplorer/backend/kubeclient"
-	"Kubexplorer/middleware"
+	"Kubexplorer/internal/binding"
+	"Kubexplorer/internal/k8s"
 	"embed"
+	"log/slog"
+	"os"
+
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -19,12 +22,11 @@ const (
 )
 
 func main() {
-	// Create an instance of the app structure
-	app := middleware.NewApp()
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
 
-	manager := kubeclient.GlobalClusterManager
+	app := binding.NewApp()
+	manager := k8s.NewClusterManager()
 
-	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  PROGRAM_NAME,
 		Width:  WIDTH,
@@ -37,16 +39,16 @@ func main() {
 		OnShutdown:       app.Shutdown,
 		Bind: []interface{}{
 			app,
-			middleware.BuildEnvironment(),
-			middleware.BuildParameters(),
-			middleware.BuildGeneral(manager),
-			middleware.BuildNetwork(manager),
-			middleware.BuildStorage(manager),
-			middleware.BuildWorkload(manager),
+			binding.BuildEnvironment(app, manager),
+			binding.BuildParameters(),
+			binding.BuildGeneral(app, manager),
+			binding.BuildNetwork(app, manager),
+			binding.BuildStorage(app, manager),
+			binding.BuildWorkload(app, manager),
 		},
 	})
 
 	if err != nil {
-		println("Error:", err.Error())
+		slog.Error("wails run failed", "error", err)
 	}
 }

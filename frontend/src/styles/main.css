@@ -1,7 +1,6 @@
 html {
-	background-color: whitesmoke;
-	text-align: center;
-	color: aqua;
+	background-color: #eef4f9;
+	color: #0e2a40;
 	height: 100%;
 }
 
@@ -9,6 +8,7 @@ body {
 	margin: 0;
 	/*color: white;*/
 	font-family:
+		'Manrope',
 		'Nunito',
 		-apple-system,
 		BlinkMacSystemFont,
@@ -33,8 +33,3 @@ body {
 		local(''),
 		url('../assets/fonts/nunito-v16-latin-regular.woff2') format('woff2');
 }
-
-/*#app {*/
-/*    height: 100vh;*/
-/*    text-align: center;*/
-/*}*/

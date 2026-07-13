@@ -1,5 +1,5 @@
-import { GetCommonParameters, GetHeaderParams, GetKubernetesParameters } from '../../wailsjs/go/middleware/ParameterMiddleware'
-import { GetClusters } from '../../wailsjs/go/middleware/EnvironmentMiddleware'
+import { GetCommonParameters, GetHeaderParams, GetKubernetesParameters } from '../../wailsjs/go/binding/Parameter'
+import { GetClusters } from '../../wailsjs/go/binding/Environment'
 
 export const fetchCommonParameters = async () => GetCommonParameters()
 export const fetchKubernetesParameters = async () => GetKubernetesParameters()
