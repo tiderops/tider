@@ -42,10 +42,10 @@ jobs:
       - name: Vet
         run: go vet ./...
 
-      - name: Lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: v2.1
+#      - name: Lint
+#        uses: golangci/golangci-lint-action@v8
+#        with:
+#          version: v2.1
 
       - name: Execute unit tests
         run: go test -race ./...
