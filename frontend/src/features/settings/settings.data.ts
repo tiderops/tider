@@ -48,7 +48,7 @@ export function fetchAbout(): AboutInfo {
 		build: hasWailsRuntime() ? 'desktop (Wails)' : 'browser (standalone)',
 		wailsRuntime: hasWailsRuntime(),
 		repo: 'https://github.com/tiderops/tider',
-		docs: 'https://github.com/beto20/Kubexplorer#readme',
+		docs: 'https://github.com/tiderops/tider#readme',
 		license: 'MIT',
 	}
 }
