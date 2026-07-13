@@ -43,6 +43,7 @@ jobs:
         run: go test -race ./...
 
   test-frontend:
+    needs: [test-backend]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
