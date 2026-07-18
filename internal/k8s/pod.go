@@ -25,6 +25,8 @@ func (p *PodClient) GetPods(ctx context.Context, clusterCtx string) ([]model.Pod
 		return nil, fmt.Errorf("cluster %s is not registered", clusterCtx)
 	}
 
+	fmt.Println("Exec Pods")
+
 	pods, err := client.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("listing pods: %w", err)
@@ -44,6 +46,7 @@ func (p *PodClient) GetPods(ctx context.Context, clusterCtx string) ([]model.Pod
 			Labels:     pod.Labels,
 		}
 
+		fmt.Println("pods:: ", pod.Name)
 		podArray = append(podArray, dto)
 	}
 
