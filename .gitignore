@@ -11,3 +11,4 @@ frontend/test-results/*
 frontend/playwright-report/*
 Kubexplorer
 frontend/wailsjs
+internal/mock_server.go

@@ -9,9 +9,7 @@ import (
 )
 
 type ResourceUseCase interface {
-	// ResourceTuning compares observed usage against configured limits
-	// and returns suggested limit changes. It never applies them; the
-	// user reviews and applies through UpdateDeployment.
+	// TODO: ResourceTuning compares observed usage against configured limits and returns suggested limit changes.
 	ResourceTuning(ctx context.Context, clusterCtx string, namespace string) ([]model.TuningRecommendation, error)
 }
 
